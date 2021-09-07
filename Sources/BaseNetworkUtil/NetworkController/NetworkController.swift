@@ -121,7 +121,7 @@ extension NetworkController {
 	}
 	
 	@discardableResult
-	public func logHandler (_ logHandler: ControllerLogHandler, _ cancellables: inout Set<AnyCancellable>) -> NetworkController {
+	public func logHandler (_ logHandler: ControllerLogHandler) -> NetworkController {
 		logger
 			.onUrlRequest { logRecord in
 				logHandler.log(.init(logRecord.requestInfo, .request(logRecord.details.urlSession, logRecord.details.urlRequest)))
