@@ -28,6 +28,7 @@ extension NetworkController {
 		let requestInfo = RequestInfo(source: self.source + source, controllerLabel: label, requestUuid: UUID())
 		
 		let requestPublisher = Just(requestDelegate)
+			.handleEvents(receiveOutput: { requestDelegate in self.logger.onSend.send(.init(requestInfo, requestDelegate)) })
 			.tryMap { (requestDelegate: RequestDelegateType) -> RequestDelegateType.RequestType in
 				try requestDelegate.request(requestInfo)
 			}
