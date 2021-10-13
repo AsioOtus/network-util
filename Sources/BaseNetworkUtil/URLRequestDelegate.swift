@@ -1,20 +1,23 @@
 import Foundation
 
-extension Data: Response {
-	public var data: Data { self }
-	public var urlResponse: URLResponse { .init() }
-	
-	public init (_ data: Data, _ urlResponse: URLResponse) throws {
-		self = data
+public extension URLRequest {
+	struct Response: BaseNetworkUtil.Response {
+		public let data: Data
+		public let urlResponse: URLResponse
+		
+		public init (_ data: Data, _ urlResponse: URLResponse) throws {
+			self.data = data
+			self.urlResponse = urlResponse
+		}
 	}
 }
 
-extension URLRequest: RequestDelegate {
+extension URLRequest: RequestDelegate {	
 	public func request (_ requestInfo: NetworkController.RequestInfo) -> URLRequest {
 		self
 	}
-		
-	public func content (_ response: Data, _ requestInfo: NetworkController.RequestInfo) -> Data {
-		response
+	
+	public func content (_ response: Response, _ requestInfo: NetworkController.RequestInfo) -> (data: Data, urlResponse: URLResponse) {
+		(response.data, response.urlResponse)
 	}
 }

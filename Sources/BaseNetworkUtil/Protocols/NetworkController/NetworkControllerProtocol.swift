@@ -1,5 +1,5 @@
 import Combine
 
 public protocol NetworkControllerProtocol {
-	func send <RequestDelegateType: RequestDelegate> (_ requestDelegate: RequestDelegateType) -> AnyPublisher<RequestDelegateType.ContentType, NetworkController.Error>
+	func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String?) -> AnyPublisher<RD.ContentType, NetworkController.Error>
 }

@@ -1,7 +1,7 @@
 import Foundation
 
 extension NetworkController {
-	public enum Error: BaseNetworkUtil.Error {
+	public enum Error: BaseNetworkUtil.BaseNetworkUtilError {
 		case preprocessingFailure(Swift.Error)
 		case networkFailure(URLSession, URLRequest, URLError)
 		case postprocessingFailure(Swift.Error)

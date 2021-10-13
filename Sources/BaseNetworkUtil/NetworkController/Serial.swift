@@ -2,23 +2,30 @@ import Foundation
 import Combine
 
 public struct Serial: NetworkControllerProtocol {
-	public let controller: NetworkController
 	private let semaphore = DispatchSemaphore(value: 1)
 	
-	public init (_ controller: NetworkController) {
-		self.controller = controller
-	}
+	public let controller: NetworkController
+	public let identificationInfo: IdentificationInfo
 	
-	public func send <RequestDelegateType: RequestDelegate> (_ requestDelegate: RequestDelegateType) -> AnyPublisher<RequestDelegateType.ContentType, NetworkController.Error> {
-		semaphore.wait()
+	public init (
+		_ controller: NetworkController,
+		label: String? = nil,
+		file: String = #fileID,
+		line: Int = #line
+	) {
+		self.controller = controller
+		self.identificationInfo = IdentificationInfo(Info.moduleName, type: String(describing: Self.self), file: file, line: line, label: label)
+	}
+
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+		let requestInfo = NetworkController.RequestInfo(controllersIdentificationInfo: [identificationInfo], source: ["Serial"], requestUuid: UUID(), sendingLabel: label)
 		
-		let requestPublisher = controller
-			._send(requestDelegate, source: ["Serial"])
-			.map { content -> RequestDelegateType.ContentType in
-				DispatchQueue.global().sync { _ = semaphore.signal() }
-				return content
-			}
-		
-		return requestPublisher.eraseToAnyPublisher()
+		return Just(requestDelegate)
+			.wait(for: semaphore)
+			.mapError{ .preprocessingFailure($0) }
+			.flatMap { controller._send($0, requestInfo, label).eraseToAnyPublisher() }
+			.release(semaphore)
+			.mapError{ .postprocessingFailure($0) }
+			.eraseToAnyPublisher()
 	}
 }

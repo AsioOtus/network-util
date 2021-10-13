@@ -5,7 +5,7 @@ extension NetworkController {
 	public class Logger {
 		public var cancellables = Set<AnyCancellable>()
 		
-		public let onSend = PassthroughSubject<LogRecord<Any>, Never>()
+		public let onDelegate = PassthroughSubject<LogRecord<Any>, Never>()
 		
 		public let onRequest = PassthroughSubject<LogRecord<Request>, Never>()
 		public let onUrlRequest = PassthroughSubject<LogRecord<(urlSession: URLSession, urlRequest: URLRequest)>, Never>()
@@ -27,8 +27,8 @@ extension NetworkController {
 
 extension NetworkController.Logger {
 	@discardableResult
-	public func onSend (_ action: @escaping (LogRecord<Any>) -> ()) -> Self {
-		onSend.sink(receiveValue: action).store(in: &cancellables)
+	public func onDelegate (_ action: @escaping (LogRecord<Any>) -> ()) -> Self {
+		onDelegate.sink(receiveValue: action).store(in: &cancellables)
 		return self
 	}
 	

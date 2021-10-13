@@ -3,44 +3,48 @@ import Combine
 
 public class NetworkController: NetworkControllerProtocol {
 	public let source: [String]
-	public let label: String
+	public let identificationInfo: IdentificationInfo
 	
 	public var delegate: NetworkControllerDelegate? = nil
 	public let logger = Logger()
 	
 	public init (
-		source: [String] = [],
+		source: [String] = [String(describing: NetworkController.self)],
 		label: String? = nil,
-		file: String = #file,
+		file: String = #fileID,
 		line: Int = #line
 	) {
-		self.source = source + [Info.moduleName, String(describing: NetworkController.self)]
-		self.label = label ?? "\(Info.moduleName).\(NetworkController.self) – \(file):\(line) – \(UUID().uuidString)"
+		self.source = source
+		self.identificationInfo = IdentificationInfo(Info.moduleName, type: String(describing: Self.self), file: file, line: line, label: label)
 	}
 }
 
 extension NetworkController {
-	public func send <RequestDelegateType: RequestDelegate> (_ requestDelegate: RequestDelegateType) -> AnyPublisher<RequestDelegateType.ContentType, NetworkController.Error> {
-		_send(requestDelegate)
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+		let requestInfo = RequestInfo(controllersIdentificationInfo: [], source: [], requestUuid: UUID(), sendingLabel: label)
+		return _send(requestDelegate, requestInfo, label)
 	}
 	
-	func _send <RequestDelegateType: RequestDelegate> (_ requestDelegate: RequestDelegateType, source: [String] = []) -> AnyPublisher<RequestDelegateType.ContentType, NetworkController.Error> {
-		let requestInfo = RequestInfo(source: self.source + source, controllerLabel: label, requestUuid: UUID())
+	func _send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo, source: [String] = [], _ label: String?) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+		
+		let requestInfo = requestInfo
+			.add(identificationInfo)
+			.add(source)
 		
 		let requestPublisher = Just(requestDelegate)
-			.handleEvents(receiveOutput: { requestDelegate in self.logger.onSend.send(.init(requestInfo, requestDelegate)) })
-			.tryMap { (requestDelegate: RequestDelegateType) -> RequestDelegateType.RequestType in
+			.handleEvents(receiveOutput: { requestDelegate in self.logger.onDelegate.send(.init(requestInfo, requestDelegate)) })
+			.tryMap { (requestDelegate: RD) -> RD.RequestType in
 				try requestDelegate.request(requestInfo)
 			}
-			.handleEvents(receiveOutput: { (request: RequestDelegateType.RequestType) in self.logger.onUnmodifiedRequest.send(.init(requestInfo, request)) })
-			.tryMap { (request: RequestDelegateType.RequestType) -> RequestDelegateType.RequestType in
+			.handleEvents(receiveOutput: { (request: RD.RequestType) in self.logger.onUnmodifiedRequest.send(.init(requestInfo, request)) })
+			.tryMap { (request: RD.RequestType) -> RD.RequestType in
 				try self.delegate?.request(request, requestInfo) ?? request
 			}
 			.handleEvents(receiveOutput: { request in self.logger.onRequest.send(.init(requestInfo, request)) })
 			
 			
 			
-			.tryMap { (request: RequestDelegateType.RequestType) -> (URLSession, URLRequest) in
+			.tryMap { (request: RD.RequestType) -> (URLSession, URLRequest) in
 				try (requestDelegate.urlSession(request, requestInfo), requestDelegate.urlRequest(request, requestInfo))
 			}
 			.handleEvents(receiveOutput: { (urlSession: URLSession, urlRequest: URLRequest) in self.logger.onUnmodifiedUrlRequest.send(.init(requestInfo, (urlSession, urlRequest))) })
@@ -71,25 +75,25 @@ extension NetworkController {
 			
 			
 			
-			.tryMap { (data: Data, urlResponse: URLResponse) -> RequestDelegateType.ResponseType in
+			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
 				try requestDelegate.response(data, urlResponse, requestInfo)
 			}
-			.handleEvents(receiveOutput: { (response: RequestDelegateType.ResponseType) in self.logger.onResponse.send(.init(requestInfo, response)) })
-			.tryMap { (response: RequestDelegateType.ResponseType) -> RequestDelegateType.ResponseType in
+			.handleEvents(receiveOutput: { (response: RD.ResponseType) in self.logger.onResponse.send(.init(requestInfo, response)) })
+			.tryMap { (response: RD.ResponseType) -> RD.ResponseType in
 				try self.delegate?.response(response, requestInfo) ?? response
 			}
-			.handleEvents(receiveOutput: { (response: RequestDelegateType.ResponseType) in self.logger.onModifiedResponse.send(.init(requestInfo, response)) })
+			.handleEvents(receiveOutput: { (response: RD.ResponseType) in self.logger.onModifiedResponse.send(.init(requestInfo, response)) })
 			
 			
 			
-			.tryMap { (response: RequestDelegateType.ResponseType) -> RequestDelegateType.ContentType in
+			.tryMap { (response: RD.ResponseType) -> RD.ContentType in
 				try requestDelegate.content(response, requestInfo)
 			}
-			.handleEvents(receiveOutput: { (content: RequestDelegateType.ContentType) in self.logger.onContent.send(.init(requestInfo, content)) })
-			.tryMap { (content: RequestDelegateType.ContentType) -> RequestDelegateType.ContentType in
+			.handleEvents(receiveOutput: { (content: RD.ContentType) in self.logger.onContent.send(.init(requestInfo, content)) })
+			.tryMap { (content: RD.ContentType) -> RD.ContentType in
 				try self.delegate?.content(content, requestInfo) ?? content
 			}
-			.handleEvents(receiveOutput: { (content: RequestDelegateType.ContentType) in self.logger.onModifiedContent.send(.init(requestInfo, content)) })
+			.handleEvents(receiveOutput: { (content: RD.ContentType) in self.logger.onModifiedContent.send(.init(requestInfo, content)) })
 			
 			
 			
