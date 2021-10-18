@@ -13,11 +13,11 @@ public extension URLRequest {
 }
 
 extension URLRequest: RequestDelegate {	
-	public func request (_ requestInfo: NetworkController.RequestInfo) -> URLRequest {
+	public func request (_ requestInfo: RequestInfo) -> URLRequest {
 		self
 	}
 	
-	public func content (_ response: Response, _ requestInfo: NetworkController.RequestInfo) -> (data: Data, urlResponse: URLResponse) {
+	public func content (_ response: Response, _ requestInfo: RequestInfo) -> (data: Data, urlResponse: URLResponse) {
 		(response.data, response.urlResponse)
 	}
 }

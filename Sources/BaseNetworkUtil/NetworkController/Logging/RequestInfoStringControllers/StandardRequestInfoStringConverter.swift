@@ -5,8 +5,8 @@ public struct StandardRequestInfoStringConverter: RequestInfoStringConverter {
 		self.componentSeparator = componentSeparator
 	}
 	
-	public func convert (_ requestInfo: NetworkController.RequestInfo) -> String {
-		let message = "REQUEST UUID – \(requestInfo.requestUuid.uuidString)"
+	public func convert (_ requestInfo: RequestInfo) -> String {
+		let message = "REQUEST UUID – \(requestInfo.uuid.uuidString)"
 		return message
 	}
 }

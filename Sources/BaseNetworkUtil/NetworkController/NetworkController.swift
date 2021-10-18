@@ -9,24 +9,34 @@ public class NetworkController: NetworkControllerProtocol {
 	public let logger = Logger()
 	
 	public init (
-		source: [String] = [String(describing: NetworkController.self)],
+		source: [String] = [],
 		label: String? = nil,
 		file: String = #fileID,
 		line: Int = #line
 	) {
 		self.source = source
-		self.identificationInfo = IdentificationInfo(Info.moduleName, type: String(describing: Self.self), file: file, line: line, label: label)
+		self.identificationInfo = IdentificationInfo(
+			module: Info.moduleName,
+			type: String(describing: Self.self),
+			file: file,
+			line: line,
+			label: label
+		)
 	}
 }
 
 extension NetworkController {
 	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
-		let requestInfo = RequestInfo(controllersIdentificationInfo: [], source: [], requestUuid: UUID(), sendingLabel: label)
-		return _send(requestDelegate, requestInfo, label)
+		let requestInfo = RequestInfo(
+			uuid: UUID(),
+			label: label,
+			source: [],
+			controllers: []
+		)
+		return _send(requestDelegate, requestInfo)
 	}
 	
-	func _send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo, source: [String] = [], _ label: String?) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
-		
+	func _send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
 			.add(source)

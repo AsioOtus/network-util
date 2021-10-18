@@ -1,31 +1,31 @@
 import Foundation
 
 public struct StandardLogRecordStringConverter: LogRecordStringConverter {
-	public var requestInfoConverter: (NetworkController.RequestInfo) -> String
+	public var requestInfoConverter: (RequestInfo) -> String
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlResponseConverter: (URLResponse, Data) -> String
 	public var httpUrlResponseConverter: (HTTPURLResponse, Data) -> String
 	public var controllerErrorConverter: (NetworkController.Error) -> String
 	
 	public init (
-		requestInfoConverter: @escaping (NetworkController.RequestInfo) -> String,
-		urlRequestConverter: @escaping (URLRequest) -> String,
-		urlResponseConverter: @escaping (URLResponse, Data) -> String,
-		httpUrlResponseConverter: @escaping (HTTPURLResponse, Data) -> String,
-		controllerErrorConverter: @escaping (NetworkController.Error) -> String
+		requestInfo: @escaping (RequestInfo) -> String,
+		urlRequest: @escaping (URLRequest) -> String,
+		urlResponse: @escaping (URLResponse, Data) -> String,
+		httpUrlResponse: @escaping (HTTPURLResponse, Data) -> String,
+		controllerError: @escaping (NetworkController.Error) -> String
 	) {
-		self.requestInfoConverter = requestInfoConverter
-		self.urlRequestConverter = urlRequestConverter
-		self.urlResponseConverter = urlResponseConverter
-		self.httpUrlResponseConverter = httpUrlResponseConverter
-		self.controllerErrorConverter = controllerErrorConverter
+		self.requestInfoConverter = requestInfo
+		self.urlRequestConverter = urlRequest
+		self.urlResponseConverter = urlResponse
+		self.httpUrlResponseConverter = httpUrlResponse
+		self.controllerErrorConverter = controllerError
 	}
 	
 	public func convert (_ record: NetworkController.Logger.LogRecord<NetworkController.Logger.BaseDetails>) -> String {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
-		let categoryMessage = convert(record.details)
+		let detailsMessage = convert(record.details)
 		
-		let messsage = "\(requestInfoMessage)\n\(categoryMessage)\n"
+		let messsage = "\(requestInfoMessage)\n\(detailsMessage)\n"
 		return messsage
 	}
 	
