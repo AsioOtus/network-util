@@ -32,6 +32,7 @@ public struct Serial: NetworkControllerProtocol {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
+			delegate: requestDelegate.name,
 			source: source,
 			controllers: [identificationInfo]
 		)

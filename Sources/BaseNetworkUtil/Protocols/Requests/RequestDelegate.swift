@@ -7,6 +7,8 @@ public protocol RequestDelegate {
 	associatedtype ResponseType: Response
 	associatedtype ContentType
 	
+	var name: String { get }
+	
 	func request (_ requestInfo: RequestInfo) throws -> RequestType
 	
 	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession
@@ -21,6 +23,8 @@ public protocol RequestDelegate {
 
 
 public extension RequestDelegate {
+	var name: String { "\(Self.self)" }
+	
 	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) -> URLSession { request.urlSession }
 	func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) -> URLRequest { request.urlRequest }
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try ResponseType(data, urlResponse) }

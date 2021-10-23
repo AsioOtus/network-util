@@ -6,7 +6,7 @@ extension NetworkController.Logger {
 		case response(Data, URLResponse)
 		case error(NetworkController.Error)
 		
-		public var name: String {
+		public var type: String {
 			switch self {
 			case .request:
 				return "request"

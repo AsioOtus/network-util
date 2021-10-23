@@ -30,6 +30,7 @@ extension NetworkController {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
+			delegate: requestDelegate.name,
 			source: [],
 			controllers: []
 		)
