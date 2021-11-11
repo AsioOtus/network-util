@@ -22,9 +22,7 @@ public protocol RequestDelegate {
 
 
 
-public extension RequestDelegate {
-	var name: String { "\(Self.self)" }
-	
+public extension RequestDelegate {	
 	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) -> URLSession { request.urlSession }
 	func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) -> URLRequest { request.urlRequest }
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try ResponseType(data, urlResponse) }

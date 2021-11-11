@@ -1,7 +1,7 @@
 import Foundation
 
 public extension URLRequest {
-	struct Response: BaseNetworkUtil.Response {
+	struct Response: NetworkingUtil.Response {
 		public let data: Data
 		public let urlResponse: URLResponse
 		
@@ -12,10 +12,10 @@ public extension URLRequest {
 	}
 }
 
-extension URLRequest: RequestDelegate {	
-	public func request (_ requestInfo: RequestInfo) -> URLRequest {
-		self
-	}
+extension URLRequest: RequestDelegate {
+	public var name: String { "\(Self.self)" }
+	
+	public func request (_ requestInfo: RequestInfo) -> URLRequest { self }
 	
 	public func content (_ response: Response, _ requestInfo: RequestInfo) -> (data: Data, urlResponse: URLResponse) {
 		(response.data, response.urlResponse)

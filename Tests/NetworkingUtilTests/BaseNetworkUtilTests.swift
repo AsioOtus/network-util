@@ -1,6 +1,6 @@
 import XCTest
 import Combine
-@testable import BaseNetworkUtil
+@testable import NetworkingUtil
 
 public struct Model: Codable {
 	public static let dateFormatter: DateFormatter = {
@@ -30,8 +30,8 @@ final class NetworkFlowUtilTests: XCTestCase {
 			NetworkController()
 				.logging { logger in
 					logger
-						.onDelegate { print("Request – \($0.requestInfo.sendingLabel!)") }
-						.onContent { print("Response  – \($0.requestInfo.sendingLabel!)") }
+						.onDelegate { print("Request – \($0.requestInfo)") }
+						.onContent { print("Response  – \($0.requestInfo)") }
 				}
 		)
 		
@@ -68,7 +68,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 		let request = URLRequest(url: URL(string: "http://localhost")!)
 		
 		print("Request")
-		_ = controller.send(request)
+		controller.send(request)
 			.handleEvents(receiveOutput: { _ in print("Response") })
 			.sink(receiveCompletion: { _ in }, receiveValue: { _ in print("Response 1") })
 			.store(in: &cancellables)
@@ -84,7 +84,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 		let request = URLRequest(url: URL(string: "http://localhost")!)
 		
 		print("Request")
-		_ = controller.send(request)
+		controller.send(request)
 			.handleEvents(receiveOutput: { _ in print("Response") })
 			.sink(receiveCompletion: { _ in }, receiveValue: { _ in print("Response 1") })
 			.store(in: &cancellables)
@@ -95,7 +95,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 	}
 	
 	func test4 () {
-		let subject = PassthroughSubject<String, Never>()
+		_ = PassthroughSubject<String, Never>()
 		
 		
 		let g = DispatchGroup()
