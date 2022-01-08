@@ -21,7 +21,7 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		self.controllerErrorConverter = controllerError
 	}
 	
-	public func convert (_ record: NetworkController.Logger.LogRecord<NetworkController.Logger.BaseDetails>) -> String {
+	public func convert (_ record: Logger.LogRecord<Logger.BaseDetails>) -> String {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
 		let detailsMessage = convert(record.details)
 		
@@ -29,7 +29,7 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		return messsage
 	}
 	
-	public func convert (_ category: NetworkController.Logger.BaseDetails) -> String {
+	public func convert (_ category: Logger.BaseDetails) -> String {
 		let message: String
 		
 		switch category {

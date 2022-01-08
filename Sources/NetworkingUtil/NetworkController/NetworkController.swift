@@ -43,7 +43,7 @@ extension NetworkController {
 			.add(source)
 		
 		let requestPublisher = Just(requestDelegate)
-			.handleEvents(receiveOutput: { requestDelegate in self.logger.onDelegate.send(.init(requestInfo, requestDelegate)) })
+			.handleEvents(receiveOutput: { requestDelegate in self.logger.onStart.send(.init(requestInfo, requestDelegate)) })
 			.tryMap { (requestDelegate: RD) -> RD.RequestType in
 				try requestDelegate.request(requestInfo)
 			}
@@ -130,25 +130,20 @@ extension NetworkController {
 		return self
 	}
 	
+    @discardableResult
+    public func mainLogger () -> AnyPublisher<Logger.LogRecord<Logger.BaseDetails>, Never> {
+        logger.onMain
+    }
+    
 	@discardableResult
-	public func logging (_ logging: (Logger) -> ()) -> NetworkController {
+	public func logging (_ logging: (Logger) -> Void) -> NetworkController {
 		logging(logger)
 		return self
 	}
-	
-	@discardableResult
-	public func logHandler (_ logHandler: ControllerLogHandler) -> NetworkController {
-		logger
-			.onUrlRequest { logRecord in
-				logHandler.log(.init(logRecord.requestInfo, .request(logRecord.details.urlSession, logRecord.details.urlRequest)))
-			}
-			.onUrlResponse { logRecord in
-				logHandler.log(.init(logRecord.requestInfo, .response(logRecord.details.data, logRecord.details.urlResponse)))
-			}
-			.onError { logRecord in
-				logHandler.log(.init(logRecord.requestInfo, .error(logRecord.details)))
-			}
-		
-		return self
-	}
+    
+    @discardableResult
+    public func mainLogging (_ logging: (AnyPublisher<Logger.LogRecord<Logger.BaseDetails>, Never>) -> Void) -> NetworkController {
+        logging(logger.onMain)
+        return self
+    }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-extension NetworkController.Logger {
+extension Logger {
 	public enum BaseDetails {
 		case request(URLSession, URLRequest)
 		case response(Data, URLResponse)
@@ -19,8 +19,7 @@ extension NetworkController.Logger {
 	}
 }
 
-
-public extension NetworkController.Logger.LogRecord where Details == NetworkController.Logger.BaseDetails{
+public extension Logger.LogRecord where Details == Logger.BaseDetails {
 	func convert (_ converter: LogRecordStringConverter) -> String {
 		converter.convert(self)
 	}

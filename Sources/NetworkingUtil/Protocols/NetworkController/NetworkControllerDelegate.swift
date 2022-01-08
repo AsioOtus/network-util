@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 public protocol NetworkControllerDelegate {
 	func request <RequestType: Request> (_ request: RequestType, _ requestInfo: RequestInfo) throws -> RequestType
 	
@@ -15,8 +13,6 @@ public protocol NetworkControllerDelegate {
 	
 	func error (_ error: Error, _ requestInfo: RequestInfo)
 }
-
-
 
 public extension NetworkControllerDelegate {
 	func request <RequestType: Request> (_ request: RequestType, _ requestInfo: RequestInfo) throws -> RequestType { request }

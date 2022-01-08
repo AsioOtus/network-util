@@ -1,6 +1,6 @@
 import Foundation
 
-extension NetworkController.Logger {
+extension Logger {
 	public struct LogRecord<Details> {
 		public let requestInfo: RequestInfo
 		public let details: Details
