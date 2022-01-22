@@ -33,6 +33,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 						.onDelegate { print("Request – \($0.requestInfo)") }
 						.onContent { print("Response  – \($0.requestInfo)") }
 				}
+				.serial()
 		)
 		
 		let url = URL(string: "http://localhost/echo/")!

@@ -25,8 +25,8 @@ public class NetworkController: NetworkControllerProtocol {
 	}
 }
 
-extension NetworkController {
-	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+public extension NetworkController {
+	func send <RD: RequestDelegate> (_ requestDelegate: RD, source: [String] = [], label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
@@ -34,10 +34,12 @@ extension NetworkController {
 			source: [],
 			controllers: []
 		)
-		return _send(requestDelegate, requestInfo)
+		.add(source)
+		
+		return send(requestDelegate, requestInfo)
 	}
 	
-	func _send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+	func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
 			.add(source)

@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 public protocol RequestDelegate {
 	associatedtype RequestType: Request
 	associatedtype ResponseType: Response
@@ -19,8 +17,6 @@ public protocol RequestDelegate {
 	
 	func error (_ error: NetworkController.Error, _ requestInfo: RequestInfo)
 }
-
-
 
 public extension RequestDelegate {	
 	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) -> URLSession { request.urlSession }
