@@ -25,11 +25,11 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
 		let detailsMessage = convert(record.message)
 		
-        let messsage = "\(requestInfoMessage) | \(record.requestDelegateName)\n\(detailsMessage)\n"
+		let messsage = "\(requestInfoMessage) | \(record.requestDelegateName)\n\(detailsMessage)\n"
 		return messsage
 	}
 	
-    public func convert (_ category: Logger.Message) -> String {
+	public func convert (_ category: Logger.Message) -> String {
 		let message: String
 		
 		switch category {

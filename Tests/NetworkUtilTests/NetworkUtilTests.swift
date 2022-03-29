@@ -1,6 +1,6 @@
 import XCTest
 import Combine
-@testable import NetworkingUtil
+@testable import NetworkUtil
 
 public struct Model: Codable {
 	public static let dateFormatter: DateFormatter = {
@@ -25,7 +25,7 @@ public struct Model: Codable {
 final class NetworkFlowUtilTests: XCTestCase {
 	var cancellables = Set<AnyCancellable>()
 	
-//    func test () {
+//	func test () {
 //		let controller = Serial(
 //			StandardNetworkController()
 //				.logging { logger in
@@ -61,7 +61,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 //		let g = DispatchGroup()
 //		g.enter()
 //		_ = g.wait(wallTimeout: .now() + 2)
-//    }
+//	}
 	
 	func test2 () {
 		let controller = Serial(StandardNetworkController())
@@ -105,11 +105,11 @@ final class NetworkFlowUtilTests: XCTestCase {
 	}
 	
 	func test5 () {
-        let gd = GeneralDelegate<URLRequest, StandardResponse, Data, NetworkError>(
-            name: "",
-            request: { _ in .init(url: URL(string: "")!) },
-            content: { response, _ in response.data }
-        )
+		let gd = GeneralDelegate<URLRequest, StandardResponse, Data, NetworkError>(
+			name: "",
+			request: { _ in .init(url: URL(string: "")!) },
+			content: { response, _ in response.data }
+		)
 	}
 }
 

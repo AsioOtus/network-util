@@ -42,13 +42,13 @@ public struct SerialDecorator: NetworkController {
 		return send(requestDelegate, requestInfo)
 	}
 	
-    public func send <RD: RequestDelegate>(_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
+	public func send <RD: RequestDelegate>(_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		return Just(requestDelegate)
 			.wait(for: semaphore)
-            .mapError{ requestDelegate.error(NetworkError.preprocessing(error: $0), requestInfo) }
+			.mapError{ requestDelegate.error(NetworkError.preprocessing(error: $0), requestInfo) }
 			.flatMap { controller.send($0, requestInfo).eraseToAnyPublisher() }
 			.signal(semaphore)
-            .mapError{ requestDelegate.error(NetworkError.postprocessing(error: $0), requestInfo) }
+			.mapError{ requestDelegate.error(NetworkError.postprocessing(error: $0), requestInfo) }
 			.eraseToAnyPublisher()
 	}
 }
