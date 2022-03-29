@@ -25,46 +25,46 @@ public struct Model: Codable {
 final class NetworkFlowUtilTests: XCTestCase {
 	var cancellables = Set<AnyCancellable>()
 	
-    func test () {
-		let controller = Serial(
-			NetworkController()
-				.logging { logger in
-					logger
-						.onDelegate { print("Request – \($0.requestInfo)") }
-						.onContent { print("Response  – \($0.requestInfo)") }
-				}
-				.serial()
-		)
-		
-		let url = URL(string: "http://localhost/echo/")!
-		let array = Array(1...10)
-		
-		for item in array {
-			let request = URLRequest(url: url.appendingPathComponent(String(item)))
-//			print("Request  – \(item) – \(Model.dateFormatter.string(from: Date()))")
-			controller.send(request, label: "\(item)")
-				.map { $0.data }
-				.decode(type: [String: Model].self, decoder: JSONDecoder())
-				.sink(
-					receiveCompletion: { completion in
-						if case let .failure(error) = completion {
-							print(error)
-						}
-					},
-					receiveValue: { response in
-//						print("Response – \(item) – \(response["echo"]!.date)")
-					}
-				)
-				.store(in: &cancellables)
-		}
-		
-		let g = DispatchGroup()
-		g.enter()
-		_ = g.wait(wallTimeout: .now() + 2)
-    }
+//    func test () {
+//		let controller = Serial(
+//			StandardNetworkController()
+//				.logging { logger in
+//					logger
+//						.onDelegate { print("Request – \($0.requestInfo)") }
+//						.onContent { print("Response  – \($0.requestInfo)") }
+//				}
+//				.serial()
+//		)
+//		
+//		let url = URL(string: "http://localhost/echo/")!
+//		let array = Array(1...10)
+//		
+//		for item in array {
+//			let request = URLRequest(url: url.appendingPathComponent(String(item)))
+////			print("Request  – \(item) – \(Model.dateFormatter.string(from: Date()))")
+//			controller.send(request, label: "\(item)")
+//				.map { $0.data }
+//				.decode(type: [String: Model].self, decoder: JSONDecoder())
+//				.sink(
+//					receiveCompletion: { completion in
+//						if case let .failure(error) = completion {
+//							print(error)
+//						}
+//					},
+//					receiveValue: { response in
+////						print("Response – \(item) – \(response["echo"]!.date)")
+//					}
+//				)
+//				.store(in: &cancellables)
+//		}
+//		
+//		let g = DispatchGroup()
+//		g.enter()
+//		_ = g.wait(wallTimeout: .now() + 2)
+//    }
 	
 	func test2 () {
-		let controller = Serial(NetworkController())
+		let controller = Serial(StandardNetworkController())
 		
 		let request = URLRequest(url: URL(string: "http://localhost")!)
 		
@@ -80,7 +80,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 	}
 	
 	func test3 () {
-		let controller = Serial(NetworkController())
+		let controller = Serial(StandardNetworkController())
 		
 		let request = URLRequest(url: URL(string: "http://localhost")!)
 		
@@ -105,7 +105,11 @@ final class NetworkFlowUtilTests: XCTestCase {
 	}
 	
 	func test5 () {
-		
+        let gd = GeneralDelegate<URLRequest, StandardResponse, Data, NetworkError>(
+            name: "",
+            request: { _ in .init(url: URL(string: "")!) },
+            content: { response, _ in response.data }
+        )
 	}
 }
 

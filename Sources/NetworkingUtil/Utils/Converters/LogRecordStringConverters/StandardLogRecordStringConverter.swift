@@ -5,14 +5,14 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlResponseConverter: (URLResponse, Data) -> String
 	public var httpUrlResponseConverter: (HTTPURLResponse, Data) -> String
-	public var controllerErrorConverter: (NetworkController.Error) -> String
+	public var controllerErrorConverter: (NetworkError) -> String
 	
 	public init (
 		requestInfo: @escaping (RequestInfo) -> String,
 		urlRequest: @escaping (URLRequest) -> String,
 		urlResponse: @escaping (URLResponse, Data) -> String,
 		httpUrlResponse: @escaping (HTTPURLResponse, Data) -> String,
-		controllerError: @escaping (NetworkController.Error) -> String
+		controllerError: @escaping (NetworkError) -> String
 	) {
 		self.requestInfoConverter = requestInfo
 		self.urlRequestConverter = urlRequest
@@ -21,15 +21,15 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		self.controllerErrorConverter = controllerError
 	}
 	
-	public func convert (_ record: Logger.LogRecord<Logger.BaseDetails>) -> String {
+	public func convert (_ record: Logger.Record) -> String {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
-		let detailsMessage = convert(record.details)
+		let detailsMessage = convert(record.message)
 		
-		let messsage = "\(requestInfoMessage)\n\(detailsMessage)\n"
+        let messsage = "\(requestInfoMessage) | \(record.requestDelegateName)\n\(detailsMessage)\n"
 		return messsage
 	}
 	
-	public func convert (_ category: Logger.BaseDetails) -> String {
+    public func convert (_ category: Logger.Message) -> String {
 		let message: String
 		
 		switch category {

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StandardControllerErrorStringConverter: ControllerErrorStringConverter {
+public struct StandardNetworkErrorStringConverter: NetworkErrorStringConverter {
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlErrorConverter: (URLError) -> String
 	
@@ -12,7 +12,7 @@ public struct StandardControllerErrorStringConverter: ControllerErrorStringConve
 		self.urlErrorConverter = urlErrorConverter
 	}
 	
-	public func convert (_ error: NetworkController.Error) -> String {
+	public func convert (_ error: NetworkError) -> String {
 		let message: String
 		
 		switch error {

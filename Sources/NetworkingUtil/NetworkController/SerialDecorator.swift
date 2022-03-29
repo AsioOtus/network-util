@@ -1,22 +1,17 @@
 import Foundation
 import Combine
 
-extension Serial {
-	public struct Error <RD: RequestDelegate>: BaseNetworkUtilError {
-		let requestDelegate: RD
-		let innerError: Swift.Error
-	}
-}
+public typealias Serial = SerialDecorator
 
-public struct Serial: NetworkControllerProtocol {
+public struct SerialDecorator: NetworkController {
 	private let semaphore: DispatchSemaphore
 	
-	public let controller: NetworkControllerProtocol
+	public let controller: NetworkController
 	public let source: [String]
 	public let identificationInfo: IdentificationInfo
 	
 	public init (
-		_ controller: NetworkControllerProtocol,
+		_ controller: NetworkController,
 		source: [String] = [],
 		label: String? = nil,
 		file: String = #fileID,
@@ -34,7 +29,7 @@ public struct Serial: NetworkControllerProtocol {
 		)
 	}
 
-	public func send <RD: RequestDelegate> (_ requestDelegate: RD, source: [String] = [], label: String? = nil) -> AnyPublisher<RD.ContentType, NetworkController.Error> {
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, source: [String] = [], label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
@@ -47,17 +42,18 @@ public struct Serial: NetworkControllerProtocol {
 		return send(requestDelegate, requestInfo)
 	}
 	
-	public func send<RD>(_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, NetworkController.Error> where RD : RequestDelegate {
+    public func send <RD: RequestDelegate>(_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		return Just(requestDelegate)
 			.wait(for: semaphore)
-			.mapError{ .preprocessingFailure(Error(requestDelegate: requestDelegate, innerError: $0)) }
+            .mapError{ requestDelegate.error(NetworkError.preprocessing(error: $0), requestInfo) }
 			.flatMap { controller.send($0, requestInfo).eraseToAnyPublisher() }
 			.signal(semaphore)
+            .mapError{ requestDelegate.error(NetworkError.postprocessing(error: $0), requestInfo) }
 			.eraseToAnyPublisher()
 	}
 }
 
-public extension NetworkControllerProtocol {
+public extension NetworkController {
 	func serial (
 		source: [String] = [],
 		label: String? = nil,
