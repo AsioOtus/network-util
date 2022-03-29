@@ -111,6 +111,17 @@ final class NetworkFlowUtilTests: XCTestCase {
 			content: { response, _ in response.data }
 		)
 	}
+	
+	func test6 () {
+		let c = StandardNetworkController()
+		c
+			.logging { record in
+				record.convert(<#T##converter: LogRecordStringConverter##LogRecordStringConverter#>)
+			}
+			.loggerSetup { logger in
+				logger.
+			}
+	}
 }
 
 //

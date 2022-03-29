@@ -80,3 +80,17 @@ public extension StandardNetworkController {
 		return requestPublisher.eraseToAnyPublisher()
 	}
 }
+
+public extension StandardNetworkController {
+	@discardableResult
+	func loggerSetup (_ logging: (Logger) -> Void) -> StandardNetworkController {
+		logging(logger)
+		return self
+	}
+	
+	@discardableResult
+	func logging (_ handler: @escaping (Logger.Record) -> Void) -> StandardNetworkController {
+		logger.logging(handler)
+		return self
+	}
+}

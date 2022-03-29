@@ -2,11 +2,13 @@ import Foundation
 import Combine
 
 public class Logger {
-	private let subject = PassthroughSubject<Record, Never>()
+	private var subscriptions = Set<AnyCancellable>()
+	internal let subject = PassthroughSubject<Record, Never>()
+	public var publisher: AnyPublisher<Logger.Record, Never> { subject.eraseToAnyPublisher() }
 	
 	public init () { }
 	
-	public func log (message: Message, requestInfo: RequestInfo, requestDelegateName: String) {
+	internal func log (message: Message, requestInfo: RequestInfo, requestDelegateName: String) {
 		let record = Record(
 			requestInfo: requestInfo,
 			requestDelegateName: requestDelegateName,
@@ -14,5 +16,11 @@ public class Logger {
 		)
 		
 		subject.send(record)
+	}
+	
+	func logging (_ handler: @escaping (Logger.Record) -> Void) {
+		subject
+			.sink(receiveValue: handler)
+			.store(in: &subscriptions)
 	}
 }
