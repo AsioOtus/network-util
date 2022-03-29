@@ -3,23 +3,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "NetworkingUtil",
+    name: "NetworkUtil",
 	platforms: [
 		.iOS(.v13),
 		.macOS(.v10_15)
 	],
     products: [
         .library(
-            name: "NetworkingUtil",
-            targets: ["NetworkingUtil"]),
+            name: "NetworkUtil",
+            targets: ["NetworkUtil"]),
     ],
     targets: [
         .target(
-            name: "NetworkingUtil"
+            name: "NetworkUtil"
 		),
         .testTarget(
-            name: "NetworkingUtilTests",
-            dependencies: ["NetworkingUtil"]
+            name: "NetworkUtilTests",
+            dependencies: ["NetworkUtil"]
 		),
     ]
 )
