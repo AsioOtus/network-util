@@ -1,1 +1,1 @@
-public protocol NetworkUtilError: Swift.Error { }
+public protocol NetworkUtilError: Error { }

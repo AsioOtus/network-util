@@ -1,6 +1,6 @@
 import Foundation
 
-public class WrappingDelegate <InnerDelegate: RequestDelegate, RequestType: Request, ResponseType: Response, ContentType, ErrorType: NetworkUtilError>: RequestDelegate {
+public class WrappingDelegate <InnerDelegate: RequestDelegate, RequestType: Request, ResponseType: Response, ContentType, ErrorType>: RequestDelegate {
 	public let name: String
 	
 	public let innerDelegate: InnerDelegate

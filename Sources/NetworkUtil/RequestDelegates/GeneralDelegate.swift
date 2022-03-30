@@ -1,6 +1,6 @@
 import Foundation
 
-public class GeneralDelegate <RequestType: Request, ResponseType: Response, ContentType, ErrorType: NetworkUtilError>: RequestDelegate {
+public class GeneralDelegate <RequestType: Request, ResponseType: Response, ContentType, ErrorType>: RequestDelegate {
 	public let name: String
 	
 	var requestHandler: (RequestInfo) throws -> RequestType

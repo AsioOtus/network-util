@@ -1,3 +1,3 @@
 public struct Info {
-	public static let moduleName = "BaseNetworkUtil"
+	public static let moduleName = "NetworkUtil"
 }
