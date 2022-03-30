@@ -116,10 +116,10 @@ final class NetworkFlowUtilTests: XCTestCase {
 		let c = StandardNetworkController()
 		c
 			.logging { record in
-				record.convert(<#T##converter: LogRecordStringConverter##LogRecordStringConverter#>)
+				
 			}
 			.loggerSetup { logger in
-				logger.
+				
 			}
 	}
 }

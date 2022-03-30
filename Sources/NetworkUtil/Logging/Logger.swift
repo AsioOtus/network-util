@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public class Logger {
+public final class Logger {
 	private var subscriptions = Set<AnyCancellable>()
 	internal let subject = PassthroughSubject<Record, Never>()
 	public var publisher: AnyPublisher<Logger.Record, Never> { subject.eraseToAnyPublisher() }

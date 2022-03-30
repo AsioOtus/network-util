@@ -29,10 +29,10 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		return messsage
 	}
 	
-	public func convert (_ message: Logger.Message) -> String {
+	public func convert (_ loggerMessage: Logger.Message) -> String {
 		let message: String
 		
-		switch message {
+		switch loggerMessage {
 		case .request(_, let urlRequest):
 			message = "REQUEST – \(urlRequestConverter(urlRequest))"
 		case .response(let data, let httpUrlResponse as HTTPURLResponse):

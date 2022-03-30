@@ -3,7 +3,7 @@ import Combine
 
 public typealias Serial = SerialDecorator
 
-public struct SerialDecorator: NetworkController {
+public class SerialDecorator: NetworkController {
 	private let semaphore: DispatchSemaphore
 	
 	public let controller: NetworkController
@@ -46,7 +46,7 @@ public struct SerialDecorator: NetworkController {
 		return Just(requestDelegate)
 			.wait(for: semaphore)
 			.mapError{ requestDelegate.error(NetworkError.preprocessing(error: $0), requestInfo) }
-			.flatMap { controller.send($0, requestInfo).eraseToAnyPublisher() }
+            .flatMap { self.controller.send($0, requestInfo).eraseToAnyPublisher() }
 			.signal(semaphore)
 			.mapError{ requestDelegate.error(NetworkError.postprocessing(error: $0), requestInfo) }
 			.eraseToAnyPublisher()
