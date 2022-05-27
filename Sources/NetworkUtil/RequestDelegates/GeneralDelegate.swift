@@ -5,8 +5,8 @@ public class GeneralDelegate <RequestType: Request, ResponseType: Response, Cont
 	
 	var requestHandler: (RequestInfo) throws -> RequestType
 	
-	var urlSessionHandler: (RequestType, RequestInfo) throws -> URLSession = { request, _ in request.urlSession }
-	var urlRequestHandler: (RequestType, RequestInfo) throws -> URLRequest = { request, _ in request.urlRequest }
+	var urlSessionHandler: (RequestType, RequestInfo) throws -> URLSession = { request, _ in try request.urlSession() }
+	var urlRequestHandler: (RequestType, RequestInfo) throws -> URLRequest = { request, _ in try request.urlRequest() }
 	
 	var responseHandler: (Data, URLResponse, RequestInfo) throws -> ResponseType = { data, urlResponse, _ in try ResponseType(data, urlResponse) }
 	var contentHandler: (ResponseType, RequestInfo) throws -> ContentType
@@ -39,7 +39,7 @@ public class GeneralDelegate <RequestType: Request, ResponseType: Response, Cont
 
 public extension GeneralDelegate where ErrorType == NetworkError {
 	convenience init (
-		name: String,
+		name: String = "\(RequestType.self)",
 		request: @escaping (RequestInfo) -> RequestType,
 		content: @escaping (ResponseType, RequestInfo) -> ContentType,
 		networkError: @escaping (NetworkError, RequestInfo) -> ErrorType = { error, _ in error }

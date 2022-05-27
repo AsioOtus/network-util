@@ -1,14 +1,13 @@
 import Foundation
 
-public class WrappingDelegate <InnerDelegate: RequestDelegate, RequestType: Request, ResponseType: Response, ContentType, ErrorType>: RequestDelegate {
+public class DecoratorDelegate <InnerDelegate: RequestDelegate, RequestType: Request, ResponseType: Response, ContentType, ErrorType>: RequestDelegate {
 	public let name: String
 	
 	public let innerDelegate: InnerDelegate
 	
 	var requestHandler: (RequestInfo, InnerDelegate) throws -> RequestType
-	
-	var urlSessionHandler: (RequestType, RequestInfo, InnerDelegate) throws -> URLSession = { request, _, _ in request.urlSession }
-	var urlRequestHandler: (RequestType, RequestInfo, InnerDelegate) throws -> URLRequest = { request, _, _ in request.urlRequest }
+	var urlSessionHandler: (RequestType, RequestInfo, InnerDelegate) throws -> URLSession = { request, _, _ in try request.urlSession() }
+	var urlRequestHandler: (RequestType, RequestInfo, InnerDelegate) throws -> URLRequest = { request, _, _ in try request.urlRequest() }
 	
 	var responseHandler: (Data, URLResponse, RequestInfo, InnerDelegate) throws -> ResponseType = { data, urlResponse, _, _ in try ResponseType(data, urlResponse) }
 	var contentHandler: (ResponseType, RequestInfo, InnerDelegate) throws -> ContentType
@@ -32,7 +31,6 @@ public class WrappingDelegate <InnerDelegate: RequestDelegate, RequestType: Requ
 	}
 	
 	public func request (_ requestInfo: RequestInfo) throws -> RequestType { try requestHandler(requestInfo, innerDelegate) }
-	
 	public func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession { try urlSessionHandler(request, requestInfo, innerDelegate) }
 	public func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest { try urlRequestHandler(request, requestInfo, innerDelegate) }
 	
@@ -42,7 +40,7 @@ public class WrappingDelegate <InnerDelegate: RequestDelegate, RequestType: Requ
 	public func error (_ error: NetworkError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo, innerDelegate) }
 }
 
-public extension WrappingDelegate where ErrorType == NetworkError {
+public extension DecoratorDelegate where ErrorType == NetworkError {
 	convenience init (
 		name: String,
 		innerDelegate: InnerDelegate,
@@ -54,7 +52,7 @@ public extension WrappingDelegate where ErrorType == NetworkError {
 	}
 }
 
-public extension WrappingDelegate {
+public extension DecoratorDelegate {
 	@discardableResult
 	func requestHandling (_ requestHandler: @escaping (RequestInfo, InnerDelegate) -> RequestType) -> Self {
 		self.requestHandler = requestHandler

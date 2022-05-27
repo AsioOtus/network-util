@@ -1,12 +1,10 @@
 import Foundation
 
-public protocol Request: CustomStringConvertible {
-	var urlSession: URLSession { get }
-	var urlRequest: URLRequest { get }
+public protocol Request {
+	func urlSession () throws -> URLSession
+	func urlRequest () throws -> URLRequest
 }
 
 public extension Request {
-	var urlSession: URLSession { .shared }
-	
-	var description: String { urlRequest.description }
+	func urlSession () -> URLSession { .init(configuration: .default) }
 }

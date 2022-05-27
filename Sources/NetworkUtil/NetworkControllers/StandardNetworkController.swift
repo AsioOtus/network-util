@@ -2,18 +2,15 @@ import Foundation
 import Combine
 
 public class StandardNetworkController: NetworkController {
-	public let source: [String]
 	public let identificationInfo: IdentificationInfo
 	
 	private let logger = Logger()
 	
 	public init (
-		source: [String] = [],
 		label: String? = nil,
 		file: String = #fileID,
 		line: Int = #line
 	) {
-		self.source = source
 		self.identificationInfo = IdentificationInfo(
 			module: Info.moduleName,
 			type: String(describing: Self.self),
@@ -25,12 +22,11 @@ public class StandardNetworkController: NetworkController {
 }
 
 public extension StandardNetworkController {
-	func send <RD: RequestDelegate> (_ requestDelegate: RD, source: [String] = [], label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
+	func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
 			delegate: requestDelegate.name,
-			source: source,
 			controllers: []
 		)
 		
@@ -40,7 +36,6 @@ public extension StandardNetworkController {
 	func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
-			.add(source)
 		
 		let requestPublisher = Just(requestDelegate)
 			.tryMap { (requestDelegate: RD) -> (URLSession, URLRequest) in
@@ -78,6 +73,16 @@ public extension StandardNetworkController {
 			.mapError { requestDelegate.error($0, requestInfo) }
 		
 		return requestPublisher.eraseToAnyPublisher()
+	}
+}
+
+public extension StandardNetworkController {
+	func send <RequestType: Request, ResponseType: Response> (
+		request: RequestType,
+		responseType: ResponseType.Type,
+		label: String? = nil
+	) -> AnyPublisher<ResponseType, NetworkError> {
+		send(TransparentDelegate(request: request, responseType: responseType), label: label)
 	}
 }
 
