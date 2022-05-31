@@ -4,7 +4,7 @@ extension Logger {
 	public enum Message {
 		case request(URLSession, URLRequest)
 		case response(Data, URLResponse)
-		case error(NetworkError)
+		case error(RequestError)
 		
 		public var typeName: String {
 			switch self {

@@ -104,14 +104,6 @@ final class NetworkFlowUtilTests: XCTestCase {
 		_ = g.wait(wallTimeout: .now() + 2)
 	}
 	
-	func test5 () {
-		let gd = GeneralDelegate<URLRequest, StandardResponse, Data, NetworkError>(
-			name: "",
-			request: { _ in .init(url: URL(string: "")!) },
-			content: { response, _ in response.data }
-		)
-	}
-	
 	func test6 () {
 		let c = StandardNetworkController()
 		c

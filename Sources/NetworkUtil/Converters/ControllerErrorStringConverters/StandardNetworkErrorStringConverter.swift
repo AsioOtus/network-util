@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StandardNetworkErrorStringConverter: NetworkErrorStringConverter {
+public struct StandardNetworkErrorStringConverter: RequestErrorStringConverter {
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlErrorConverter: (URLError) -> String
 	
@@ -12,22 +12,7 @@ public struct StandardNetworkErrorStringConverter: NetworkErrorStringConverter {
 		self.urlErrorConverter = urlErrorConverter
 	}
 	
-	public func convert (_ error: NetworkError) -> String {
-		let message: String
-		
-		switch error {
-		case .preprocessingFailure(let error):
-			message = "PREPROCESSING ERROR – \(error)"
-			
-		case .networkFailure(_, let urlRequest, let urlError):
-			let urlRequestMessage = urlRequestConverter(urlRequest)
-			let urlErrorMessage = urlErrorConverter(urlError)
-			message = "NETWORK ERROR – \(urlErrorMessage) | REQUEST – \(urlRequestMessage)"
-			
-		case .postprocessingFailure(let error):
-			message = "POSTPROCESSING ERROR – \(error)"
-		}
-		
-		return message
+	public func convert (_ error: RequestError) -> String {
+        "\(error.name.uppercased()) ERROR – \(error.innerError)"
 	}
 }

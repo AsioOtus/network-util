@@ -5,20 +5,20 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlResponseConverter: (URLResponse, Data) -> String
 	public var httpUrlResponseConverter: (HTTPURLResponse, Data) -> String
-	public var networkErrorConverter: (NetworkError) -> String
+	public var requestErrorConverter: (RequestError) -> String
 	
 	public init (
 		requestInfo: @escaping (RequestInfo) -> String,
 		urlRequest: @escaping (URLRequest) -> String,
 		urlResponse: @escaping (URLResponse, Data) -> String,
 		httpUrlResponse: @escaping (HTTPURLResponse, Data) -> String,
-		networkError: @escaping (NetworkError) -> String
+		requestError: @escaping (RequestError) -> String
 	) {
 		self.requestInfoConverter = requestInfo
 		self.urlRequestConverter = urlRequest
 		self.urlResponseConverter = urlResponse
 		self.httpUrlResponseConverter = httpUrlResponse
-		self.networkErrorConverter = networkError
+		self.requestErrorConverter = requestError
 	}
 	
 	public func convert (_ record: Logger.Record) -> String {
@@ -40,7 +40,7 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		case .response(let data, let urlResponse):
 			message = "RESPONSE – \(urlResponseConverter(urlResponse, data))"
 		case .error(let controllerError):
-			message = networkErrorConverter(controllerError)
+			message = requestErrorConverter(controllerError)
 		}
 		
 		return message

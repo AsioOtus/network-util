@@ -38,8 +38,12 @@ public extension StandardNetworkController {
 			.add(identificationInfo)
 		
 		let requestPublisher = Just(requestDelegate)
-			.tryMap { (requestDelegate: RD) -> (URLSession, URLRequest) in
-				let request = try requestDelegate.request(requestInfo)
+            .tryMap { (requestDelegate: RD) -> (RD.RequestType, RD) in
+                let request = try requestDelegate.request(requestInfo)
+                return (request, requestDelegate)
+            }
+            .mapError { RequestError.requestFailure(error: $0) }
+            .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
 				let urlSession = try requestDelegate.urlSession(request, requestInfo)
 				let urlRequest = try requestDelegate.urlRequest(request, requestInfo)
 				
@@ -47,21 +51,23 @@ public extension StandardNetworkController {
 				
 				return (urlSession, urlRequest)
 			}
-			.mapError { NetworkError.preprocessing(error: $0) }
-			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), NetworkError> in
+            .mapError { RequestError.networkFailure(error: $0) }
+			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), RequestError> in
 				urlSession.dataTaskPublisher(for: urlRequest)
-					.mapError {	NetworkError.networkFailure(urlSession, urlRequest, $0) }
+					.mapError {	RequestError.networkFailure(error: NetworkError(urlSession, urlRequest, $0)) }
 					.eraseToAnyPublisher()
 			}
-			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ContentType in
+			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
 				self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
 				
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
-				let content = try requestDelegate.content(response, requestInfo)
-				
-				return content
+				return response
 			}
-			.mapError { NetworkError.postprocessing(error: $0) }
+            .mapError { RequestError.networkFailure(error: $0) }
+            .tryMap { (response: RD.ResponseType) in
+                try requestDelegate.content(response, requestInfo)
+            }
+            .mapError { RequestError.contentFailure(error: $0) }
 			.handleEvents(
 				receiveCompletion: { completion in
 					if case .failure(let error) = completion {
@@ -77,24 +83,14 @@ public extension StandardNetworkController {
 }
 
 public extension StandardNetworkController {
-	func send <RequestType: Request, ResponseType: Response> (
-		request: RequestType,
-		responseType: ResponseType.Type,
-		label: String? = nil
-	) -> AnyPublisher<ResponseType, NetworkError> {
-		send(TransparentDelegate(request: request, responseType: responseType), label: label)
-	}
-}
-
-public extension StandardNetworkController {
 	@discardableResult
-	func loggerSetup (_ logging: (Logger) -> Void) -> StandardNetworkController {
+	func loggerSetup (_ logging: (Logger) -> Void) -> Self {
 		logging(logger)
 		return self
 	}
 	
 	@discardableResult
-	func logging (_ handler: @escaping (Logger.Record) -> Void) -> StandardNetworkController {
+	func logging (_ handler: @escaping (Logger.Record) -> Void) -> Self {
 		logger.logging(handler)
 		return self
 	}
