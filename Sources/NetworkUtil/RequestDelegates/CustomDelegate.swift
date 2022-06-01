@@ -13,18 +13,6 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
     
     let errorHandler: (RequestError, RequestInfo) -> ErrorType
     
-    public func request (_ requestInfo: RequestInfo) throws -> RequestType { try requestHandler(requestInfo) }
-    
-    public func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession { try urlSessionHandler(request, requestInfo) }
-    public func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest { try urlRequestHandler(request, requestInfo) }
-    
-    public func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try responseHandler(data, urlResponse, requestInfo) }
-    public func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType { try contentHandler(response, requestInfo) }
-    
-    public func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo) }
-}
-
-public extension CustomDelegate {
     init (
         request: @escaping (RequestInfo) throws -> RequestType,
         urlSession: @escaping (RequestType, RequestInfo) throws -> URLSession = { request, _ in try request.urlSession() },
@@ -43,6 +31,16 @@ public extension CustomDelegate {
         self.contentHandler = content
         self.errorHandler = error
     }
+    
+    public func request (_ requestInfo: RequestInfo) throws -> RequestType { try requestHandler(requestInfo) }
+    
+    public func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession { try urlSessionHandler(request, requestInfo) }
+    public func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest { try urlRequestHandler(request, requestInfo) }
+    
+    public func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try responseHandler(data, urlResponse, requestInfo) }
+    public func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType { try contentHandler(response, requestInfo) }
+    
+    public func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo) }
 }
 
 public extension CustomDelegate where ResponseType == ContentType, ResponseType == StandardResponse, ErrorType == RequestError {

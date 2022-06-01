@@ -25,7 +25,8 @@ extension StandardNativeNetworkController: NativeNetworkController {
         _ requestDelegate: RD,
         label: String? = nil,
         onSuccess: @escaping (RD.ContentType) -> Void,
-        onCompleted: @escaping (Result<Void, RD.ErrorType>) -> Void
+        onFailure: @escaping (RD.ErrorType) -> Void = { _ in },
+        onCompleted: @escaping () -> Void = { }
     ) {
         let requestInfo = RequestInfo(
             uuid: UUID(),
@@ -34,18 +35,20 @@ extension StandardNativeNetworkController: NativeNetworkController {
             controllers: []
         )
 
-        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onCompleted: onCompleted)
+        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onFailure: onFailure, onCompleted: onCompleted)
     }
     
     public func send <RD: RequestDelegate> (
         _ requestDelegate: RD,
         _ requestInfo: RequestInfo,
         onSuccess: @escaping (RD.ContentType) -> Void,
-        onCompleted: @escaping (Result<Void, RD.ErrorType>) -> Void
+        onFailure: @escaping (RD.ErrorType) -> Void  = { _ in },
+        onCompleted: @escaping () -> Void  = { }
     ) {
         func onError (_ requestError: RequestError) {
             self.logger.log(message: .error(requestError), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
-            onCompleted(.failure(requestDelegate.error(requestError, requestInfo)))
+            onFailure(requestDelegate.error(requestError, requestInfo))
+            onCompleted()
         }
         
         let requestInfo = requestInfo
@@ -102,7 +105,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 }
                 
                 onSuccess(content)
-                onCompleted(.success(()))
+                onCompleted()
             } else {
                 onError(RequestError.networkFailure(UnexpectedError()))
             }

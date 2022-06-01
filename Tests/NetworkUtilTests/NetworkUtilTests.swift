@@ -114,22 +114,16 @@ final class NetworkFlowUtilTests: XCTestCase {
 				
 			}
 	}
+    
+    func test7 () {
+        StandardNativeNetworkController().send(URL(string: "")!) { data, urlResponse in }
+        StandardNativeNetworkController().send(URL(string: "")!) { data, urlResponse in }
+        
+        let crd = CustomDelegate(
+            request: <#T##(RequestInfo) throws -> _#>,
+            content: <#T##(_, RequestInfo) throws -> _#>
+        )
+        
+        StandardNativeNetworkController().send(crd) { domainModel in }
+    }
 }
-
-//
-//	
-//	func sample<P>(source: P)
-//	-> AnyPublisher<Self.Output, Self.Failure>
-//	where P: Publisher, P.Output: Equatable,
-//	P.Failure == Self.Failure {
-//		combineLatest(source)
-//			.removeDuplicates(by: {
-//				(tuple1, tuple2) -> Bool in
-//				tuple1.1 == tuple2.1
-//			})
-//			.map { tuple in
-//				tuple.0
-//			}
-//			.eraseToAnyPublisher()
-//	}
-//}
