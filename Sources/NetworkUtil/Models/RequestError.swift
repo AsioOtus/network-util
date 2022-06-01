@@ -38,15 +38,15 @@ public enum RequestError: NetworkUtilError {
 }
 
 public  extension RequestError {
-    static func requestFailure (error: Error) -> Self {
+    static func requestFailure (_ error: Error) -> Self {
         (error as? Self) ?? .request(error)
     }
     
-    static func networkFailure (error: Error) -> Self {
+    static func networkFailure (_ error: Error) -> Self {
         (error as? Self) ?? .network(error)
     }
     
-    static func contentFailure (error: Error) -> Self {
+    static func contentFailure (_ error: Error) -> Self {
         (error as? Self) ?? .content(error)
     }
 }

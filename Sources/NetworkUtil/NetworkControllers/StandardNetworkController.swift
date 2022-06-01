@@ -42,7 +42,7 @@ public extension StandardNetworkController {
                 let request = try requestDelegate.request(requestInfo)
                 return (request, requestDelegate)
             }
-            .mapError { RequestError.requestFailure(error: $0) }
+            .mapError { RequestError.requestFailure($0) }
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
 				let urlSession = try requestDelegate.urlSession(request, requestInfo)
 				let urlRequest = try requestDelegate.urlRequest(request, requestInfo)
@@ -51,10 +51,10 @@ public extension StandardNetworkController {
 				
 				return (urlSession, urlRequest)
 			}
-            .mapError { RequestError.networkFailure(error: $0) }
+            .mapError { RequestError.networkFailure($0) }
 			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), RequestError> in
 				urlSession.dataTaskPublisher(for: urlRequest)
-					.mapError {	RequestError.networkFailure(error: NetworkError(urlSession, urlRequest, $0)) }
+					.mapError {	RequestError.networkFailure(NetworkError(urlSession, urlRequest, $0)) }
 					.eraseToAnyPublisher()
 			}
 			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
@@ -63,11 +63,11 @@ public extension StandardNetworkController {
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
 			}
-            .mapError { RequestError.networkFailure(error: $0) }
+            .mapError { RequestError.networkFailure($0) }
             .tryMap { (response: RD.ResponseType) in
                 try requestDelegate.content(response, requestInfo)
             }
-            .mapError { RequestError.contentFailure(error: $0) }
+            .mapError { RequestError.contentFailure($0) }
 			.handleEvents(
 				receiveCompletion: { completion in
 					if case .failure(let error) = completion {
