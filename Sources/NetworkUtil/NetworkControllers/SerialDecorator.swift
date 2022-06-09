@@ -45,10 +45,10 @@ public extension SerialDecorator {
 	func send <RD: RequestDelegate>(_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		Just(requestDelegate)
 			.wait(for: semaphore)
-			.mapError { requestDelegate.error(RequestError.networkFailure($0), requestInfo) }
+			.mapError { requestDelegate.error(RequestError.generalFailure($0), requestInfo) }
             .flatMap { self.controller.send($0, requestInfo).eraseToAnyPublisher() }
 			.signal(semaphore)
-			.mapError { requestDelegate.error(RequestError.networkFailure($0), requestInfo) }
+			.mapError { requestDelegate.error(RequestError.generalFailure($0), requestInfo) }
 			.eraseToAnyPublisher()
 	}
 }

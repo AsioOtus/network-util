@@ -7,6 +7,8 @@ public class StandardNetworkController: NetworkController {
 
 	private let logger = Logger()
 
+	private var interceptors = [(URLRequest) throws -> URLRequest]()
+
 	public init (
 		label: String? = nil,
 		file: String = #fileID,
@@ -44,16 +46,18 @@ public extension StandardNetworkController {
                 let request = try requestDelegate.request(requestInfo)
                 return (request, requestDelegate)
             }
-            .mapError { RequestError.requestFailure($0) }
+            .mapError { RequestError.creationFailure($0) }
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
 				let urlSession = try requestDelegate.urlSession(request, requestInfo)
-				let urlRequest = try requestDelegate.urlRequest(request, requestInfo)
+				var urlRequest = try requestDelegate.urlRequest(request, requestInfo)
+
+				try interceptors.forEach { urlRequest = try $0(urlRequest) }
 
 				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
 
 				return (urlSession, urlRequest)
 			}
-            .mapError { RequestError.networkFailure($0) }
+            .mapError { RequestError.requestFailure($0) }
 			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), RequestError> in
 				urlSession.dataTaskPublisher(for: urlRequest)
 					.mapError {	RequestError.networkFailure(NetworkError(urlSession, urlRequest, $0)) }
@@ -65,7 +69,7 @@ public extension StandardNetworkController {
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
 			}
-            .mapError { RequestError.networkFailure($0) }
+            .mapError { RequestError.responseFailure($0) }
             .tryMap { (response: RD.ResponseType) in
                 try requestDelegate.content(response, requestInfo)
             }
@@ -95,6 +99,12 @@ public extension StandardNetworkController {
 	@discardableResult
 	func logging (_ handler: @escaping (LogRecord) -> Void) -> Self {
 		logger.logging(handler)
+		return self
+	}
+
+	@discardableResult
+	func add (interseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
+		interceptors.append(interseptor)
 		return self
 	}
 }

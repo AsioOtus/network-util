@@ -5,6 +5,8 @@ public class StandardNativeNetworkController {
 
     private let logger = NativeLogger()
 
+	private var interceptors = [(URLRequest) throws -> URLRequest]()
+
     public init (
         label: String? = nil,
         file: String = #fileID,
@@ -59,18 +61,20 @@ extension StandardNativeNetworkController: NativeNetworkController {
         do {
             request = try requestDelegate.request(requestInfo)
         } catch {
-            onError(RequestError.requestFailure(error))
+            onError(RequestError.creationFailure(error))
             return
         }
 
         let urlSession: URLSession
-        let urlRequest: URLRequest
+        var urlRequest: URLRequest
 
         do {
             urlSession = try requestDelegate.urlSession(request, requestInfo)
             urlRequest = try requestDelegate.urlRequest(request, requestInfo)
+
+			try interceptors.forEach { urlRequest = try $0(urlRequest) }
         } catch {
-            onError(RequestError.networkFailure(error))
+            onError(RequestError.requestFailure(error))
             return
         }
 
@@ -81,7 +85,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 onError(RequestError.networkFailure(NetworkError(urlSession, urlRequest, error)))
                 return
             } else if let error = error {
-                onError(RequestError.networkFailure(error))
+                onError(RequestError.generalFailure(error))
                 return
             } else if let data = data, let urlResponse = urlResponse {
                 self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
@@ -91,7 +95,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 do {
                     response = try requestDelegate.response(data, urlResponse, requestInfo)
                 } catch {
-                    onError(RequestError.networkFailure(error))
+                    onError(RequestError.responseFailure(error))
                     return
                 }
 
@@ -107,7 +111,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 onSuccess(content)
                 onCompleted()
             } else {
-                onError(RequestError.networkFailure(UnexpectedError()))
+                onError(RequestError.generalFailure(UnexpectedError()))
             }
         }
 
@@ -121,4 +125,10 @@ public extension StandardNativeNetworkController {
         logger.logging(handler)
         return self
     }
+
+	@discardableResult
+	func add (interseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
+		interceptors.append(interseptor)
+		return self
+	}
 }
