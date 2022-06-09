@@ -8,7 +8,7 @@ public protocol NativeNetworkController {
         onFailure: @escaping (RD.ErrorType) -> Void,
         onCompleted: @escaping () -> Void
     )
-    
+
     func send <RD: RequestDelegate> (
         _ requestDelegate: RD,
         _ requestInfo: RequestInfo,

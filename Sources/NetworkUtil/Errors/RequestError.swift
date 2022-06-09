@@ -4,7 +4,7 @@ public enum RequestError: NetworkUtilError {
     case request(Error)
     case network(Error)
     case content(Error)
-    
+
     public var innerError: Error {
         switch self {
         case .request(let error): fallthrough
@@ -12,7 +12,7 @@ public enum RequestError: NetworkUtilError {
         case .content(let error): return error
         }
     }
-    
+
     public var domainError: Error? {
         switch self {
         case .request(let error): fallthrough
@@ -20,14 +20,14 @@ public enum RequestError: NetworkUtilError {
         default: return nil
         }
     }
-    
+
     public var networkError: Error? {
         switch self {
         case .network(let error): return error
         default: return nil
         }
     }
-    
+
     public var name: String {
         switch self {
         case .request: return "request"
@@ -41,11 +41,11 @@ public  extension RequestError {
     static func requestFailure (_ error: Error) -> Self {
         (error as? Self) ?? .request(error)
     }
-    
+
     static func networkFailure (_ error: Error) -> Self {
         (error as? Self) ?? .network(error)
     }
-    
+
     static func contentFailure (_ error: Error) -> Self {
         (error as? Self) ?? .content(error)
     }

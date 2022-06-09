@@ -2,17 +2,17 @@ import Foundation
 
 public struct CustomDelegate <RequestType: Request, ResponseType: Response, ContentType, ErrorType: Error>: RequestDelegate {
     public let name: String
-    
+
     let requestHandler: (RequestInfo) throws -> RequestType
-    
+
     let urlSessionHandler: (RequestType, RequestInfo) throws -> URLSession
     let urlRequestHandler: (RequestType, RequestInfo) throws -> URLRequest
-    
+
     let responseHandler: (Data, URLResponse, RequestInfo) throws -> ResponseType
     let contentHandler: (ResponseType, RequestInfo) throws -> ContentType
-    
+
     let errorHandler: (RequestError, RequestInfo) -> ErrorType
-    
+
     init (
         request: @escaping (RequestInfo) throws -> RequestType,
         urlSession: @escaping (RequestType, RequestInfo) throws -> URLSession = { request, _ in try request.urlSession() },
@@ -23,7 +23,7 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
         name: String = "\(RequestType.self)"
     ) {
         self.name = name
-        
+
         self.requestHandler = request
         self.urlSessionHandler = urlSession
         self.urlRequestHandler = urlRequest
@@ -31,15 +31,15 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
         self.contentHandler = content
         self.errorHandler = error
     }
-    
+
     public func request (_ requestInfo: RequestInfo) throws -> RequestType { try requestHandler(requestInfo) }
-    
+
     public func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession { try urlSessionHandler(request, requestInfo) }
     public func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest { try urlRequestHandler(request, requestInfo) }
-    
+
     public func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try responseHandler(data, urlResponse, requestInfo) }
     public func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType { try contentHandler(response, requestInfo) }
-    
+
     public func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo) }
 }
 

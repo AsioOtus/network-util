@@ -118,12 +118,8 @@ final class NetworkFlowUtilTests: XCTestCase {
     func test7 () {
         StandardNativeNetworkController().send(URL(string: "")!) { data, urlResponse in }
         StandardNativeNetworkController().send(URL(string: "")!) { data, urlResponse in }
+
         
-        let crd = CustomDelegate(
-            request: <#T##(RequestInfo) throws -> _#>,
-            content: <#T##(_, RequestInfo) throws -> _#>
-        )
         
-        StandardNativeNetworkController().send(crd) { domainModel in }
     }
 }

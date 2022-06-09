@@ -1,12 +1,13 @@
 import Foundation
 
+@available(iOS 13.0, *)
 public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 	public var requestInfoConverter: (RequestInfo) -> String
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlResponseConverter: (URLResponse, Data) -> String
 	public var httpUrlResponseConverter: (HTTPURLResponse, Data) -> String
 	public var requestErrorConverter: (RequestError) -> String
-	
+
 	public init (
 		requestInfo: @escaping (RequestInfo) -> String,
 		urlRequest: @escaping (URLRequest) -> String,
@@ -20,18 +21,18 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		self.httpUrlResponseConverter = httpUrlResponse
 		self.requestErrorConverter = requestError
 	}
-	
-	public func convert (_ record: Logger.Record) -> String {
+
+	public func convert (_ record: LogRecord) -> String {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
 		let detailsMessage = convert(record.message)
-		
+
 		let messsage = "\(requestInfoMessage) | \(record.requestDelegateName)\n\(detailsMessage)\n"
 		return messsage
 	}
-	
-	public func convert (_ loggerMessage: Logger.Message) -> String {
+
+	public func convert (_ loggerMessage: LogMessage) -> String {
 		let message: String
-		
+
 		switch loggerMessage {
 		case .request(_, let urlRequest):
 			message = "REQUEST – \(urlRequestConverter(urlRequest))"
@@ -42,7 +43,7 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 		case .error(let controllerError):
 			message = requestErrorConverter(controllerError)
 		}
-		
+
 		return message
 	}
 }

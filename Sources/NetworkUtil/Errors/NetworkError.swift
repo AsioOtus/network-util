@@ -4,7 +4,7 @@ public struct NetworkError: NetworkUtilError {
     public let urlSession: URLSession
     public let urlRequest: URLRequest
     public let urlError: URLError
-    
+
     public init (
         _ urlSession: URLSession,
         _ urlRequest: URLRequest,

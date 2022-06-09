@@ -7,19 +7,19 @@ public struct IdentificationInfo: Codable, CustomStringConvertible {
 	public let instance: String
 	public let label: String?
 	public let extra: String?
-	
+
 	public var description: String {
-		"\(module.map{ "\($0)." } ?? "")\(type) – \(definition)\(label.map{ " – label: \($0)." } ?? "") – \(instance)\(extra.map{ " – \($0)" } ?? "")"
+		"\(module.map { "\($0)." } ?? "")\(type) – \(definition)\(label.map { " – label: \($0)." } ?? "") – \(instance)\(extra.map { " – \($0)" } ?? "")"
 	}
-	
+
 	public var compactDescription: String {
-		"\(module.map{ "\($0)." } ?? "")\(type) – \(instance)"
+		"\(module.map { "\($0)." } ?? "")\(type) – \(instance)"
 	}
-	
+
 	public var typeDescription: String {
-		"\(module.map{ "\($0)." } ?? "")\(type)"
+		"\(module.map { "\($0)." } ?? "")\(type)"
 	}
-	
+
 	init (module: String? = nil, type: String, file: String, line: Int, label: String? = nil, extra: String? = nil) {
 		self.module = module
 		self.type = type

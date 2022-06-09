@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
 	name: "NetworkUtil",
 	platforms: [
-		.iOS(.v13),
+		.iOS(.v11),
 		.macOS(.v10_15)
 	],
 	products: [
@@ -14,9 +14,7 @@ let package = Package(
 			targets: ["NetworkUtil"]),
 	],
 	targets: [
-		.target(
-			name: "NetworkUtil"
-		),
+		.target(name: "NetworkUtil"),
 		.testTarget(
 			name: "NetworkUtilTests",
 			dependencies: ["NetworkUtil"]

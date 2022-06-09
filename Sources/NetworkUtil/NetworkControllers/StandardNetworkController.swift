@@ -1,11 +1,12 @@
 import Foundation
 import Combine
 
+@available(iOS 13.0, *)
 public class StandardNetworkController: NetworkController {
 	public let identificationInfo: IdentificationInfo
-	
+
 	private let logger = Logger()
-	
+
 	public init (
 		label: String? = nil,
 		file: String = #fileID,
@@ -21,6 +22,7 @@ public class StandardNetworkController: NetworkController {
 	}
 }
 
+@available(iOS 13.0, *)
 public extension StandardNetworkController {
 	func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = RequestInfo(
@@ -29,14 +31,14 @@ public extension StandardNetworkController {
 			delegate: requestDelegate.name,
 			controllers: []
 		)
-		
+
 		return send(requestDelegate, requestInfo)
 	}
-	
+
 	func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
-		
+
 		let requestPublisher = Just(requestDelegate)
             .tryMap { (requestDelegate: RD) -> (RD.RequestType, RD) in
                 let request = try requestDelegate.request(requestInfo)
@@ -46,9 +48,9 @@ public extension StandardNetworkController {
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
 				let urlSession = try requestDelegate.urlSession(request, requestInfo)
 				let urlRequest = try requestDelegate.urlRequest(request, requestInfo)
-				
+
 				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
-				
+
 				return (urlSession, urlRequest)
 			}
             .mapError { RequestError.networkFailure($0) }
@@ -59,7 +61,7 @@ public extension StandardNetworkController {
 			}
 			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
 				self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
-				
+
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
 			}
@@ -75,22 +77,23 @@ public extension StandardNetworkController {
 					}
 				}
 			)
-		
+
 			.mapError { requestDelegate.error($0, requestInfo) }
-		
+
 		return requestPublisher.eraseToAnyPublisher()
 	}
 }
 
+@available(iOS 13.0, *)
 public extension StandardNetworkController {
 	@discardableResult
 	func loggerSetup (_ logging: (Logger) -> Void) -> Self {
 		logging(logger)
 		return self
 	}
-	
+
 	@discardableResult
-	func logging (_ handler: @escaping (Logger.Record) -> Void) -> Self {
+	func logging (_ handler: @escaping (LogRecord) -> Void) -> Self {
 		logger.logging(handler)
 		return self
 	}
