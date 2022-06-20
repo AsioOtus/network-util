@@ -5,11 +5,3 @@ public protocol ModellableRequest: Request {
 
 	var model: Model { get }
 }
-
-public protocol RequestModel: Encodable {
-	func data () throws -> Data
-}
-
-public extension RequestModel {
-	func data () throws -> Data { try JSONEncoder().encode(self) }
-}
