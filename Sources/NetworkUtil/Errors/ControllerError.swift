@@ -1,23 +1,22 @@
 import Foundation
 
-public enum RequestError: NetworkUtilError {
+public enum ControllerError: NetworkUtilError {
 	case creation(Error)
     case request(Error)
     case network(NetworkError)
 	case response(Error)
     case content(Error)
 
-	case general(Error)
+	case general(GeneralError)
 
     public var innerError: Error {
         switch self {
 		case .creation(let error): fallthrough
         case .request(let error): fallthrough
+		case .network(let error as Error): return error
 		case .response(let error): fallthrough
         case .content(let error): fallthrough
-		case .general(let error): return error
-
-		case .network(let error): return error
+		case .general(let error as Error): return error
         }
     }
 
@@ -48,7 +47,7 @@ public enum RequestError: NetworkUtilError {
     }
 }
 
-public extension RequestError {
+public extension ControllerError {
 	static func creationFailure (_ error: Error) -> Self {
 		(error as? Self) ?? .creation(error)
 	}
@@ -70,6 +69,6 @@ public extension RequestError {
 	}
 
 	static func generalFailure (_ error: Error) -> Self {
-		(error as? Self) ?? .general(error)
+		(error as? Self) ?? .general(.otherError(error))
 	}
 }

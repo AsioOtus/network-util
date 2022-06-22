@@ -9,5 +9,5 @@ extension URLRequest: RequestDelegate {
 		(response.data, response.urlResponse)
 	}
 
-	public func error(_ error: RequestError, _ requestInfo: RequestInfo) -> RequestError { error }
+	public func error(_ error: ControllerError, _ requestInfo: RequestInfo) -> ControllerError { error }
 }

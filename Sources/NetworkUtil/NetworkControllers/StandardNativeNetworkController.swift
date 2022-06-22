@@ -47,7 +47,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
         onFailure: @escaping (RD.ErrorType) -> Void  = { _ in },
         onCompleted: @escaping () -> Void  = { }
     ) {
-        func onError (_ requestError: RequestError) {
+        func onError (_ requestError: ControllerError) {
             self.logger.log(message: .error(requestError), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
             onFailure(requestDelegate.error(requestError, requestInfo))
             onCompleted()
@@ -61,7 +61,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
         do {
             request = try requestDelegate.request(requestInfo)
         } catch {
-            onError(RequestError.creationFailure(error))
+            onError(ControllerError.creationFailure(error))
             return
         }
 
@@ -74,7 +74,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
 
 			try interceptors.forEach { urlRequest = try $0(urlRequest) }
         } catch {
-            onError(RequestError.requestFailure(error))
+            onError(ControllerError.requestFailure(error))
             return
         }
 
@@ -82,10 +82,10 @@ extension StandardNativeNetworkController: NativeNetworkController {
 
         let task = urlSession.dataTask(with: urlRequest) { data, urlResponse, error in
             if let error = error as? URLError {
-                onError(RequestError.networkFailure(NetworkError(urlSession, urlRequest, error)))
+                onError(ControllerError.networkFailure(NetworkError(urlSession, urlRequest, error)))
                 return
             } else if let error = error {
-                onError(RequestError.generalFailure(error))
+				onError(ControllerError.general(.urlErrorIsEmpty(error)))
                 return
             } else if let data = data, let urlResponse = urlResponse {
                 self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
@@ -95,7 +95,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 do {
                     response = try requestDelegate.response(data, urlResponse, requestInfo)
                 } catch {
-                    onError(RequestError.responseFailure(error))
+                    onError(ControllerError.responseFailure(error))
                     return
                 }
 
@@ -104,14 +104,14 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 do {
                     content = try requestDelegate.content(response, requestInfo)
                 } catch {
-                    onError(RequestError.contentFailure(error))
+                    onError(ControllerError.contentFailure(error))
                     return
                 }
 
                 onSuccess(content)
                 onCompleted()
             } else {
-                onError(RequestError.generalFailure(UnexpectedError()))
+				onError(ControllerError.general(.urlResponseContentIsEmpty))
             }
         }
 

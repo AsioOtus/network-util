@@ -11,7 +11,7 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
     let responseHandler: (Data, URLResponse, RequestInfo) throws -> ResponseType
     let contentHandler: (ResponseType, RequestInfo) throws -> ContentType
 
-    let errorHandler: (RequestError, RequestInfo) -> ErrorType
+    let errorHandler: (ControllerError, RequestInfo) -> ErrorType
 
     init (
         request: @escaping (RequestInfo) throws -> RequestType,
@@ -19,7 +19,7 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
         urlRequest: @escaping (RequestType, RequestInfo) throws -> URLRequest = { request, _ in try request.urlRequest() },
         response: @escaping (Data, URLResponse, RequestInfo) throws -> ResponseType = { data, urlResponse, _ in try ResponseType(data, urlResponse) },
         content: @escaping (ResponseType, RequestInfo) throws -> ContentType,
-        error: @escaping (RequestError, RequestInfo) -> ErrorType,
+        error: @escaping (ControllerError, RequestInfo) -> ErrorType,
         name: String = "\(RequestType.self)"
     ) {
         self.name = name
@@ -40,17 +40,17 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
     public func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try responseHandler(data, urlResponse, requestInfo) }
     public func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType { try contentHandler(response, requestInfo) }
 
-    public func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo) }
+    public func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo) }
 }
 
-public extension CustomDelegate where ResponseType == ContentType, ResponseType == StandardResponse, ErrorType == RequestError {
+public extension CustomDelegate where ResponseType == ContentType, ResponseType == StandardResponse, ErrorType == ControllerError {
     init (
         request: @escaping (RequestInfo) throws -> RequestType,
         urlSession: @escaping (RequestType, RequestInfo) throws -> URLSession = { request, _ in try request.urlSession() },
         urlRequest: @escaping (RequestType, RequestInfo) throws -> URLRequest = { request, _ in try request.urlRequest() },
         response: @escaping (Data, URLResponse, RequestInfo) throws -> ResponseType = { data, urlResponse, _ in try ResponseType(data, urlResponse) },
         content: @escaping (ResponseType, RequestInfo) throws -> ContentType = { response, _ in response },
-        requestError: @escaping (RequestError, RequestInfo) -> ErrorType = { error, _ in error },
+        requestError: @escaping (ControllerError, RequestInfo) -> ErrorType = { error, _ in error },
         name: String = "\(RequestType.self)"
     ) {
         self.init(
@@ -65,14 +65,14 @@ public extension CustomDelegate where ResponseType == ContentType, ResponseType 
     }
 }
 
-public extension CustomDelegate where ErrorType == RequestError {
+public extension CustomDelegate where ErrorType == ControllerError {
     init (
         request: @escaping (RequestInfo) throws -> RequestType,
         urlSession: @escaping (RequestType, RequestInfo) throws -> URLSession = { request, _ in try request.urlSession() },
         urlRequest: @escaping (RequestType, RequestInfo) throws -> URLRequest = { request, _ in try request.urlRequest() },
         response: @escaping (Data, URLResponse, RequestInfo) throws -> ResponseType = { data, urlResponse, _ in try ResponseType(data, urlResponse) },
         content: @escaping (ResponseType, RequestInfo) throws -> ContentType,
-        requestError: @escaping (RequestError, RequestInfo) -> ErrorType = { error, _ in error },
+        requestError: @escaping (ControllerError, RequestInfo) -> ErrorType = { error, _ in error },
         name: String = "\(RequestType.self)"
     ) {
         self.init(

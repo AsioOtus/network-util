@@ -3,7 +3,7 @@ import Foundation
 public enum LogMessage {
 	case request(URLSession, URLRequest)
 	case response(Data, URLResponse)
-	case error(RequestError)
+	case error(ControllerError)
 
 	public var typeName: String {
 		switch self {

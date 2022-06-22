@@ -46,7 +46,7 @@ public extension StandardNetworkController {
                 let request = try requestDelegate.request(requestInfo)
                 return (request, requestDelegate)
             }
-            .mapError { RequestError.creationFailure($0) }
+            .mapError { ControllerError.creationFailure($0) }
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
 				let urlSession = try requestDelegate.urlSession(request, requestInfo)
 				var urlRequest = try requestDelegate.urlRequest(request, requestInfo)
@@ -57,10 +57,10 @@ public extension StandardNetworkController {
 
 				return (urlSession, urlRequest)
 			}
-            .mapError { RequestError.requestFailure($0) }
-			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), RequestError> in
+            .mapError { ControllerError.requestFailure($0) }
+			.flatMap { (urlSession: URLSession, urlRequest: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), ControllerError> in
 				urlSession.dataTaskPublisher(for: urlRequest)
-					.mapError {	RequestError.networkFailure(NetworkError(urlSession, urlRequest, $0)) }
+					.mapError {	ControllerError.networkFailure(NetworkError(urlSession, urlRequest, $0)) }
 					.eraseToAnyPublisher()
 			}
 			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
@@ -69,11 +69,11 @@ public extension StandardNetworkController {
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
 			}
-            .mapError { RequestError.responseFailure($0) }
+            .mapError { ControllerError.responseFailure($0) }
             .tryMap { (response: RD.ResponseType) in
                 try requestDelegate.content(response, requestInfo)
             }
-            .mapError { RequestError.contentFailure($0) }
+            .mapError { ControllerError.contentFailure($0) }
 			.handleEvents(
 				receiveCompletion: { completion in
 					if case .failure(let error) = completion {

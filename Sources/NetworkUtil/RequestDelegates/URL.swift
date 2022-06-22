@@ -1,7 +1,7 @@
 import Foundation
 
 extension URL: RequestDelegate {
-	public func error(_ error: RequestError, _ requestInfo: RequestInfo) -> RequestError {
+	public func error(_ error: ControllerError, _ requestInfo: RequestInfo) -> ControllerError {
 		error
 	}
     public var name: String { "\(Self.self)" }

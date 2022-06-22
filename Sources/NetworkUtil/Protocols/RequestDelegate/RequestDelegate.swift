@@ -4,7 +4,7 @@ public protocol RequestDelegate {
 	associatedtype RequestType: Request
 	associatedtype ResponseType: Response = StandardResponse
 	associatedtype ContentType = Void
-	associatedtype ErrorType: Error = RequestError
+	associatedtype ErrorType: Error = ControllerError
 
 	var name: String { get }
 
@@ -16,7 +16,7 @@ public protocol RequestDelegate {
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType
 	func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType
 
-	func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType
+	func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType
 }
 
 public extension RequestDelegate {
@@ -37,6 +37,6 @@ public extension RequestDelegate where ContentType == Void {
 	func content (_ response: ResponseType, _ requestInfo: RequestInfo) { }
 }
 
-public extension RequestDelegate where ErrorType == RequestError {
-	func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { error }
+public extension RequestDelegate where ErrorType == ControllerError {
+	func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType { error }
 }

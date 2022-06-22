@@ -6,14 +6,14 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 	public var urlRequestConverter: (URLRequest) -> String
 	public var urlResponseConverter: (URLResponse, Data) -> String
 	public var httpUrlResponseConverter: (HTTPURLResponse, Data) -> String
-	public var requestErrorConverter: (RequestError) -> String
+	public var requestErrorConverter: (ControllerError) -> String
 
 	public init (
 		requestInfo: @escaping (RequestInfo) -> String,
 		urlRequest: @escaping (URLRequest) -> String,
 		urlResponse: @escaping (URLResponse, Data) -> String,
 		httpUrlResponse: @escaping (HTTPURLResponse, Data) -> String,
-		requestError: @escaping (RequestError) -> String
+		requestError: @escaping (ControllerError) -> String
 	) {
 		self.requestInfoConverter = requestInfo
 		self.urlRequestConverter = urlRequest

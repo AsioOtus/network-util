@@ -12,7 +12,7 @@ public class DecoratorDelegate <InnerDelegate: RequestDelegate, RequestType: Req
 	let responseHandler: (Data, URLResponse, RequestInfo, InnerDelegate) throws -> ResponseType
 	let contentHandler: (ResponseType, RequestInfo, InnerDelegate) throws -> ContentType
 
-	let errorHandler: (RequestError, RequestInfo, InnerDelegate) -> ErrorType
+	let errorHandler: (ControllerError, RequestInfo, InnerDelegate) -> ErrorType
 
 	public init (
 		innerDelegate: InnerDelegate,
@@ -21,7 +21,7 @@ public class DecoratorDelegate <InnerDelegate: RequestDelegate, RequestType: Req
         urlRequest: @escaping (RequestType, RequestInfo, InnerDelegate) throws -> URLRequest = { request, _, _ in try request.urlRequest() },
         response: @escaping (Data, URLResponse, RequestInfo, InnerDelegate) throws -> ResponseType = { data, urlResponse, _, _ in try ResponseType(data, urlResponse) },
         content: @escaping (ResponseType, RequestInfo, InnerDelegate) throws -> ContentType,
-        error: @escaping (RequestError, RequestInfo, InnerDelegate) -> ErrorType,
+        error: @escaping (ControllerError, RequestInfo, InnerDelegate) -> ErrorType,
         name: String = "\(RequestType.self)"
 	) {
 		self.name = name
@@ -43,5 +43,5 @@ public class DecoratorDelegate <InnerDelegate: RequestDelegate, RequestType: Req
 	public func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try responseHandler(data, urlResponse, requestInfo, innerDelegate) }
 	public func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType { try contentHandler(response, requestInfo, innerDelegate) }
 
-	public func error (_ error: RequestError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo, innerDelegate) }
+	public func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType { errorHandler(error, requestInfo, innerDelegate) }
 }
