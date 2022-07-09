@@ -28,7 +28,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
         label: String? = nil,
         onSuccess: @escaping (RD.ContentType) -> Void,
         onFailure: @escaping (RD.ErrorType) -> Void = { _ in },
-        onCompleted: @escaping () -> Void = { }
+        onCompletion: @escaping () -> Void = { }
     ) {
         let requestInfo = RequestInfo(
             uuid: UUID(),
@@ -37,7 +37,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
             controllers: []
         )
 
-        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onFailure: onFailure, onCompleted: onCompleted)
+        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onFailure: onFailure, onCompleted: onCompletion)
     }
 
     public func send <RD: RequestDelegate> (
@@ -45,12 +45,12 @@ extension StandardNativeNetworkController: NativeNetworkController {
         _ requestInfo: RequestInfo,
         onSuccess: @escaping (RD.ContentType) -> Void,
         onFailure: @escaping (RD.ErrorType) -> Void  = { _ in },
-        onCompleted: @escaping () -> Void  = { }
+        onCompletion: @escaping () -> Void  = { }
     ) {
         func onError (_ requestError: ControllerError) {
-            self.logger.log(message: .error(requestError), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+            self.logger.log(message: .error(requestError), requestInfo: requestInfo)
             onFailure(requestDelegate.error(requestError, requestInfo))
-            onCompleted()
+            onCompletion()
         }
 
         let requestInfo = requestInfo
@@ -78,17 +78,15 @@ extension StandardNativeNetworkController: NativeNetworkController {
             return
         }
 
-        logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+        logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo)
 
         let task = urlSession.dataTask(with: urlRequest) { data, urlResponse, error in
             if let error = error as? URLError {
                 onError(ControllerError.networkFailure(NetworkError(urlSession, urlRequest, error)))
-                return
             } else if let error = error {
 				onError(ControllerError.general(.urlErrorIsEmpty(error)))
-                return
             } else if let data = data, let urlResponse = urlResponse {
-                self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+                self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo)
 
                 let response: RD.ResponseType
 
@@ -109,7 +107,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 }
 
                 onSuccess(content)
-                onCompleted()
+                onCompletion()
             } else {
 				onError(ControllerError.general(.urlResponseContentIsEmpty))
             }
