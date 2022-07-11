@@ -9,10 +9,9 @@ public final class Logger {
 
 	public init () { }
 
-	internal func log (message: LogMessage, requestInfo: RequestInfo, requestDelegateName: String) {
+	internal func log (message: LogMessage, requestInfo: RequestInfo) {
 		let record = LogRecord(
 			requestInfo: requestInfo,
-			requestDelegateName: requestDelegateName,
 			message: message
 		)
 

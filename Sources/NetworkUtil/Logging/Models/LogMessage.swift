@@ -13,3 +13,13 @@ public enum LogMessage {
 		}
 	}
 }
+
+public extension LogMessage {
+	var urlRequest: URLRequest? {
+		if case .request(_, let urlRequest) = self {
+			return urlRequest
+		} else {
+			return nil
+		}
+	}
+}

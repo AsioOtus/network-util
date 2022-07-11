@@ -10,7 +10,7 @@ public enum GeneralError: NetworkUtilError {
 	case other(Error)
 }
 
-extension GeneralError {
+public extension GeneralError {
 	static func otherError (_ error: Error) -> Self {
 		(error as? Self) ?? .other(error)
 	}

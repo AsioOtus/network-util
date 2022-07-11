@@ -53,7 +53,7 @@ public extension StandardNetworkController {
 
 				try interceptors.forEach { urlRequest = try $0(urlRequest) }
 
-				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo)
 
 				return (urlSession, urlRequest)
 			}
@@ -64,7 +64,7 @@ public extension StandardNetworkController {
 					.eraseToAnyPublisher()
 			}
 			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
-				self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+				self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo)
 
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
@@ -77,7 +77,7 @@ public extension StandardNetworkController {
 			.handleEvents(
 				receiveCompletion: { completion in
 					if case .failure(let error) = completion {
-						self.logger.log(message: .error(error), requestInfo: requestInfo, requestDelegateName: requestDelegate.name)
+						self.logger.log(message: .error(error), requestInfo: requestInfo)
 					}
 				}
 			)

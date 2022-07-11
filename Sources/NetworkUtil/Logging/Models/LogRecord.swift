@@ -1,6 +1,5 @@
 public struct LogRecord {
 	public let requestInfo: RequestInfo
-	public let requestDelegateName: String
 	public let message: LogMessage
 }
 

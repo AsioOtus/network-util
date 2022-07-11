@@ -6,9 +6,9 @@ public struct StandardRequestInfoStringConverter: RequestInfoStringConverter {
 	}
 
 	public func convert (_ requestInfo: RequestInfo) -> String {
-//		let message = "REQUEST UUID – \(requestInfo.uuid.uuidString)"
-//		return message
-		""
+		var message = "REQUEST UUID – \(requestInfo.uuid.uuidString)"
+		requestInfo.label.map { message.append(" | LABEL – \($0)") }
+		return message
 	}
 }
 

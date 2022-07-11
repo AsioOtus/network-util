@@ -24,13 +24,16 @@ public struct StandardLogRecordStringConverter: LogRecordStringConverter {
 
 	public func convert (_ record: LogRecord) -> String {
 		let requestInfoMessage = requestInfoConverter(record.requestInfo)
-		let detailsMessage = convert(record.message)
+		var messsage = "\(requestInfoMessage) | \(record.requestInfo.delegate)\n"
 
-		let messsage = "\(requestInfoMessage) | \(record.requestDelegateName)\n\(detailsMessage)\n"
+		if let detailsMessage = convert(record.message) {
+			messsage.append("\n\(detailsMessage)")
+		}
+
 		return messsage
 	}
 
-	public func convert (_ loggerMessage: LogMessage) -> String {
+	public func convert (_ loggerMessage: LogMessage) -> String? {
 		let message: String
 
 		switch loggerMessage {
