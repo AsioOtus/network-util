@@ -4,14 +4,19 @@ public class StandardNativeNetworkController {
     public let identificationInfo: IdentificationInfo
 
     private let logger = NativeLogger()
+	private let delegate: NetworkControllerDelegate
 
-	private var interceptors = [(URLRequest) throws -> URLRequest]()
+	private var requestInterceptors = [(URLRequest) throws -> URLRequest]()
+	private var responseInterceptors = [(URLResponse) throws -> URLResponse]()
 
     public init (
+		delegate: NetworkControllerDelegate = DefaultNetworkControllerDelegate(),
         label: String? = nil,
         file: String = #fileID,
         line: Int = #line
     ) {
+		self.delegate = delegate
+
         self.identificationInfo = IdentificationInfo(
             module: Info.moduleName,
             type: String(describing: Self.self),
@@ -37,7 +42,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
             controllers: []
         )
 
-        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onFailure: onFailure, onCompleted: onCompletion)
+        return send(requestDelegate, requestInfo, onSuccess: onSuccess, onFailure: onFailure, onCompletion: onCompletion)
     }
 
     public func send <RD: RequestDelegate> (
@@ -65,14 +70,17 @@ extension StandardNativeNetworkController: NativeNetworkController {
             return
         }
 
-        let urlSession: URLSession
+        var urlSession: URLSession
         var urlRequest: URLRequest
 
         do {
-            urlSession = try requestDelegate.urlSession(request, requestInfo)
-            urlRequest = try requestDelegate.urlRequest(request, requestInfo)
+			urlSession = try delegate.urlSession(request.urlRequest(), requestInfo)
+			urlRequest = try delegate.urlRequest(request.urlRequest(), requestInfo)
 
-			try interceptors.forEach { urlRequest = try $0(urlRequest) }
+			urlSession = try requestDelegate.urlSession(urlSession, requestInfo)
+			urlRequest = try requestDelegate.urlRequest(urlRequest, requestInfo)
+
+			try requestInterceptors.forEach { urlRequest = try $0(urlRequest) }
         } catch {
             onError(ControllerError.requestFailure(error))
             return
@@ -85,12 +93,14 @@ extension StandardNativeNetworkController: NativeNetworkController {
                 onError(ControllerError.networkFailure(NetworkError(urlSession, urlRequest, error)))
             } else if let error = error {
 				onError(ControllerError.general(.urlErrorIsEmpty(error)))
-            } else if let data = data, let urlResponse = urlResponse {
+            } else if let data = data, var urlResponse = urlResponse {
                 self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo)
 
                 let response: RD.ResponseType
 
                 do {
+					try self.responseInterceptors.forEach { urlResponse = try $0(urlResponse) }
+					
                     response = try requestDelegate.response(data, urlResponse, requestInfo)
                 } catch {
                     onError(ControllerError.responseFailure(error))
@@ -125,8 +135,14 @@ public extension StandardNativeNetworkController {
     }
 
 	@discardableResult
-	func add (interseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
-		interceptors.append(interseptor)
+	func add (requestInterseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
+		requestInterceptors.append(requestInterseptor)
+		return self
+	}
+
+	@discardableResult
+	func add (responseInterceptor: @escaping (URLResponse) throws -> URLResponse) -> Self {
+		responseInterceptors.append(responseInterceptor)
 		return self
 	}
 }

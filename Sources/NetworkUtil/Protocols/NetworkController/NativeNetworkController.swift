@@ -6,7 +6,7 @@ public protocol NativeNetworkController {
         label: String?,
         onSuccess: @escaping (RD.ContentType) -> Void,
         onFailure: @escaping (RD.ErrorType) -> Void,
-        onCompleted: @escaping () -> Void
+        onCompletion: @escaping () -> Void
     )
 
     func send <RD: RequestDelegate> (
@@ -14,6 +14,6 @@ public protocol NativeNetworkController {
         _ requestInfo: RequestInfo,
         onSuccess: @escaping (RD.ContentType) -> Void,
         onFailure: @escaping (RD.ErrorType) -> Void,
-        onCompleted: @escaping () -> Void
+		onCompletion: @escaping () -> Void
     )
 }

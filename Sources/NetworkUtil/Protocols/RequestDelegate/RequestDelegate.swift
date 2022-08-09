@@ -10,8 +10,8 @@ public protocol RequestDelegate {
 
 	func request (_ requestInfo: RequestInfo) throws -> RequestType
 
-	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession
-	func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest
+	func urlSession (_ urlSession: URLSession, _ requestInfo: RequestInfo) throws -> URLSession
+	func urlRequest (_ urlRequest: URLRequest, _ requestInfo: RequestInfo) throws -> URLRequest
 
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType
 	func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType
@@ -22,8 +22,8 @@ public protocol RequestDelegate {
 public extension RequestDelegate {
 	var name: String { "\(Self.self)" }
 
-	func urlSession (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLSession { try request.urlSession() }
-	func urlRequest (_ request: RequestType, _ requestInfo: RequestInfo) throws -> URLRequest { try request.urlRequest() }
+	func urlSession (_ urlSession: URLSession, _ requestInfo: RequestInfo) throws -> URLSession { urlSession }
+	func urlRequest (_ urlRequest: URLRequest, _ requestInfo: RequestInfo) throws -> URLRequest { urlRequest }
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try ResponseType(data, urlResponse) }
 }
 

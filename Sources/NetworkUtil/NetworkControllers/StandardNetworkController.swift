@@ -6,14 +6,19 @@ public class StandardNetworkController: NetworkController {
 	public let identificationInfo: IdentificationInfo
 
 	private let logger = Logger()
+	private let delegate: NetworkControllerDelegate
 
-	private var interceptors = [(URLRequest) throws -> URLRequest]()
+	private var requestInterceptors = [(URLRequest) throws -> URLRequest]()
+	private var responseInterceptors = [(URLResponse) throws -> URLResponse]()
 
 	public init (
+		delegate: NetworkControllerDelegate = DefaultNetworkControllerDelegate(),
 		label: String? = nil,
 		file: String = #fileID,
 		line: Int = #line
 	) {
+		self.delegate = delegate
+
 		self.identificationInfo = IdentificationInfo(
 			module: Info.moduleName,
 			type: String(describing: Self.self),
@@ -48,10 +53,15 @@ public extension StandardNetworkController {
             }
             .mapError { ControllerError.creationFailure($0) }
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
-				let urlSession = try requestDelegate.urlSession(request, requestInfo)
-				var urlRequest = try requestDelegate.urlRequest(request, requestInfo)
+				var urlSession = try delegate.urlSession(request, requestInfo)
+				var urlRequest = try delegate.urlRequest(request, requestInfo)
 
-				try interceptors.forEach { urlRequest = try $0(urlRequest) }
+				urlSession = try requestDelegate.urlSession(request.urlSession(), requestInfo)
+				urlRequest = try requestDelegate.urlRequest(request.urlRequest(), requestInfo)
+
+				try requestInterceptors.forEach { urlRequest = try $0(urlRequest) }
+				
+				urlRequest = try requestDelegate.urlRequest(urlRequest, requestInfo)
 
 				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo)
 
@@ -64,7 +74,11 @@ public extension StandardNetworkController {
 					.eraseToAnyPublisher()
 			}
 			.tryMap { (data: Data, urlResponse: URLResponse) -> RD.ResponseType in
+				var urlResponse = urlResponse
+
 				self.logger.log(message: .response(data, urlResponse), requestInfo: requestInfo)
+
+				try self.responseInterceptors.forEach { urlResponse = try $0(urlResponse) }
 
 				let response = try requestDelegate.response(data, urlResponse, requestInfo)
 				return response
@@ -103,8 +117,14 @@ public extension StandardNetworkController {
 	}
 
 	@discardableResult
-	func add (interseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
-		interceptors.append(interseptor)
+	func add (requestInterseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
+		requestInterceptors.append(requestInterseptor)
+		return self
+	}
+
+	@discardableResult
+	func add (responseInterceptor: @escaping (URLResponse) throws -> URLResponse) -> Self {
+		responseInterceptors.append(responseInterceptor)
 		return self
 	}
 }
