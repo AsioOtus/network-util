@@ -8,6 +8,4 @@ extension URLRequest: RequestDelegate {
 	public func content (_ response: StandardResponse, _ requestInfo: RequestInfo) -> (data: Data, urlResponse: URLResponse) {
 		(response.data, response.urlResponse)
 	}
-
-	public func error(_ error: ControllerError, _ requestInfo: RequestInfo) -> ControllerError { error }
 }
