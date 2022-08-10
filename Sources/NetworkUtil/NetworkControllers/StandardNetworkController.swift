@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, *)
-public class StandardNetworkController: NetworkController {
+public class StandardNetworkController {
 	public let identificationInfo: IdentificationInfo
 
 	private let logger = Logger()
@@ -30,8 +30,12 @@ public class StandardNetworkController: NetworkController {
 }
 
 @available(iOS 13.0, *)
-public extension StandardNetworkController {
-	func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
+extension StandardNetworkController: NetworkController {
+	public func send <RQ: Request, RS: Response> (request: RQ, response: RS.Type, label: String?) -> AnyPublisher<RS, ControllerError> {
+		send(TransparentDelegate(request: request, response: response), label: label)
+	}
+
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
 			label: label,
@@ -42,7 +46,7 @@ public extension StandardNetworkController {
 		return send(requestDelegate, requestInfo)
 	}
 
-	func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
 

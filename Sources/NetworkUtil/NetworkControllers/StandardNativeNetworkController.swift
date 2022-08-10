@@ -28,6 +28,22 @@ public class StandardNativeNetworkController {
 }
 
 extension StandardNativeNetworkController: NativeNetworkController {
+	public func send <RQ: Request, RS: Response> (
+		request: RQ,
+		response: RS.Type,
+		label: String?,
+		onSuccess: @escaping (RS) -> Void,
+		onFailure: @escaping (ControllerError) -> Void,
+		onCompletion: @escaping () -> Void
+	) {
+		send(
+			TransparentDelegate(request: request, response: response),
+			onSuccess: onSuccess,
+			onFailure: onFailure,
+			onCompletion: onCompletion
+		)
+	}
+
     public func send <RD: RequestDelegate> (
         _ requestDelegate: RD,
         label: String? = nil,

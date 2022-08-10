@@ -3,7 +3,7 @@ import Foundation
 public protocol RequestDelegate {
 	associatedtype RequestType: Request
 	associatedtype ResponseType: Response = StandardResponse
-	associatedtype ContentType = Void
+	associatedtype ContentType
 	associatedtype ErrorType: Error = ControllerError
 
 	var name: String { get }
@@ -25,16 +25,11 @@ public extension RequestDelegate {
 	func urlSession (_ urlSession: URLSession, _ requestInfo: RequestInfo) throws -> URLSession { urlSession }
 	func urlRequest (_ urlRequest: URLRequest, _ requestInfo: RequestInfo) throws -> URLRequest { urlRequest }
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType { try ResponseType(data, urlResponse) }
-}
-
-public extension RequestDelegate where ResponseType == StandardResponse {
-	func content (_ response: ResponseType, _ requestInfo: RequestInfo) -> (data: Data, urlResponse: URLResponse) {
-        (response.data, response.urlResponse)
-    }
+	func content (_ response: ResponseType, _ requestInfo: RequestInfo) -> ResponseType { response }
 }
 
 public extension RequestDelegate where ContentType == Void {
-	func content (_ response: ResponseType, _ requestInfo: RequestInfo) { }
+	func content (_ response: ResponseType, _ requestInfo: RequestInfo) -> ContentType { }
 }
 
 public extension RequestDelegate where ErrorType == ControllerError {
