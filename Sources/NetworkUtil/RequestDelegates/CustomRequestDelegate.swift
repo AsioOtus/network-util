@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CustomDelegate <RequestType: Request, ResponseType: Response, ContentType, ErrorType: Error> {
+public struct CustomRequestDelegate <RequestType: Request, ResponseType: Response, ContentType, ErrorType: Error> {
     public let name: String
 
     private let _request: (RequestInfo) throws -> RequestType
@@ -14,7 +14,7 @@ public struct CustomDelegate <RequestType: Request, ResponseType: Response, Cont
 	private let _error: (ControllerError, RequestInfo) -> ErrorType
 }
 
-extension CustomDelegate: RequestDelegate {
+extension CustomRequestDelegate: RequestDelegate {
 	public func request (_ requestInfo: RequestInfo) throws -> RequestType { try _request(requestInfo) }
 
 	public func urlSession (_ urlSession: URLSession, _ requestInfo: RequestInfo) throws -> URLSession { try _urlSession(urlSession, requestInfo) }
@@ -26,7 +26,7 @@ extension CustomDelegate: RequestDelegate {
 	public func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType { _error(error, requestInfo) }
 }
 
-public extension CustomDelegate {
+public extension CustomRequestDelegate {
 	init (
 		request: @escaping (RequestInfo) throws -> RequestType,
 		urlSession: @escaping (URLSession, RequestInfo) throws -> URLSession = { urlSession, _ in urlSession },
@@ -47,7 +47,7 @@ public extension CustomDelegate {
 	}
 }
 
-public extension CustomDelegate where ResponseType == StandardResponse {
+public extension CustomRequestDelegate where ResponseType == StandardResponse {
 	init (
 		request: @escaping (RequestInfo) throws -> RequestType,
 		content: @escaping (ResponseType, RequestInfo) throws -> ContentType,
@@ -63,7 +63,7 @@ public extension CustomDelegate where ResponseType == StandardResponse {
 	}
 }
 
-public extension CustomDelegate where ResponseType == StandardResponse, ErrorType == ControllerError {
+public extension CustomRequestDelegate where ResponseType == StandardResponse, ErrorType == ControllerError {
 	init (
 		request: @escaping (RequestInfo) throws -> RequestType,
 		content: @escaping (ResponseType, RequestInfo) throws -> ContentType,
@@ -78,7 +78,7 @@ public extension CustomDelegate where ResponseType == StandardResponse, ErrorTyp
 	}
 }
 
-public extension CustomDelegate where ResponseType == ContentType, ResponseType == StandardResponse, ErrorType == ControllerError {
+public extension CustomRequestDelegate where ResponseType == ContentType, ResponseType == StandardResponse, ErrorType == ControllerError {
 	init (
 		request: RequestType,
 		name: String = "\(RequestType.self)"
@@ -104,7 +104,7 @@ public extension CustomDelegate where ResponseType == ContentType, ResponseType 
 	}
 }
 
-public extension CustomDelegate {
+public extension CustomRequestDelegate {
 	@discardableResult
 	func on (urlSession urlSessionHandler: @escaping (URLSession, RequestInfo) throws -> URLSession) -> Self {
 		.init(
@@ -161,7 +161,7 @@ public extension CustomDelegate {
 	func on <NewResponseType: Response, NewContentType> (
 		response responseHandler: @escaping (Data, URLResponse, RequestInfo) throws -> NewResponseType,
 		content contentHandler: @escaping (NewResponseType, RequestInfo) throws -> NewContentType
-	) -> CustomDelegate<RequestType, NewResponseType, NewContentType, ErrorType> {
+	) -> CustomRequestDelegate<RequestType, NewResponseType, NewContentType, ErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,
@@ -177,7 +177,7 @@ public extension CustomDelegate {
 	func on <NewResponseType: Response, NewContentType> (
 		response responseHandler: @escaping (Data, URLResponse) throws -> NewResponseType,
 		content contentHandler: @escaping (NewResponseType) throws -> NewContentType
-	) -> CustomDelegate<RequestType, NewResponseType, NewContentType, ErrorType> {
+	) -> CustomRequestDelegate<RequestType, NewResponseType, NewContentType, ErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,
@@ -190,7 +190,37 @@ public extension CustomDelegate {
 	}
 
 	@discardableResult
-	func on <NewContentType> (content contentHandler: @escaping (ResponseType, RequestInfo) throws -> NewContentType) -> CustomDelegate<RequestType, ResponseType, NewContentType, ErrorType> {
+	func on <NewResponseType: Response> (
+		response responseHandler: @escaping (Data, URLResponse, RequestInfo) throws -> NewResponseType
+	) -> CustomRequestDelegate<RequestType, NewResponseType, NewResponseType, ErrorType> {
+		.init(
+			request: self._request,
+			urlSession: self._urlSession,
+			urlRequest: self._urlRequest,
+			response: responseHandler,
+			content: { response, _ in response },
+			error: 	self._error,
+			delegateName: self.name
+		)
+	}
+
+	@discardableResult
+	func on <NewResponseType: Response> (
+		response responseHandler: @escaping (Data, URLResponse) throws -> NewResponseType
+	) -> CustomRequestDelegate<RequestType, NewResponseType, NewResponseType, ErrorType> {
+		.init(
+			request: self._request,
+			urlSession: self._urlSession,
+			urlRequest: self._urlRequest,
+			response: { data, urlResponse, _ in try responseHandler(data, urlResponse) },
+			content: { response, _ in response },
+			error: 	self._error,
+			delegateName: self.name
+		)
+	}
+
+	@discardableResult
+	func on <NewContentType> (content contentHandler: @escaping (ResponseType, RequestInfo) throws -> NewContentType) -> CustomRequestDelegate<RequestType, ResponseType, NewContentType, ErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,
@@ -203,7 +233,7 @@ public extension CustomDelegate {
 	}
 
 	@discardableResult
-	func on <NewContentType> (content contentHandler: @escaping (ResponseType) throws -> NewContentType) -> CustomDelegate<RequestType, ResponseType, NewContentType, ErrorType> {
+	func on <NewContentType> (content contentHandler: @escaping (ResponseType) throws -> NewContentType) -> CustomRequestDelegate<RequestType, ResponseType, NewContentType, ErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,
@@ -216,7 +246,7 @@ public extension CustomDelegate {
 	}
 
 	@discardableResult
-	func on <NewErrorType: Error> (error errorHandler: @escaping (ControllerError, RequestInfo) -> NewErrorType) -> CustomDelegate<RequestType, ResponseType, ContentType, NewErrorType> {
+	func on <NewErrorType: Error> (error errorHandler: @escaping (ControllerError, RequestInfo) -> NewErrorType) -> CustomRequestDelegate<RequestType, ResponseType, ContentType, NewErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,
@@ -229,7 +259,7 @@ public extension CustomDelegate {
 	}
 
 	@discardableResult
-	func on <NewErrorType: Error> (error errorHandler: @escaping (ControllerError) -> NewErrorType) -> CustomDelegate<RequestType, ResponseType, ContentType, NewErrorType> {
+	func on <NewErrorType: Error> (error errorHandler: @escaping (ControllerError) -> NewErrorType) -> CustomRequestDelegate<RequestType, ResponseType, ContentType, NewErrorType> {
 		.init(
 			request: self._request,
 			urlSession: self._urlSession,

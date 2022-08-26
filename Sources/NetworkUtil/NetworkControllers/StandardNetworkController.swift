@@ -31,7 +31,7 @@ public class StandardNetworkController {
 
 @available(iOS 13.0, *)
 extension StandardNetworkController: NetworkController {
-	public func send <RQ: Request, RS: Response> (request: RQ, response: RS.Type, label: String?) -> AnyPublisher<RS, ControllerError> {
+	public func send <RQ: Request, RS: Response> (request: RQ, response: RS.Type, label: String? = nil) -> AnyPublisher<RS, ControllerError> {
 		send(TransparentDelegate(request: request, response: response), label: label)
 	}
 

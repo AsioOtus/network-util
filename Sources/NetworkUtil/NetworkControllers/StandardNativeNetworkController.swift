@@ -31,7 +31,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		request: RQ,
 		response: RS.Type,
-		label: String?,
+		label: String? = nil,
 		onSuccess: @escaping (RS) -> Void,
 		onFailure: @escaping (ControllerError) -> Void,
 		onCompletion: @escaping () -> Void
