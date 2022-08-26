@@ -35,6 +35,12 @@ extension StandardNetworkController: NetworkController {
 		send(TransparentDelegate(request: request, response: response), label: label)
 	}
 
+	public func send <RQ: Request, RM: ResponseModel> (request: RQ, responseModel: RM.Type, label: String? = nil) -> AnyPublisher<RM, ControllerError> {
+		send(TransparentDelegate(request: request, response: StandardModelResponse<RM>.self), label: label)
+			.map { response in response.model }
+			.eraseToAnyPublisher()
+	}
+
 	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
 		let requestInfo = RequestInfo(
 			uuid: UUID(),
