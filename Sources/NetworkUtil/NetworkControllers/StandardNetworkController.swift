@@ -35,28 +35,42 @@ public class StandardNetworkController {
 
 @available(iOS 13.0, *)
 extension StandardNetworkController: NetworkController {
-	public func send <RQ: Request, RS: Response> (request: RQ, response: RS.Type, label: String? = nil) -> AnyPublisher<RS, ControllerError> {
-		send(TransparentDelegate(request: request, response: response), label: label)
-	}
+    public func send <RQ: Request> (request: RQ, label: String? = nil)
+    -> AnyPublisher<StandardResponse, ControllerError>
+    {
+        send(TransparentDelegate(request: request, response: StandardResponse.self), label: label)
+    }
 
-	public func send <RQ: Request, RM: ResponseModel> (request: RQ, responseModel: RM.Type, label: String? = nil) -> AnyPublisher<RM, ControllerError> {
-		send(TransparentDelegate(request: request, response: StandardModelResponse<RM>.self), label: label)
-			.map { response in response.model }
-			.eraseToAnyPublisher()
-	}
+    public func send <RQ: Request, RS: Response> (request: RQ, response: RS.Type, label: String? = nil)
+    -> AnyPublisher<RS, ControllerError>
+    {
+        send(TransparentDelegate(request: request, response: response), label: label)
+    }
 
-	public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
-		let requestInfo = RequestInfo(
-			uuid: UUID(),
-			label: label,
-			delegate: requestDelegate.name,
-			controllers: []
-		)
+    public func send <RQ: Request, RM: ResponseModel> (request: RQ, responseModel: RM.Type, label: String? = nil)
+    -> AnyPublisher<RM, ControllerError>
+    {
+        send(TransparentDelegate(request: request, response: StandardModelResponse<RM>.self), label: label)
+            .map { response in response.model }
+            .eraseToAnyPublisher()
+    }
 
-		return send(requestDelegate, requestInfo)
-	}
+    public func send <RD: RequestDelegate> (_ requestDelegate: RD, label: String? = nil)
+    -> AnyPublisher<RD.ContentType, RD.ErrorType>
+    {
+        let requestInfo = RequestInfo(
+            uuid: UUID(),
+            label: label,
+            delegate: requestDelegate.name,
+            controllers: []
+        )
 
-	public func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo) -> AnyPublisher<RD.ContentType, RD.ErrorType> {
+        return send(requestDelegate, requestInfo)
+    }
+
+	public func send <RD: RequestDelegate> (_ requestDelegate: RD, _ requestInfo: RequestInfo)
+    -> AnyPublisher<RD.ContentType, RD.ErrorType>
+    {
 		let requestInfo = requestInfo
 			.add(identificationInfo)
 
@@ -129,8 +143,8 @@ public extension StandardNetworkController {
 	}
 
 	@discardableResult
-	func add (requestInterseptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
-		requestInterceptors.append(requestInterseptor)
+	func add (requestInterceptor: @escaping (URLRequest) throws -> URLRequest) -> Self {
+		requestInterceptors.append(requestInterceptor)
 		return self
 	}
 
