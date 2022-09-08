@@ -27,7 +27,7 @@ final class NetworkFlowUtilTests: XCTestCase {
 	
 	func test () {
 		let c = StandardNativeNetworkController()
-		CustomDelegate(request: URL(string: "")!)
+		CustomRequestDelegate(request: URL(string: "")!)
 		.on(
 			response: StandardResponse.init,
 			content: { $0 }

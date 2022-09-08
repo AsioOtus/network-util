@@ -29,7 +29,7 @@ public extension RequestDelegate {
 }
 
 public extension RequestDelegate where ContentType == Void {
-	func content (_ response: ResponseType, _ requestInfo: RequestInfo) -> ContentType { }
+	func content (_ response: ResponseType, _ requestInfo: RequestInfo) -> ContentType { () }
 }
 
 public extension RequestDelegate where ErrorType == ControllerError {

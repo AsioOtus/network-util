@@ -1,7 +1,7 @@
 import Foundation
 
 public enum GeneralError: NetworkUtilError {
-	case urlComponnetsCreationFailure(String)
+	case urlComponentsCreationFailure(String)
 	case urlCreationFailure(URLComponents)
 	case urlErrorIsEmpty(Error)
 	case urlResponseContentIsEmpty

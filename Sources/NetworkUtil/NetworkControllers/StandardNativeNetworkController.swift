@@ -4,18 +4,22 @@ public class StandardNativeNetworkController {
     public let identificationInfo: IdentificationInfo
 
     private let logger = NativeLogger()
-	private let delegate: NetworkControllerDelegate
+    
+    private let urlSessionBuilder: URLSessionBuilder
+    private let urlRequestBuilder: URLRequestBuilder
 
 	private var requestInterceptors = [(URLRequest) throws -> URLRequest]()
 	private var responseInterceptors = [(URLResponse) throws -> URLResponse]()
 
     public init (
-		delegate: NetworkControllerDelegate = DefaultNetworkControllerDelegate(),
+        urlSessionBuilder: URLSessionBuilder = .standard(),
+        urlRequestBuilder: URLRequestBuilder = .default,
         label: String? = nil,
         file: String = #fileID,
         line: Int = #line
     ) {
-		self.delegate = delegate
+        self.urlSessionBuilder = urlSessionBuilder
+		self.urlRequestBuilder = urlRequestBuilder
 
         self.identificationInfo = IdentificationInfo(
             module: Info.moduleName,
@@ -90,10 +94,10 @@ extension StandardNativeNetworkController: NativeNetworkController {
         var urlRequest: URLRequest
 
         do {
-			urlSession = try delegate.urlSession(request.urlRequest(), requestInfo)
-			urlRequest = try delegate.urlRequest(request.urlRequest(), requestInfo)
+			urlSession = try urlSessionBuilder.build(request, requestInfo)
+            urlSession = try requestDelegate.urlSession(urlSession, requestInfo)
 
-			urlSession = try requestDelegate.urlSession(urlSession, requestInfo)
+            urlRequest = try urlRequestBuilder.build(request, requestInfo)
 			urlRequest = try requestDelegate.urlRequest(urlRequest, requestInfo)
 
 			try requestInterceptors.forEach { urlRequest = try $0(urlRequest) }

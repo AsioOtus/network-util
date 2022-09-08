@@ -1,7 +1,9 @@
 import Foundation
 
 public protocol StructuredRequest: Request {
-	var method: String { get }
+    var basePath: String? { get }
+
+    var method: String { get }
 	var path: String { get }
 
 	var query: [String: String] { get }
@@ -11,6 +13,7 @@ public protocol StructuredRequest: Request {
 }
 
 public extension StructuredRequest {
+    var basePath: String? { nil }
 	var query: [String: String] { [:] }
 	var headers: [String: String] { [:] }
 
@@ -19,13 +22,19 @@ public extension StructuredRequest {
 
 public extension StructuredRequest {
 	func url () throws -> URL {
+        let path = basePath ?? path
+
 		guard var urlComponents = URLComponents(string: path)
-		else { throw GeneralError.urlComponnetsCreationFailure("Request path: \(path)") }
+		else { throw GeneralError.urlComponentsCreationFailure("Request path: \(path)") }
 
 		urlComponents.queryItems = query.map { key, value in .init(name: key, value: value) }
 
-		guard let url = urlComponents.url
+		guard var url = urlComponents.url
 		else { throw GeneralError.urlCreationFailure(urlComponents) }
+
+        if basePath != nil {
+            url.appendPathComponent(path)
+        }
 
 		return url
 	}

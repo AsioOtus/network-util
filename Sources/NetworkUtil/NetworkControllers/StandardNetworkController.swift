@@ -6,18 +6,22 @@ public class StandardNetworkController {
 	public let identificationInfo: IdentificationInfo
 
 	private let logger = Logger()
-	private let delegate: NetworkControllerDelegate
+    
+    private let urlSessionBuilder: URLSessionBuilder
+    private let urlRequestBuilder: URLRequestBuilder
 
 	private var requestInterceptors = [(URLRequest) throws -> URLRequest]()
 	private var responseInterceptors = [(URLResponse) throws -> URLResponse]()
 
 	public init (
-		delegate: NetworkControllerDelegate = DefaultNetworkControllerDelegate(),
+        urlSessionBuilder: URLSessionBuilder = .standard(),
+        urlRequestBuilder: URLRequestBuilder = .default,
 		label: String? = nil,
 		file: String = #fileID,
 		line: Int = #line
 	) {
-		self.delegate = delegate
+        self.urlSessionBuilder = urlSessionBuilder
+        self.urlRequestBuilder = urlRequestBuilder
 
 		self.identificationInfo = IdentificationInfo(
 			module: Info.moduleName,
@@ -63,15 +67,13 @@ extension StandardNetworkController: NetworkController {
             }
             .mapError { ControllerError.creationFailure($0) }
             .tryMap { (request: RD.RequestType, requestDelegate: RD) -> (URLSession, URLRequest) in
-				var urlSession = try delegate.urlSession(request, requestInfo)
-				var urlRequest = try delegate.urlRequest(request, requestInfo)
+				var urlSession = try urlSessionBuilder.build(request, requestInfo)
+                urlSession = try requestDelegate.urlSession(urlSession, requestInfo)
 
-				urlSession = try requestDelegate.urlSession(request.urlSession(), requestInfo)
-				urlRequest = try requestDelegate.urlRequest(request.urlRequest(), requestInfo)
+                var urlRequest = try urlRequestBuilder.build(request, requestInfo)
+				urlRequest = try requestDelegate.urlRequest(urlRequest, requestInfo)
 
 				try requestInterceptors.forEach { urlRequest = try $0(urlRequest) }
-				
-				urlRequest = try requestDelegate.urlRequest(urlRequest, requestInfo)
 
 				self.logger.log(message: .request(urlSession, urlRequest), requestInfo: requestInfo)
 
