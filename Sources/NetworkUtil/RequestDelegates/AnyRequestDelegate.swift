@@ -10,7 +10,7 @@ public struct AnyRequestDelegate <RequestType: Request, ResponseType: Response, 
 	private let _response: (Data, URLResponse, RequestInfo) throws -> ResponseType
 	private let _content: (ResponseType, RequestInfo) throws -> ContentType
 
-	private let _error: (ControllerError, RequestInfo) -> ErrorType
+	private let _error: (ControllerError.Category, RequestInfo) -> ErrorType
 
 	public init <RD: RequestDelegate> (
 		_ delegate: RD,

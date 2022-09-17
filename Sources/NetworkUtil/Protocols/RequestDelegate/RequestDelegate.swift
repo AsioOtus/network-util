@@ -16,7 +16,7 @@ public protocol RequestDelegate {
 	func response (_ data: Data, _ urlResponse: URLResponse, _ requestInfo: RequestInfo) throws -> ResponseType
 	func content (_ response: ResponseType, _ requestInfo: RequestInfo) throws -> ContentType
 
-	func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType
+	func error (_ category: ControllerError.Category, _ requestInfo: RequestInfo) -> ErrorType
 }
 
 public extension RequestDelegate {
@@ -33,5 +33,5 @@ public extension RequestDelegate where ContentType == Void {
 }
 
 public extension RequestDelegate where ErrorType == ControllerError {
-	func error (_ error: ControllerError, _ requestInfo: RequestInfo) -> ErrorType { error }
+    func error (_ category: ControllerError.Category, _ requestInfo: RequestInfo) -> ErrorType { .init(requestType: RequestType.self, category: category) }
 }

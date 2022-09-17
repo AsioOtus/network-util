@@ -72,7 +72,7 @@ extension StandardNativeNetworkController: NativeNetworkController {
         onFailure: @escaping (RD.ErrorType) -> Void  = { _ in },
         onCompletion: @escaping () -> Void  = { }
     ) {
-        func onError (_ requestError: ControllerError) {
+        func onError (_ requestError: ControllerError.Category) {
             self.logger.log(message: .error(requestError), requestInfo: requestInfo)
             onFailure(requestDelegate.error(requestError, requestInfo))
             onCompletion()
