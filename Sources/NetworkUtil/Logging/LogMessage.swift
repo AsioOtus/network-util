@@ -5,11 +5,21 @@ public enum LogMessage {
 	case response(Data, URLResponse)
 	case error(ControllerError)
 
-	public var typeName: String {
+	public var name: String {
 		switch self {
 		case .request: return "request"
 		case .response: return "response"
 		case .error: return "error"
+		}
+	}
+}
+
+extension LogMessage: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case .request(_, let urlRequest): return urlRequest.description
+		case .response(_, let urlResponse): return urlResponse.description
+		case .error(let error): return "\(error.name): \(error.innerError.localizedDescription)"
 		}
 	}
 }

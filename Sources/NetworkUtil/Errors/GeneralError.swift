@@ -3,9 +3,6 @@ import Foundation
 public enum GeneralError: NetworkUtilError {
 	case urlComponentsCreationFailure(String)
 	case urlCreationFailure(URLComponents)
-	case urlErrorIsEmpty(Error)
-	case urlResponseContentIsEmpty
-	case serialTimeout(Error)
 
 	case other(Error)
 }

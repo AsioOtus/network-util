@@ -1,74 +1,41 @@
-import Foundation
+public struct ControllerError: NetworkUtilError {
+	let request: Request
+	let category: Category
+}
 
-public enum ControllerError: NetworkUtilError {
-	case creation(Error)
-    case request(Error)
-    case network(NetworkError)
-	case response(Error)
-    case content(Error)
+extension ControllerError {
+	public enum Category {
+		case request(Error)
+		case network(NetworkError)
+		case response(Error)
 
-	case general(GeneralError)
-
-    public var innerError: Error {
-        switch self {
-		case .creation(let error): fallthrough
-        case .request(let error): fallthrough
-		case .network(let error as Error): return error
-		case .response(let error): fallthrough
-        case .content(let error): fallthrough
-		case .general(let error as Error): return error
-        }
-    }
-
-    public var domainError: Error? {
-        switch self {
-        case .creation(let error): fallthrough
-        case .content(let error): return error
-        default: return nil
-        }
-    }
-
-    public var networkError: NetworkError? {
-        switch self {
-        case .network(let error): return error
-        default: return nil
-        }
-    }
-
-    public var name: String {
-        switch self {
-		case .creation: return "creation"
-        case .request: return "request"
-        case .network: return "network"
-		case .response: return "response"
-        case .content: return "content"
-		case .general: return "general"
-        }
-    }
+		case general(GeneralError)
+	}
 }
 
 public extension ControllerError {
-	static func creationFailure (_ error: Error) -> Self {
-		(error as? Self) ?? .creation(error)
+	var innerError: Error {
+		switch category {
+		case .request(let error): fallthrough
+		case .network(let error as Error): return error
+		case .response(let error): fallthrough
+		case .general(let error as Error): return error
+		}
 	}
 
-    static func requestFailure (_ error: Error) -> Self {
-        (error as? Self) ?? .request(error)
-    }
-
-    static func networkFailure (_ error: NetworkError) -> Self {
-        .network(error)
-    }
-
-    static func responseFailure (_ error: Error) -> Self {
-        (error as? Self) ?? .response(error)
-    }
-
-	static func contentFailure (_ error: Error) -> Self {
-		(error as? Self) ?? .content(error)
+	var networkError: NetworkError? {
+		switch category {
+		case .network(let error): return error
+		default: return nil
+		}
 	}
 
-	static func generalFailure (_ error: Error) -> Self {
-		(error as? Self) ?? .general(.otherError(error))
+	var name: String {
+		switch category {
+		case .request: return "request"
+		case .network: return "network"
+		case .response: return "response"
+		case .general: return "general"
+		}
 	}
 }

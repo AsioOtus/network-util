@@ -5,3 +5,7 @@ public protocol ModellableRequest: Request {
 
 	var model: Model { get }
 }
+
+public extension ModellableRequest {
+	var body: Data? { get throws { try model.data() } }
+}
