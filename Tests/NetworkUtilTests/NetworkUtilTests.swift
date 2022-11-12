@@ -25,25 +25,12 @@ public struct Model: Codable {
 var subscriptions = Set<AnyCancellable>()
 
 final class NetworkFlowUtilTests: XCTestCase {
-//	var cancellables = Set<AnyCancellable>()
-
-    @available(iOS 13, *)
-	func test () {
-		let c = StandardNetworkController()
-
-        StandardNetworkController()
-            .send(request: .standard(subpath: "qwe"))
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { _ in }
-            )
-            .store(in: &subscriptions)
-
-		CustomRequestDelegate(request: URL(string: "")!)
-		.on(
-			response: StandardResponse.init,
-			content: { $0 }
-		)
-		.on(error: { $0 })
+	func test () async throws {
+		try await StandardAsyncNetworkController(basePath: "").send(.get("qwe"))
+		StandardCombineNetworkController(basePath: "").send(.get("qwe"))
+			.sink(
+				receiveCompletion: { _ in },
+				receiveValue: { _ in }
+			)
 	}
 }

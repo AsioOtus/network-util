@@ -1,4 +1,7 @@
+import Foundation
+
 public struct ControllerError: NetworkUtilError {
+	let requestId: UUID
 	let request: Request
 	let category: Category
 }

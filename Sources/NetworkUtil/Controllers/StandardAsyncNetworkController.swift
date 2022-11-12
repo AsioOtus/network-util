@@ -1,6 +1,6 @@
 import Foundation
 
-public class StandardAsyncNetworkController {
+public class StandardAsyncNetworkController: BuilderInitializable {
 	private let logger = Logger()
 
 	private let urlSessionBuilder: URLSessionBuilder
@@ -42,7 +42,7 @@ private extension StandardAsyncNetworkController {
 			logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 		} catch {
 			throw controllerError(
-				.init(request: request, category: .request(error)),
+				.init(requestId: requestId, request: request, category: .request(error)),
 				requestId,
 				request
 			)
@@ -55,13 +55,13 @@ private extension StandardAsyncNetworkController {
 			logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
 		} catch let urlError as URLError {
 			throw controllerError(
-				.init(request: request, category: .network(.init(urlSession, urlRequest, urlError))),
+				.init(requestId: requestId, request: request, category: .network(.init(urlSession, urlRequest, urlError))),
 				requestId,
 				request
 			)
 		} catch {
 			throw controllerError(
-				.init(request: request, category: .general(.other(error))),
+				.init(requestId: requestId, request: request, category: .general(.other(error))),
 				requestId,
 				request
 			)
@@ -72,7 +72,7 @@ private extension StandardAsyncNetworkController {
 			response = try .init(data, urlResponse)
 		} catch {
 			throw controllerError(
-				.init(request: request, category: .response(error)),
+				.init(requestId: requestId, request: request, category: .response(error)),
 				requestId,
 				request
 			)
@@ -94,3 +94,5 @@ public extension StandardAsyncNetworkController {
 		return self
 	}
 }
+
+extension StandardAsyncNetworkController: StandardBuilderInitializable { }
