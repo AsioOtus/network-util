@@ -3,10 +3,10 @@ public protocol StandardBuilderInitializable: BuilderInitializable { }
 extension StandardBuilderInitializable {
 	init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		scheme: String = "http",
-		basePath: String,
-		query: [String: String] = [:],
-		headers: [String: String] = [:]
+		scheme: @escaping @autoclosure () -> String = "http",
+		basePath: @escaping @autoclosure () -> String,
+		query: @escaping @autoclosure () -> [String: String] = [:],
+		headers: @escaping @autoclosure () -> [String: String] = [:]
 	) {
 		self.init(
 			urlSessionBuilder: urlSessionBuilder,

@@ -25,7 +25,6 @@ public struct StandardModelRequest <Model: RequestModel>: ModellableRequest {
 }
 
 public extension StandardModelRequest {
-	@discardableResult
 	func set (method: HTTPMethod) -> Self {
 		.init(
 			method: method,
@@ -36,7 +35,6 @@ public extension StandardModelRequest {
 		)
 	}
 
-	@discardableResult
 	func set (path: String) -> Self {
 		.init(
 			method: method,
@@ -47,7 +45,6 @@ public extension StandardModelRequest {
 		)
 	}
 
-	@discardableResult
 	func set (query: [String: String]) -> Self {
 		.init(
 			method: method,
@@ -58,7 +55,6 @@ public extension StandardModelRequest {
 		)
 	}
 
-	@discardableResult
 	func set (headers: [String: String]) -> Self {
 		.init(
 			method: method,
@@ -69,7 +65,6 @@ public extension StandardModelRequest {
 		)
 	}
 
-	@discardableResult
 	func set <NewModel: RequestModel> (model: NewModel) -> StandardModelRequest<NewModel> {
 		.init(
 			method: method,
