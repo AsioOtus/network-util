@@ -6,32 +6,46 @@ public class StandardCombineNetworkController {
 
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
+	private let urlRequestsInterceptors: [URLRequestInterceptor]
 
-	public required init (
+	public init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder
+		urlRequestBuilder: URLRequestBuilder,
+		urlRequestsInterceptors: [URLRequestInterceptor] = []
 	) {
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
+		self.urlRequestsInterceptors = urlRequestsInterceptors
 	}
 }
 
-extension StandardCombineNetworkController {
-	public func send <RQ: Request> (_ request: RQ) -> AnyPublisher<StandardResponse, ControllerError> {
-		send(request, StandardResponse.self)
+extension StandardCombineNetworkController: CombineNetworkController {
+	public func send <RQ: Request> (
+		_ request: RQ,
+		interceptors: URLRequestInterceptor? = nil
+	) -> AnyPublisher<StandardResponse, ControllerError> {
+		send(request, StandardResponse.self, interceptor: interceptors)
 	}
 
-	public func send <RQ: Request, RS: Response> (_ request: RQ, response: RS.Type) -> AnyPublisher<RS, ControllerError> {
-		send(request, RS.self)
+	public func send <RQ: Request, RS: Response> (
+		_ request: RQ,
+		response: RS.Type,
+		interceptors: URLRequestInterceptor? = nil
+	) -> AnyPublisher<RS, ControllerError> {
+		send(request, RS.self, interceptor: interceptors)
 	}
 
-	public func send <RQ: Request, RSM: ResponseModel> (_ request: RQ, responseModel: RSM.Type) -> AnyPublisher<StandardModelResponse<RSM>, ControllerError> {
-		send(request, StandardModelResponse<RSM>.self)
+	public func send <RQ: Request, RSM: ResponseModel> (
+		_ request: RQ,
+		responseModel: RSM.Type,
+		interceptors: URLRequestInterceptor? = nil
+	) -> AnyPublisher<StandardModelResponse<RSM>, ControllerError> {
+		send(request, StandardModelResponse<RSM>.self, interceptor: interceptors)
 	}
 }
 
 private extension StandardCombineNetworkController {
-	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type) -> AnyPublisher<RS, ControllerError> {
+	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, interceptor: URLRequestInterceptor?) -> AnyPublisher<RS, ControllerError> {
 		let requestId = UUID()
 
 		return Just(request)
@@ -42,6 +56,12 @@ private extension StandardCombineNetworkController {
 				logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
 				return (urlSession, urlRequest)
+			}
+			.tryMap { urlSession, urlRequest in
+				let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
+				let interceptedUrlRequest = try Chain.create(chainUnits: interceptors)?.transform(urlRequest)
+
+				return (urlSession, interceptedUrlRequest ?? urlRequest)
 			}
 			.mapError { ControllerError(requestId: requestId, request: request, category: .request($0)) }
 			.flatMap { urlSession, urlRequest in
@@ -75,4 +95,24 @@ public extension StandardCombineNetworkController {
 	}
 }
 
-extension StandardCombineNetworkController: StandardBuilderInitializable { }
+public extension StandardCombineNetworkController {
+	convenience init (
+		urlSessionBuilder: URLSessionBuilder = .standard(),
+		scheme: @escaping @autoclosure () -> String = "http",
+		basePath: @escaping @autoclosure () -> String,
+		query: @escaping @autoclosure () -> [String: String] = [:],
+		headers: @escaping @autoclosure () -> [String: String] = [:],
+		urlRequestsInterceptors: [URLRequestInterceptor] = []
+	) {
+		self.init(
+			urlSessionBuilder: urlSessionBuilder,
+			urlRequestBuilder: .standard(
+				scheme: scheme,
+				basePath: basePath,
+				query: query,
+				headers: headers
+			),
+			urlRequestsInterceptors: urlRequestsInterceptors
+		)
+	}
+}

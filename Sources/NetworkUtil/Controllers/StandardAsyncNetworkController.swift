@@ -1,43 +1,62 @@
 import Foundation
 
-public class StandardAsyncNetworkController: BuilderInitializable {
+public class StandardAsyncNetworkController {
 	private let logger = Logger()
 
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
+	private let urlRequestsInterceptors: [URLRequestInterceptor]
 
-	public required init (
+	public init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder
+		urlRequestBuilder: URLRequestBuilder,
+		urlRequestsInterceptors: [URLRequestInterceptor] = []
 	) {
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
+		self.urlRequestsInterceptors = urlRequestsInterceptors
 	}
 }
 
 extension StandardAsyncNetworkController: AsyncNetworkController {
-	public func send <RQ: Request> (_ request: RQ) async throws -> StandardResponse {
-		try await send(request, StandardResponse.self)
+	public func send <RQ: Request> (
+		_ request: RQ,
+	interceptors: URLRequestInterceptor? = nil
+	) async throws -> StandardResponse {
+		try await send(request, StandardResponse.self, interceptor: interceptors)
 	}
 
-	public func send <RQ: Request, RS: Response> (_ request: RQ, response: RS.Type) async throws -> RS {
-		try await send(request, RS.self)
+	public func send <RQ: Request, RS: Response> (
+		_ request: RQ,
+		response: RS.Type,
+		interceptors: URLRequestInterceptor? = nil
+	) async throws -> RS {
+		try await send(request, RS.self, interceptor: interceptors)
 	}
 
-	public func send <RQ: Request, RSM: ResponseModel> (_ request: RQ, responseModel: RSM.Type) async throws -> StandardModelResponse<RSM> {
-		try await send(request, StandardModelResponse<RSM>.self)
+	public func send <RQ: Request, RSM: ResponseModel> (
+		_ request: RQ,
+		responseModel: RSM.Type,
+		interceptors: URLRequestInterceptor? = nil
+	) async throws -> StandardModelResponse<RSM> {
+		try await send(request, StandardModelResponse<RSM>.self, interceptor: interceptors)
 	}
 }
 
 private extension StandardAsyncNetworkController {
-	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type) async throws -> RS {
+	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, interceptor: URLRequestInterceptor?) async throws -> RS {
 		let requestId = UUID()
 
 		let urlSession: URLSession
 		let urlRequest: URLRequest
 		do {
 			urlSession = try urlSessionBuilder.build(request)
-			urlRequest = try urlRequestBuilder.build(request)
+
+			let buildUrlRequest = try urlRequestBuilder.build(request)
+			let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
+			let interceptedUrlRequest = try Chain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
+
+			urlRequest = interceptedUrlRequest ?? buildUrlRequest
 
 			logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 		} catch {
@@ -95,4 +114,24 @@ public extension StandardAsyncNetworkController {
 	}
 }
 
-extension StandardAsyncNetworkController: StandardBuilderInitializable { }
+public extension StandardAsyncNetworkController {
+	convenience init (
+		urlSessionBuilder: URLSessionBuilder = .standard(),
+		scheme: @escaping @autoclosure () -> String = "http",
+		basePath: @escaping @autoclosure () -> String,
+		query: @escaping @autoclosure () -> [String: String] = [:],
+		headers: @escaping @autoclosure () -> [String: String] = [:],
+		urlRequestsInterceptors: [URLRequestInterceptor] = []
+	) {
+		self.init(
+			urlSessionBuilder: urlSessionBuilder,
+			urlRequestBuilder: .standard(
+				scheme: scheme,
+				basePath: basePath,
+				query: query,
+				headers: headers
+			),
+			urlRequestsInterceptors: urlRequestsInterceptors
+		)
+	}
+}
