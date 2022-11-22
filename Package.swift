@@ -6,7 +6,7 @@ let package = Package(
 	name: "NetworkUtil",
 	platforms: [
 		.iOS(.v13),
-		.macOS(.v12)
+		.macOS(.v13)
 	],
 	products: [
 		.library(
@@ -15,6 +15,7 @@ let package = Package(
 	],
 	targets: [
 		.target(name: "NetworkUtil"),
+		.executableTarget(name: "qwe", dependencies: ["NetworkUtil"]),
 		.testTarget(
 			name: "NetworkUtilTests",
 			dependencies: ["NetworkUtil"]

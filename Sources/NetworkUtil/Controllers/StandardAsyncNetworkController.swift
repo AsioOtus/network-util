@@ -5,46 +5,69 @@ public class StandardAsyncNetworkController {
 
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
-	private let urlRequestsInterceptors: [URLRequestInterceptor]
+	private let urlRequestsInterceptors: [any URLRequestInterceptor]
 
 	public init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
 		urlRequestBuilder: URLRequestBuilder,
-		urlRequestsInterceptors: [URLRequestInterceptor] = []
+		interceptors: [any URLRequestInterceptor] = []
 	) {
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
-		self.urlRequestsInterceptors = urlRequestsInterceptors
+		self.urlRequestsInterceptors = interceptors
 	}
 }
 
 extension StandardAsyncNetworkController: AsyncNetworkController {
 	public func send <RQ: Request> (
 		_ request: RQ,
-	interceptors: URLRequestInterceptor? = nil
+	interceptor: (some URLRequestInterceptor)? = nil
 	) async throws -> StandardResponse {
-		try await send(request, StandardResponse.self, interceptor: interceptors)
+		try await send(request, StandardResponse.self, interceptor)
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		interceptors: URLRequestInterceptor? = nil
+		interceptor: (some URLRequestInterceptor)? = nil
 	) async throws -> RS {
-		try await send(request, RS.self, interceptor: interceptors)
+		try await send(request, RS.self, interceptor)
 	}
 
 	public func send <RQ: Request, RSM: ResponseModel> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		interceptors: URLRequestInterceptor? = nil
+		interceptor: (some URLRequestInterceptor)? = nil
 	) async throws -> StandardModelResponse<RSM> {
-		try await send(request, StandardModelResponse<RSM>.self, interceptor: interceptors)
+		try await send(request, StandardModelResponse<RSM>.self, interceptor)
+	}
+
+	public func send <RQ: Request> (
+		_ request: RQ,
+		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
+	) async throws -> StandardResponse {
+		try await send(request, StandardResponse.self, CompactURLRequestInterceptor(interception))
+	}
+
+	public func send <RQ: Request, RS: Response> (
+		_ request: RQ,
+		response: RS.Type,
+		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
+	) async throws -> RS {
+		try await send(request, RS.self, CompactURLRequestInterceptor(interception))
+	}
+
+	public func send <RQ: Request, RSM: ResponseModel> (
+		_ request: RQ,
+		responseModel: RSM.Type,
+		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
+	) async throws -> StandardModelResponse<RSM> {
+		try await send(request, StandardModelResponse<RSM>.self, CompactURLRequestInterceptor(interception))
 	}
 }
 
 private extension StandardAsyncNetworkController {
-	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, interceptor: URLRequestInterceptor?) async throws -> RS {
+	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, _ interceptor: (some URLRequestInterceptor)?) async throws -> RS {
 		let requestId = UUID()
 
 		let urlSession: URLSession
@@ -54,7 +77,8 @@ private extension StandardAsyncNetworkController {
 
 			let buildUrlRequest = try urlRequestBuilder.build(request)
 			let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
-			let interceptedUrlRequest = try Chain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
+			let interceptedUrlRequest = try URLRequestInterceptorChain.create(chainUnits: interceptors)?
+				.transform(buildUrlRequest)
 
 			urlRequest = interceptedUrlRequest ?? buildUrlRequest
 
@@ -121,7 +145,7 @@ public extension StandardAsyncNetworkController {
 		basePath: @escaping @autoclosure () -> String,
 		query: @escaping @autoclosure () -> [String: String] = [:],
 		headers: @escaping @autoclosure () -> [String: String] = [:],
-		urlRequestsInterceptors: [URLRequestInterceptor] = []
+		interceptors: [any URLRequestInterceptor] = []
 	) {
 		self.init(
 			urlSessionBuilder: urlSessionBuilder,
@@ -131,7 +155,7 @@ public extension StandardAsyncNetworkController {
 				query: query,
 				headers: headers
 			),
-			urlRequestsInterceptors: urlRequestsInterceptors
+			interceptors: interceptors
 		)
 	}
 }

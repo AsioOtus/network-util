@@ -6,16 +6,20 @@ var subscriptions = Set<AnyCancellable>()
 
 final class NetworkFlowUtilTests: XCTestCase {
 	func test () async throws {
+//		let array: [any URLRequestInterceptor] = [
+//			{ current, next in print(1); return try next(current) },
+//			{ current, next in print(2); return try next(current) },
+//			{ current, next in print(3); return try next(current) },
+//		]
+//
+//		
+//
+//		let a = Chain.create(chainUnits: array)
+//		try a?.transform(.init(url: .init(string: "localhost")!))
 
-		let array: [URLRequestInterceptor] = [
-			{ current, next in print(1); return try next(current) },
-			{ current, next in print(2); return try next(current) },
-			{ current, next in print(3); return try next(current) },
-		]
-
-		
-
-		let a = Chain.create(chainUnits: array)
-		try a?.transform(.init(url: .init(string: "localhost")!))
+		let nc = StandardAsyncNetworkController(basePath: "")
+//		nc.send(.get("")) { a, b in
+//			return a
+//		}
 	}
 }
