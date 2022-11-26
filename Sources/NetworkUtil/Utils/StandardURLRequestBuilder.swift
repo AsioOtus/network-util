@@ -24,7 +24,7 @@ public struct StandardURLRequestBuilder {
 	public init (
 		scheme: String = "http",
 		basePath: String,
-    port: Int,
+    port: Int? = nil,
 		query: [String: String] = [:],
 		headers: [String: String] = [:]
 	) {
@@ -83,12 +83,14 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 	static func standard (
 		scheme: @escaping () throws -> String = { "http" },
 		basePath: @escaping () throws -> String,
+    port: @escaping () throws -> Int? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },
 		headers: @escaping () throws -> [String: String] = { [:] }
 	) -> Self {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
+      port: port,
 			query: query,
 			headers: headers
 		)

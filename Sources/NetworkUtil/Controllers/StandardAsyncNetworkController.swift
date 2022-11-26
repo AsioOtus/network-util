@@ -143,6 +143,7 @@ public extension StandardAsyncNetworkController {
 		urlSessionBuilder: URLSessionBuilder = .standard(),
     scheme: @escaping () throws -> String = { "http" },
     basePath: @escaping () throws -> String,
+    port: @escaping () throws -> Int? = { nil },
     query: @escaping () throws -> [String: String] = { [:] },
     headers: @escaping () throws -> [String: String] = { [:] },
 		interceptors: [any URLRequestInterceptor] = []
@@ -152,6 +153,7 @@ public extension StandardAsyncNetworkController {
 			urlRequestBuilder: .standard(
 				scheme: scheme,
 				basePath: basePath,
+        port: port,
 				query: query,
 				headers: headers
 			),
@@ -163,6 +165,7 @@ public extension StandardAsyncNetworkController {
     urlSessionBuilder: URLSessionBuilder = .standard(),
     scheme: String = "http",
     basePath: String,
+    port: Int? = nil,
     query: [String: String] = [:],
     headers: [String: String] = [:],
     interceptors: [any URLRequestInterceptor] = []
@@ -172,6 +175,7 @@ public extension StandardAsyncNetworkController {
       urlRequestBuilder: .standard(
         scheme: { scheme },
         basePath: { basePath },
+        port: { port },
         query: { query },
         headers: { headers }
       ),
