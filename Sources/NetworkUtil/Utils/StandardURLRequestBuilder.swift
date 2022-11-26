@@ -43,7 +43,7 @@ public struct StandardURLRequestBuilder {
     let port = try port()
 		let query = try query()
 
-		let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString
+		let path = URL(string: "\(scheme)://\(basePath)")?.appendingPathComponent(request.path).absoluteString
 
 		guard
 			let path = path,
@@ -90,7 +90,7 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
-      port: port,
+      
 			query: query,
 			headers: headers
 		)
