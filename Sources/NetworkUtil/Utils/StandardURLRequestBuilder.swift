@@ -1,16 +1,16 @@
 import Foundation
 
 public struct StandardURLRequestBuilder {
-	public let scheme: () -> String
-	public let basePath: () -> String
-	public let query: () -> [String: String]
-	public let headers: () -> [String: String]
+	public let scheme: () throws -> String
+	public let basePath: () throws -> String
+	public let query: () throws -> [String: String]
+	public let headers: () throws -> [String: String]
 
 	public init (
-		scheme: @escaping () -> String = { "http" },
-		basePath: @escaping () -> String,
-		query: @escaping () -> [String: String] = { [:] },
-		headers: @escaping () -> [String: String] = { [:] }
+		scheme: @escaping () throws -> String = { "http" },
+		basePath: @escaping () throws -> String,
+		query: @escaping () throws -> [String: String] = { [:] },
+		headers: @escaping () throws -> [String: String] = { [:] }
 	) {
 		self.scheme = scheme
 		self.basePath = basePath
@@ -33,9 +33,9 @@ public struct StandardURLRequestBuilder {
 	}
 
 	public func url (_ request: Request) throws -> URL {
-		let basePath = basePath()
-		let scheme = scheme()
-		let query = query()
+		let basePath = try basePath()
+		let scheme = try scheme()
+		let query = try query()
 
 		let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString
 
@@ -58,7 +58,7 @@ public struct StandardURLRequestBuilder {
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
 	public func build <R: Request> (_ request: R) throws -> URLRequest {
-		let headers = headers()
+		let headers = try headers()
 
 		let url = try url(request)
 		var urlRequest = URLRequest(url: url)
@@ -75,30 +75,16 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 
 public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 	static func standard (
-		scheme: @escaping @autoclosure () -> String = "http",
-		basePath: @escaping @autoclosure () -> String,
-		query: @escaping @autoclosure () -> [String: String] = [:],
-		headers: @escaping @autoclosure () -> [String: String] = [:]
+		scheme: @escaping () throws -> String = { "http" },
+		basePath: @escaping () throws -> String,
+		query: @escaping () throws -> [String: String] = { [:] },
+		headers: @escaping () throws -> [String: String] = { [:] }
 	) -> Self {
 		.init(
-			scheme: scheme(),
-			basePath: basePath(),
-			query: query(),
-			headers: headers()
-		)
-	}
-
-	static func standard (
-		scheme: @escaping () -> String = { "http" },
-		basePath: @escaping () -> String,
-		query: @escaping () -> [String: String] = { [:] },
-		headers: @escaping () -> [String: String] = { [:] }
-	) -> Self {
-		.init(
-			scheme: scheme(),
-			basePath: basePath(),
-			query: query(),
-			headers: headers()
+			scheme: scheme,
+			basePath: basePath,
+			query: query,
+			headers: headers
 		)
 	}
 }

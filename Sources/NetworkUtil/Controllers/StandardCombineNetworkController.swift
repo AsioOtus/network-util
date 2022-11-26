@@ -121,10 +121,10 @@ public extension StandardCombineNetworkController {
 public extension StandardCombineNetworkController {
   convenience init (
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: @escaping () -> String = { "http" },
-    basePath: @escaping () -> String,
-    query: @escaping () -> [String: String] = { [:] },
-    headers: @escaping () -> [String: String] = { [:] },
+    scheme: @escaping () throws -> String = { "http" },
+    basePath: @escaping () throws -> String,
+    query: @escaping () throws -> [String: String] = { [:] },
+    headers: @escaping () throws -> [String: String] = { [:] },
     interceptors: [any URLRequestInterceptor] = []
   ) {
     self.init(
@@ -150,10 +150,10 @@ public extension StandardCombineNetworkController {
     self.init(
       urlSessionBuilder: urlSessionBuilder,
       urlRequestBuilder: .standard(
-        scheme: scheme,
-        basePath: basePath,
-        query: query,
-        headers: headers
+        scheme: { scheme },
+        basePath: { basePath },
+        query: { query },
+        headers: { headers }
       ),
       interceptors: interceptors
     )
