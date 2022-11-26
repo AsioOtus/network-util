@@ -3,17 +3,20 @@ import Foundation
 public struct StandardURLRequestBuilder {
 	public let scheme: () throws -> String
 	public let basePath: () throws -> String
+  public let port: () throws -> Int?
 	public let query: () throws -> [String: String]
 	public let headers: () throws -> [String: String]
 
 	public init (
 		scheme: @escaping () throws -> String = { "http" },
 		basePath: @escaping () throws -> String,
+    port: @escaping () throws -> Int? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },
 		headers: @escaping () throws -> [String: String] = { [:] }
 	) {
 		self.scheme = scheme
 		self.basePath = basePath
+    self.port = port
 		self.query = query
 		self.headers = headers
 	}
@@ -21,20 +24,23 @@ public struct StandardURLRequestBuilder {
 	public init (
 		scheme: String = "http",
 		basePath: String,
+    port: Int,
 		query: [String: String] = [:],
 		headers: [String: String] = [:]
 	) {
 		self.init(
 			scheme: { scheme },
       basePath: { basePath },
+      port: { port },
       query: { query },
       headers: { headers }
 		)
 	}
 
 	public func url (_ request: Request) throws -> URL {
-		let basePath = try basePath()
-		let scheme = try scheme()
+    let scheme = try scheme()
+    let basePath = try basePath()
+    let port = try port()
 		let query = try query()
 
 		let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString
@@ -45,6 +51,7 @@ public struct StandardURLRequestBuilder {
 		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(basePath) – Request path: \(request.path)") }
 
 		urlComponents.scheme = scheme
+    urlComponents.port = port
 
 		let requestQuery = request.query.merging(query) { value, _ in value }
 		urlComponents.queryItems = requestQuery.map { key, value in .init(name: key, value: value) }
