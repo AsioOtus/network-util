@@ -141,10 +141,10 @@ public extension StandardAsyncNetworkController {
 public extension StandardAsyncNetworkController {
 	convenience init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		scheme: @escaping @autoclosure () -> String = "http",
-		basePath: @escaping @autoclosure () -> String,
-		query: @escaping @autoclosure () -> [String: String] = [:],
-		headers: @escaping @autoclosure () -> [String: String] = [:],
+    scheme: @escaping () -> String = { "http" },
+    basePath: @escaping () -> String,
+    query: @escaping () -> [String: String] = { [:] },
+    headers: @escaping () -> [String: String] = { [:] },
 		interceptors: [any URLRequestInterceptor] = []
 	) {
 		self.init(
@@ -158,4 +158,24 @@ public extension StandardAsyncNetworkController {
 			interceptors: interceptors
 		)
 	}
+
+  convenience init (
+    urlSessionBuilder: URLSessionBuilder = .standard(),
+    scheme: String = "http",
+    basePath: String,
+    query: [String: String] = [:],
+    headers: [String: String] = [:],
+    interceptors: [any URLRequestInterceptor] = []
+  ) {
+    self.init(
+      urlSessionBuilder: urlSessionBuilder,
+      urlRequestBuilder: .standard(
+        scheme: scheme,
+        basePath: basePath,
+        query: query,
+        headers: headers
+      ),
+      interceptors: interceptors
+    )
+  }
 }

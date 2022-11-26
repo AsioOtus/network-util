@@ -19,16 +19,16 @@ public struct StandardURLRequestBuilder {
 	}
 
 	public init (
-		scheme: @escaping @autoclosure () -> String = "http",
-		basePath: @escaping @autoclosure () -> String,
-		query: @escaping @autoclosure () -> [String: String] = [:],
-		headers: @escaping @autoclosure () -> [String: String] = [:]
+		scheme: String = "http",
+		basePath: String,
+		query: [String: String] = [:],
+		headers: [String: String] = [:]
 	) {
 		self.init(
-			scheme: scheme,
-			basePath: basePath,
-			query: query,
-			headers: headers
+			scheme: { scheme },
+      basePath: { basePath },
+      query: { query },
+      headers: { headers }
 		)
 	}
 

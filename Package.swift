@@ -15,7 +15,6 @@ let package = Package(
 	],
 	targets: [
 		.target(name: "NetworkUtil"),
-		.executableTarget(name: "qwe", dependencies: ["NetworkUtil"]),
 		.testTarget(
 			name: "NetworkUtilTests",
 			dependencies: ["NetworkUtil"]
