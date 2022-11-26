@@ -22,7 +22,7 @@ public class StandardCombineNetworkController {
 extension StandardCombineNetworkController: CombineNetworkController {
 	public func send <RQ: Request> (
 		_ request: RQ,
-		interceptor: (some URLRequestInterceptor)? = nil
+		interceptor: some URLRequestInterceptor = .empty()
 	) -> AnyPublisher<StandardResponse, ControllerError> {
 		send(request, StandardResponse.self, interceptor)
 	}
@@ -30,7 +30,7 @@ extension StandardCombineNetworkController: CombineNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		interceptor: (some URLRequestInterceptor)? = nil
+		interceptor: some URLRequestInterceptor = .empty()
 	) -> AnyPublisher<RS, ControllerError> {
 		send(request, RS.self, interceptor)
 	}
@@ -38,7 +38,7 @@ extension StandardCombineNetworkController: CombineNetworkController {
 	public func send <RQ: Request, RSM: ResponseModel> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		interceptor: (some URLRequestInterceptor)? = nil
+		interceptor: some URLRequestInterceptor = .empty()
 	) -> AnyPublisher<StandardModelResponse<RSM>, ControllerError> {
 		send(request, StandardModelResponse<RSM>.self, interceptor)
 	}

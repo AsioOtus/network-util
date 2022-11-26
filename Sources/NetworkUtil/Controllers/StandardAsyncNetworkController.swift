@@ -21,15 +21,15 @@ public class StandardAsyncNetworkController {
 extension StandardAsyncNetworkController: AsyncNetworkController {
 	public func send <RQ: Request> (
 		_ request: RQ,
-	interceptor: (some URLRequestInterceptor)? = nil
+	interceptor: some URLRequestInterceptor = .empty()
 	) async throws -> StandardResponse {
 		try await send(request, StandardResponse.self, interceptor)
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS.Type,
-		interceptor: (some URLRequestInterceptor)? = nil
+    response: RS.Type,
+    interceptor: some URLRequestInterceptor = .empty()
 	) async throws -> RS {
 		try await send(request, RS.self, interceptor)
 	}
@@ -37,7 +37,7 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 	public func send <RQ: Request, RSM: ResponseModel> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		interceptor: (some URLRequestInterceptor)? = nil
+		interceptor: some URLRequestInterceptor = .empty()
 	) async throws -> StandardModelResponse<RSM> {
 		try await send(request, StandardModelResponse<RSM>.self, interceptor)
 	}

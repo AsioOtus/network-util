@@ -58,14 +58,13 @@ public struct StandardURLRequestBuilder {
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
 	public func build <R: Request> (_ request: R) throws -> URLRequest {
-		let headers = try headers()
-
 		let url = try url(request)
 		var urlRequest = URLRequest(url: url)
 
 		urlRequest.httpMethod = request.method.value
 		urlRequest.httpBody = try request.body
 
+    let headers = try headers()
 		let requestHeaders = request.headers.merging(headers) { value, _ in value }
 		requestHeaders.forEach { key, value in urlRequest.setValue(value, forHTTPHeaderField: key) }
 
@@ -90,7 +89,7 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 }
 
 public extension StandardURLRequestBuilder {
-	func set (scheme: @escaping @autoclosure () -> String) -> Self {
+	func set (scheme: @escaping () -> String) -> Self {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
@@ -99,7 +98,7 @@ public extension StandardURLRequestBuilder {
 		)
 	}
 
-	func set (basePath: @escaping @autoclosure () -> String) -> Self {
+	func set (basePath: @escaping () -> String) -> Self {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
@@ -108,7 +107,7 @@ public extension StandardURLRequestBuilder {
 		)
 	}
 
-	func set (query: @escaping @autoclosure () -> [String: String]) -> Self {
+	func set (query: @escaping () -> [String: String]) -> Self {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
@@ -117,7 +116,7 @@ public extension StandardURLRequestBuilder {
 		)
 	}
 
-	func set (headers: @escaping @autoclosure () -> [String: String]) -> Self {
+	func set (headers: @escaping () -> [String: String]) -> Self {
 		.init(
 			scheme: scheme,
 			basePath: basePath,
