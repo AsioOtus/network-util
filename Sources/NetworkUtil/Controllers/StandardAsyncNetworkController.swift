@@ -142,8 +142,9 @@ public extension StandardAsyncNetworkController {
 	convenience init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
     scheme: @escaping () throws -> String? = { nil },
-    basePath: @escaping () throws -> String,
+    address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
+    baseSubpath: @escaping () throws -> String? = { nil },
     query: @escaping () throws -> [String: String] = { [:] },
     headers: @escaping () throws -> [String: String] = { [:] },
 		interceptors: [any URLRequestInterceptor] = []
@@ -152,8 +153,9 @@ public extension StandardAsyncNetworkController {
 			urlSessionBuilder: urlSessionBuilder,
 			urlRequestBuilder: .standard(
 				scheme: scheme,
-				basePath: basePath,
+        address: address,
         port: port,
+        baseSubpath: baseSubpath,
 				query: query,
 				headers: headers
 			),
@@ -164,8 +166,9 @@ public extension StandardAsyncNetworkController {
   convenience init (
     urlSessionBuilder: URLSessionBuilder = .standard(),
     scheme: String? = nil,
-    basePath: String,
+    address: String,
     port: Int? = nil,
+    baseSubpath: String? = nil,
     query: [String: String] = [:],
     headers: [String: String] = [:],
     interceptors: [any URLRequestInterceptor] = []
@@ -174,8 +177,9 @@ public extension StandardAsyncNetworkController {
       urlSessionBuilder: urlSessionBuilder,
       urlRequestBuilder: .standard(
         scheme: { scheme },
-        basePath: { basePath },
+        address: { address },
         port: { port },
+        baseSubpath: { baseSubpath },
         query: { query },
         headers: { headers }
       ),

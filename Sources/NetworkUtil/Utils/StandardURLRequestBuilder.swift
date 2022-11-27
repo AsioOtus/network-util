@@ -2,36 +2,41 @@ import Foundation
 
 public struct StandardURLRequestBuilder {
 	public let scheme: () throws -> String?
-	public let basePath: () throws -> String
+  public let address: () throws -> String
   public let port: () throws -> Int?
+  public let baseSubpath: () throws -> String?
 	public let query: () throws -> [String: String]
 	public let headers: () throws -> [String: String]
 
 	public init (
 		scheme: @escaping () throws -> String? = { nil },
-		basePath: @escaping () throws -> String,
+    address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
+    baseSubpath: @escaping () throws -> String? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },
 		headers: @escaping () throws -> [String: String] = { [:] }
 	) {
 		self.scheme = scheme
-		self.basePath = basePath
+    self.address = address
     self.port = port
+    self.baseSubpath = baseSubpath
 		self.query = query
 		self.headers = headers
 	}
 
 	public init (
 		scheme: String? = nil,
-		basePath: String,
+    address: String,
     port: Int? = nil,
+    baseSubpath: String? = nil,
 		query: [String: String] = [:],
 		headers: [String: String] = [:]
 	) {
 		self.init(
 			scheme: { scheme },
-      basePath: { basePath },
+      address: { address },
       port: { port },
+      baseSubpath: { baseSubpath },
       query: { query },
       headers: { headers }
 		)
@@ -39,20 +44,22 @@ public struct StandardURLRequestBuilder {
 
 	public func url (_ request: Request) throws -> URL {
     let scheme = try scheme()
-    var basePath = try basePath()
+    let address = try address()
+    let baseSubpath = try baseSubpath()
     let port = try port()
-		let query = try query()
 
-    if let scheme = scheme { basePath = "\(scheme)://\(basePath)" }
-    if let port = port { basePath = "\(basePath):\(port)" }
+    var subpath = ""
 
-		let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString
+    if let scheme = scheme { subpath = "\(scheme)://\(address)" }
+    if let port = port { subpath = "\(subpath):\(port)" }
+    if let baseSubpath = baseSubpath { subpath = "\(subpath)/\(baseSubpath)" }
 
 		guard
-			let path = path,
+			let path = URL(string: subpath)?.appendingPathComponent(request.path).absoluteString,
 			var urlComponents = URLComponents(string: path)
-		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(basePath) – Request path: \(request.path)") }
+		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(subpath) – Request path: \(request.path)") }
 
+    let query = try query()
 		let requestQuery = request.query.merging(query) { value, _ in value }
 		urlComponents.queryItems = requestQuery.map { key, value in .init(name: key, value: value) }
 
@@ -82,15 +89,17 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 	static func standard (
 		scheme: @escaping () throws -> String? = { nil },
-		basePath: @escaping () throws -> String,
+    address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
+    baseSubpath: @escaping () throws -> String? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },
 		headers: @escaping () throws -> [String: String] = { [:] }
 	) -> Self {
 		.init(
 			scheme: scheme,
-			basePath: basePath,
-      
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
 			query: query,
 			headers: headers
 		)
@@ -98,28 +107,56 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 }
 
 public extension StandardURLRequestBuilder {
-	func set (scheme: @escaping () -> String) -> Self {
+	func set (scheme: @escaping () -> String?) -> Self {
 		.init(
 			scheme: scheme,
-			basePath: basePath,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
 			query: query,
 			headers: headers
 		)
 	}
 
-	func set (basePath: @escaping () -> String) -> Self {
+  func set (address: @escaping () -> String) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers
+    )
+  }
+
+	func set (baseSubpath: @escaping () -> String?) -> Self {
 		.init(
 			scheme: scheme,
-			basePath: basePath,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
 			query: query,
 			headers: headers
 		)
 	}
+
+  func set (port: @escaping () -> Int?) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers
+    )
+  }
 
 	func set (query: @escaping () -> [String: String]) -> Self {
 		.init(
 			scheme: scheme,
-			basePath: basePath,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
 			query: query,
 			headers: headers
 		)
@@ -128,7 +165,9 @@ public extension StandardURLRequestBuilder {
 	func set (headers: @escaping () -> [String: String]) -> Self {
 		.init(
 			scheme: scheme,
-			basePath: basePath,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
 			query: query,
 			headers: headers
 		)
