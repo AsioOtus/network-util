@@ -1,14 +1,14 @@
 import Foundation
 
 public struct StandardURLRequestBuilder {
-	public let scheme: () throws -> String
+	public let scheme: () throws -> String?
 	public let basePath: () throws -> String
   public let port: () throws -> Int?
 	public let query: () throws -> [String: String]
 	public let headers: () throws -> [String: String]
 
 	public init (
-		scheme: @escaping () throws -> String = { "http" },
+		scheme: @escaping () throws -> String? = { nil },
 		basePath: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },
@@ -22,7 +22,7 @@ public struct StandardURLRequestBuilder {
 	}
 
 	public init (
-		scheme: String = "http",
+		scheme: String? = nil,
 		basePath: String,
     port: Int? = nil,
 		query: [String: String] = [:],
@@ -39,19 +39,19 @@ public struct StandardURLRequestBuilder {
 
 	public func url (_ request: Request) throws -> URL {
     let scheme = try scheme()
-    let basePath = try basePath()
+    var basePath = try basePath()
     let port = try port()
 		let query = try query()
 
-		let path = URL(string: "\(scheme)://\(basePath)")?.appendingPathComponent(request.path).absoluteString
+    if let scheme = scheme { basePath = "\(scheme)://\(basePath)" }
+    if let port = port { basePath = "\(basePath):\(port)" }
+
+		let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString
 
 		guard
 			let path = path,
 			var urlComponents = URLComponents(string: path)
 		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(basePath) – Request path: \(request.path)") }
-
-		urlComponents.scheme = scheme
-    urlComponents.port = port
 
 		let requestQuery = request.query.merging(query) { value, _ in value }
 		urlComponents.queryItems = requestQuery.map { key, value in .init(name: key, value: value) }
@@ -81,7 +81,7 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 
 public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 	static func standard (
-		scheme: @escaping () throws -> String = { "http" },
+		scheme: @escaping () throws -> String? = { nil },
 		basePath: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
 		query: @escaping () throws -> [String: String] = { [:] },

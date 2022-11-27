@@ -121,8 +121,9 @@ public extension StandardCombineNetworkController {
 public extension StandardCombineNetworkController {
   convenience init (
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: @escaping () throws -> String = { "http" },
+    scheme: @escaping () throws -> String? = { nil },
     basePath: @escaping () throws -> String,
+    port: @escaping () throws -> Int? = { nil },
     query: @escaping () throws -> [String: String] = { [:] },
     headers: @escaping () throws -> [String: String] = { [:] },
     interceptors: [any URLRequestInterceptor] = []
@@ -132,6 +133,7 @@ public extension StandardCombineNetworkController {
       urlRequestBuilder: .standard(
         scheme: scheme,
         basePath: basePath,
+        port: port,
         query: query,
         headers: headers
       ),
@@ -141,9 +143,10 @@ public extension StandardCombineNetworkController {
 
   convenience init (
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: String = "http",
+    scheme: String? = nil,
     basePath: String,
     query: [String: String] = [:],
+    port: Int? = nil,
     headers: [String: String] = [:],
     interceptors: [any URLRequestInterceptor] = []
   ) {
@@ -152,6 +155,7 @@ public extension StandardCombineNetworkController {
       urlRequestBuilder: .standard(
         scheme: { scheme },
         basePath: { basePath },
+        port: { port },
         query: { query },
         headers: { headers }
       ),

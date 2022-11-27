@@ -141,7 +141,7 @@ public extension StandardAsyncNetworkController {
 public extension StandardAsyncNetworkController {
 	convenience init (
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: @escaping () throws -> String = { "http" },
+    scheme: @escaping () throws -> String? = { nil },
     basePath: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
     query: @escaping () throws -> [String: String] = { [:] },
@@ -163,7 +163,7 @@ public extension StandardAsyncNetworkController {
 
   convenience init (
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: String = "http",
+    scheme: String? = nil,
     basePath: String,
     port: Int? = nil,
     query: [String: String] = [:],
