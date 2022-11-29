@@ -1,7 +1,7 @@
 import Foundation
 
 public struct CompactURLRequestInterceptor: URLRequestInterceptor {
-	private let interception: (_ urlRequest: URLRequest) throws -> URLRequest
+	public let interception: (_ urlRequest: URLRequest) throws -> URLRequest
 
 	public init (_ interception: @escaping (_: URLRequest) throws -> URLRequest) {
 		self.interception = interception

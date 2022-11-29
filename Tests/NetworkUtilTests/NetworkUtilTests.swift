@@ -11,14 +11,20 @@ final class NetworkFlowUtilTests: XCTestCase {
 //			{ current, next in print(2); return try next(current) },
 //			{ current, next in print(3); return try next(current) },
 //		]
-//
-//		
-//
+
+
+
 //		let a = Chain.create(chainUnits: array)
 //		try a?.transform(.init(url: .init(string: "localhost")!))
 
-//		let nc = StandardAsyncNetworkController(basePath: "")
-//		nc.send(.get("")) { a, b in
+    let urlReq = StandardURLRequestBuilder(address: "") {
+      var urlRequest = $0
+      urlRequest.timeoutInterval = 1
+      return urlRequest
+    }
+
+    let nc = StandardCombineNetworkController(urlRequestBuilder: .standard(address: "") { $0 }) { $0 }
+//		nc.send(.get("")) { a in
 //			return a
 //		}
 	}

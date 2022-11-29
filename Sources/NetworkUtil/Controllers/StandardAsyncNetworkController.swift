@@ -16,6 +16,16 @@ public class StandardAsyncNetworkController {
 		self.urlRequestBuilder = urlRequestBuilder
 		self.urlRequestsInterceptors = interceptors
 	}
+
+  public init (
+    urlSessionBuilder: URLSessionBuilder = .standard(),
+    urlRequestBuilder: URLRequestBuilder,
+    interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
+  ) {
+    self.urlSessionBuilder = urlSessionBuilder
+    self.urlRequestBuilder = urlRequestBuilder
+    self.urlRequestsInterceptors = [CompactURLRequestInterceptor(interception)]
+  }
 }
 
 extension StandardAsyncNetworkController: AsyncNetworkController {
@@ -136,54 +146,4 @@ public extension StandardAsyncNetworkController {
 		logging(logger)
 		return self
 	}
-}
-
-public extension StandardAsyncNetworkController {
-	convenience init (
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: @escaping () throws -> String? = { nil },
-    address: @escaping () throws -> String,
-    port: @escaping () throws -> Int? = { nil },
-    baseSubpath: @escaping () throws -> String? = { nil },
-    query: @escaping () throws -> [String: String] = { [:] },
-    headers: @escaping () throws -> [String: String] = { [:] },
-		interceptors: [any URLRequestInterceptor] = []
-	) {
-		self.init(
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: .standard(
-				scheme: scheme,
-        address: address,
-        port: port,
-        baseSubpath: baseSubpath,
-				query: query,
-				headers: headers
-			),
-			interceptors: interceptors
-		)
-	}
-
-  convenience init (
-    urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: String? = nil,
-    address: String,
-    port: Int? = nil,
-    baseSubpath: String? = nil,
-    query: [String: String] = [:],
-    headers: [String: String] = [:],
-    interceptors: [any URLRequestInterceptor] = []
-  ) {
-    self.init(
-      urlSessionBuilder: urlSessionBuilder,
-      urlRequestBuilder: .standard(
-        scheme: { scheme },
-        address: { address },
-        port: { port },
-        baseSubpath: { baseSubpath },
-        query: { query },
-        headers: { headers }
-      ),
-      interceptors: interceptors
-    )
-  }
 }
