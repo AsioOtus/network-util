@@ -1,8 +1,8 @@
 import Foundation
 
 public struct EmptyURLRequestInterceptor: URLRequestInterceptor {
-  public func perform (_ current: URLRequest, _ next: (URLRequest) throws -> URLRequest) throws -> URLRequest {
-    try next(current)
+  public func perform (_ current: URLRequest, _ next: (URLRequest) async throws -> URLRequest) async throws -> URLRequest {
+    try await next(current)
   }
 }
 

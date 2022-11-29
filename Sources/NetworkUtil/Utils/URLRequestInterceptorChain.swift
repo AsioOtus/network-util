@@ -12,12 +12,12 @@ final class URLRequestInterceptorChain {
 		self.next = next
 	}
 
-	func transform (_ urlRequest: URLRequest) throws -> URLRequest {
-		try chainUnit.perform(
+	func transform (_ urlRequest: URLRequest) async throws -> URLRequest {
+		try await chainUnit.perform(
 			urlRequest,
 			{ urlRequest in
 				guard let next = next else { return urlRequest }
-				return try next.transform(urlRequest)
+				return try await next.transform(urlRequest)
 			}
 		)
 	}

@@ -25,7 +25,7 @@ public class StandardCombineNetworkController {
   ) {
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
-    self.urlRequestsInterceptors = [CompactURLRequestInterceptor(interception)]
+    self.urlRequestsInterceptors = [.compact(interception)]
   }
 }
 
@@ -82,17 +82,14 @@ private extension StandardCombineNetworkController {
 		let requestId = UUID()
 
 		return Just(request)
-			.tryMap { request in
-				let urlSession = try urlSessionBuilder.build(request)
-				let urlRequest = try urlRequestBuilder.build(request)
+      .asyncTryMap { request in
+        let urlSession = try await self.urlSessionBuilder.build(request)
+        let urlRequest = try await self.urlRequestBuilder.build(request)
 
-				logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
+        self.logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
-				return (urlSession, urlRequest)
-			}
-			.tryMap { urlSession, urlRequest in
-				let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
-				let interceptedUrlRequest = try URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
+        let interceptors = (interceptor.map { [$0] } ?? []) + self.urlRequestsInterceptors
+				let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
 
 				return (urlSession, interceptedUrlRequest ?? urlRequest)
 			}

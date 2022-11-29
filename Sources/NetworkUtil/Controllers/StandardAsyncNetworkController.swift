@@ -24,7 +24,7 @@ public class StandardAsyncNetworkController {
   ) {
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
-    self.urlRequestsInterceptors = [CompactURLRequestInterceptor(interception)]
+    self.urlRequestsInterceptors = [.compact(interception)]
   }
 }
 
@@ -83,12 +83,11 @@ private extension StandardAsyncNetworkController {
 		let urlSession: URLSession
 		let urlRequest: URLRequest
 		do {
-			urlSession = try urlSessionBuilder.build(request)
+			urlSession = try await urlSessionBuilder.build(request)
 
-			let buildUrlRequest = try urlRequestBuilder.build(request)
+			let buildUrlRequest = try await urlRequestBuilder.build(request)
 			let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
-			let interceptedUrlRequest = try URLRequestInterceptorChain.create(chainUnits: interceptors)?
-				.transform(buildUrlRequest)
+			let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
 
 			urlRequest = interceptedUrlRequest ?? buildUrlRequest
 

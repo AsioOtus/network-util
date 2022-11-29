@@ -5,20 +5,20 @@ public struct StandardURLRequestBuilder {
   public let address: () throws -> String
   public let port: () throws -> Int?
   public let baseSubpath: () throws -> String?
-	public let query: () throws -> [String: String]
-	public let headers: () throws -> [String: String]
+	public let query: [() throws -> [String: String]]
+	public let headers: [() throws -> [String: String]]
   public let timeout: () throws -> Double?
-  public let configuration: (URLRequest) throws -> URLRequest
+  public let interceptors: [any URLRequestInterceptor]
 
 	public init (
 		scheme: @escaping () throws -> String? = { nil },
     address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
     baseSubpath: @escaping () throws -> String? = { nil },
-		query: @escaping () throws -> [String: String] = { [:] },
-		headers: @escaping () throws -> [String: String] = { [:] },
+		query: [() throws -> [String: String]] = [{ [:] }],
+		headers: [() throws -> [String: String]] = [{ [:] }],
     timeout: @escaping () throws -> Double? = { nil },
-    configuration: @escaping (URLRequest) throws -> URLRequest = { $0 }
+    interceptors: [any URLRequestInterceptor] = []
 	) {
 		self.scheme = scheme
     self.address = address
@@ -27,7 +27,7 @@ public struct StandardURLRequestBuilder {
 		self.query = query
 		self.headers = headers
     self.timeout = timeout
-    self.configuration = configuration
+    self.interceptors = interceptors
 	}
 
 	public init (
@@ -38,17 +38,17 @@ public struct StandardURLRequestBuilder {
 		query: [String: String] = [:],
     headers: [String: String] = [:],
     timeout: Double? = nil,
-    configuration: @escaping (URLRequest) throws -> URLRequest = { $0 }
+    interceptors: [any URLRequestInterceptor] = []
 	) {
 		self.init(
 			scheme: { scheme },
       address: { address },
       port: { port },
       baseSubpath: { baseSubpath },
-      query: { query },
-      headers: { headers },
+      query: [{ query }],
+      headers: [{ headers }],
       timeout: { timeout },
-      configuration: configuration
+      interceptors: interceptors
 		)
 	}
 
@@ -69,7 +69,7 @@ public struct StandardURLRequestBuilder {
 			var urlComponents = URLComponents(string: path)
 		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(subpath) – Request path: \(request.path)") }
 
-    let query = try query()
+    let query = try query.reduce([String: String]()) { try $0.merging($1()) { _, key in key } }
 		let requestQuery = request.query.merging(query) { value, _ in value }
     if !requestQuery.isEmpty {
       urlComponents.queryItems = requestQuery.map { key, value in .init(name: key, value: value) }
@@ -83,14 +83,14 @@ public struct StandardURLRequestBuilder {
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build <R: Request> (_ request: R) throws -> URLRequest {
+	public func build <R: Request> (_ request: R) async throws -> URLRequest {
 		let url = try url(request)
 		var urlRequest = URLRequest(url: url)
 
 		urlRequest.httpMethod = request.method.value
 		urlRequest.httpBody = try request.body
 
-    let headers = try headers()
+    let headers = try headers.reduce([String: String]()) { try $0.merging($1()) { _, key in key } }
 		let requestHeaders = request.headers.merging(headers) { value, _ in value }
 		requestHeaders.forEach { key, value in urlRequest.setValue(value, forHTTPHeaderField: key) }
 
@@ -98,9 +98,10 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
       urlRequest.timeoutInterval = builderTimeout
     }
 
-    let configuredUrlRequest = try configuration(urlRequest)
+    let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
+    urlRequest = interceptedUrlRequest ?? urlRequest
 
-		return configuredUrlRequest
+		return urlRequest
 	}
 }
 
@@ -110,10 +111,10 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
     address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
     baseSubpath: @escaping () throws -> String? = { nil },
-		query: @escaping () throws -> [String: String] = { [:] },
-		headers: @escaping () throws -> [String: String] = { [:] },
+		query: [() throws -> [String: String]] = [{ [:] }],
+		headers: [() throws -> [String: String]] = [{ [:] }],
     timeout: @escaping () throws -> Double? = { nil },
-    configuration: @escaping (URLRequest) throws -> URLRequest = { $0 }
+    interceptors: [any URLRequestInterceptor] = []
 	) -> Self {
 		.init(
 			scheme: scheme,
@@ -123,7 +124,7 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 			query: query,
 			headers: headers,
       timeout: timeout,
-      configuration: configuration
+      interceptors: interceptors
 		)
 	}
 
@@ -135,34 +136,34 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
     query: [String: String] = [:],
     headers: [String: String] = [:],
     timeout: Double? = nil,
-    configuration: @escaping (URLRequest) throws -> URLRequest = { $0 }
+    interceptors: [any URLRequestInterceptor] = []
   ) -> Self {
     .init(
       scheme: { scheme },
       address: { address },
       port: { port },
       baseSubpath: { baseSubpath },
-      query: { query },
-      headers: { headers },
+      query: [{ query }],
+      headers: [{ headers }],
       timeout: { timeout },
-      configuration: configuration
+      interceptors: interceptors
     )
   }
 }
 
 public extension StandardURLRequestBuilder {
-	func set (scheme: @escaping () throws -> String?) -> Self {
-		.init(
-			scheme: scheme,
+  func set (scheme: @escaping () throws -> String?) -> Self {
+    .init(
+      scheme: scheme,
       address: address,
       port: port,
       baseSubpath: baseSubpath,
-			query: query,
+      query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
-		)
-	}
+      interceptors: interceptors
+    )
+  }
 
   func set (address: @escaping () throws -> String) -> Self {
     .init(
@@ -173,22 +174,22 @@ public extension StandardURLRequestBuilder {
       query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
+      interceptors: interceptors
     )
   }
 
-	func set (baseSubpath: @escaping () throws -> String?) -> Self {
-		.init(
-			scheme: scheme,
+  func set (baseSubpath: @escaping () throws -> String?) -> Self {
+    .init(
+      scheme: scheme,
       address: address,
       port: port,
       baseSubpath: baseSubpath,
-			query: query,
+      query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
-		)
-	}
+      interceptors: interceptors
+    )
+  }
 
   func set (port: @escaping () throws -> Int?) -> Self {
     .init(
@@ -199,35 +200,35 @@ public extension StandardURLRequestBuilder {
       query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
+      interceptors: interceptors
     )
   }
 
-	func set (query: @escaping () throws -> [String: String]) -> Self {
-		.init(
-			scheme: scheme,
+  func set (query: [() throws -> [String: String]]) -> Self {
+    .init(
+      scheme: scheme,
       address: address,
       port: port,
       baseSubpath: baseSubpath,
-			query: query,
+      query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
-		)
-	}
+      interceptors: interceptors
+    )
+  }
 
-	func set (headers: @escaping () throws -> [String: String]) -> Self {
-		.init(
-			scheme: scheme,
+  func set (headers: [() throws -> [String: String]]) -> Self {
+    .init(
+      scheme: scheme,
       address: address,
       port: port,
       baseSubpath: baseSubpath,
-			query: query,
+      query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
-		)
-	}
+      interceptors: interceptors
+    )
+  }
 
   func set (timeout: @escaping () throws -> Double) -> Self {
     .init(
@@ -238,11 +239,11 @@ public extension StandardURLRequestBuilder {
       query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
+      interceptors: interceptors
     )
   }
 
-  func set (configuration: @escaping (URLRequest) throws -> URLRequest) -> Self {
+  func set (interceptors: [any URLRequestInterceptor]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -251,7 +252,74 @@ public extension StandardURLRequestBuilder {
       query: query,
       headers: headers,
       timeout: timeout,
-      configuration: configuration
+      interceptors: interceptors
+    )
+  }
+
+  func set (interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers,
+      timeout: timeout,
+      interceptors: [.compact(interception)]
+    )
+  }
+}
+
+public extension StandardURLRequestBuilder {
+  func add (query: @escaping () throws -> [String: String]) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: self.query + [query],
+      headers: headers,
+      timeout: timeout,
+      interceptors: interceptors
+    )
+  }
+
+  func add (header: @escaping () throws -> [String: String]) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers + [header],
+      timeout: timeout,
+      interceptors: interceptors
+    )
+  }
+
+  func add (interceptor: any URLRequestInterceptor) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers,
+      timeout: timeout,
+      interceptors: interceptors + [interceptor]
+    )
+  }
+
+  func add (interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
+    .init(
+      scheme: scheme,
+      address: address,
+      port: port,
+      baseSubpath: baseSubpath,
+      query: query,
+      headers: headers,
+      timeout: timeout,
+      interceptors: interceptors + [.compact(interception)]
     )
   }
 }
@@ -263,8 +331,8 @@ public extension StandardAsyncNetworkController {
     address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
     baseSubpath: @escaping () throws -> String? = { nil },
-    query: @escaping () throws -> [String: String] = { [:] },
-    headers: @escaping () throws -> [String: String] = { [:] },
+    query: [() throws -> [String: String]] = [{ [:] }],
+    headers: [() throws -> [String: String]] = [{ [:] }],
     timeout: @escaping () throws -> Double? = { nil },
     interceptors: [any URLRequestInterceptor] = []
   ) {
@@ -301,8 +369,8 @@ public extension StandardAsyncNetworkController {
         address: { address },
         port: { port },
         baseSubpath: { baseSubpath },
-        query: { query },
-        headers: { headers },
+        query: [{ query }],
+        headers: [{ headers }],
         timeout: { timeout }
       ),
       interceptors: interceptors
@@ -317,8 +385,8 @@ public extension StandardCombineNetworkController {
     address: @escaping () throws -> String,
     port: @escaping () throws -> Int? = { nil },
     baseSubpath: @escaping () throws -> String? = { nil },
-    query: @escaping () throws -> [String: String] = { [:] },
-    headers: @escaping () throws -> [String: String] = { [:] },
+    query: [() throws -> [String: String]] = [{ [:] }],
+    headers: [() throws -> [String: String]] = [{ [:] }],
     timeout: @escaping () throws -> Double? = { nil },
     interceptors: [any URLRequestInterceptor] = []
   ) {
@@ -355,8 +423,8 @@ public extension StandardCombineNetworkController {
         address: { address },
         port: { port },
         baseSubpath: { baseSubpath },
-        query: { query },
-        headers: { headers },
+        query: [{ query }],
+        headers: [{ headers }],
         timeout: { timeout }
       ),
       interceptors: interceptors
