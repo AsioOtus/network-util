@@ -8,6 +8,6 @@ public struct StandardModelResponse <Model: ResponseModel>: ModellableResponse {
 	public init (_ data: Data, _ urlResponse: URLResponse) throws {
 		self.data = data
 		self.urlResponse = urlResponse
-		self.model = try .init(data)
+    self.model = try .decode(from: data)
 	}
 }

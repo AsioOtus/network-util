@@ -3,7 +3,7 @@ import Foundation
 public protocol JSONResponseModel: ResponseModel { }
 
 public extension JSONResponseModel {
-	init (_ data: Data) throws {
-		self = try JSONDecoder().decode(Self.self, from: data)
-	}
+  static func decode (from data: Data) throws -> Self {
+    try JSONDecoder().decode(Self.self, from: data)
+  }
 }

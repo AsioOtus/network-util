@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol ResponseModel: Decodable {
-	init (_ data: Data) throws
+  static func decode (from data: Data) throws -> Self
 }
