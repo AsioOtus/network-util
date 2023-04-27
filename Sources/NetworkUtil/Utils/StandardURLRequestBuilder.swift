@@ -58,16 +58,16 @@ public struct StandardURLRequestBuilder {
     let baseSubpath = try baseSubpath()
     let port = try port()
 
-    var subpath = ""
+    var basePath = ""
 
-    if let scheme = scheme { subpath = "\(scheme)://\(address)" }
-    if let port = port { subpath = "\(subpath):\(port)" }
-    if let baseSubpath = baseSubpath { subpath = "\(subpath)/\(baseSubpath)" }
+    if let scheme = scheme { basePath = "\(scheme)://\(address)" }
+    if let port = port { basePath = "\(basePath):\(port)" }
+    if let baseSubpath = baseSubpath { basePath = "\(basePath)/\(baseSubpath)" }
 
 		guard
-			let path = URL(string: subpath)?.appendingPathComponent(request.path).absoluteString,
+			let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString,
 			var urlComponents = URLComponents(string: path)
-		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(subpath) – Request path: \(request.path)") }
+		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(basePath) – Request path: \(request.path)") }
 
     let query = try query.reduce([String: String]()) { try $0.merging($1()) { _, key in key } }
 		let requestQuery = request.query.merging(query) { value, _ in value }
@@ -152,7 +152,7 @@ public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
 }
 
 public extension StandardURLRequestBuilder {
-  func set (scheme: @escaping () throws -> String?) -> Self {
+  func setScheme (_ scheme: @escaping () throws -> String?) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -165,7 +165,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (address: @escaping () throws -> String) -> Self {
+  func setAddress (_ address: @escaping () throws -> String) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -178,7 +178,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (baseSubpath: @escaping () throws -> String?) -> Self {
+  func setBaseSubpath (_ baseSubpath: @escaping () throws -> String?) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -191,7 +191,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (port: @escaping () throws -> Int?) -> Self {
+  func setPort (_ port: @escaping () throws -> Int?) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -204,7 +204,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (query: [() throws -> [String: String]]) -> Self {
+  func setQuery (_ query: [() throws -> [String: String]]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -217,7 +217,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (headers: [() throws -> [String: String]]) -> Self {
+  func setHeaders (_ headers: [() throws -> [String: String]]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -230,7 +230,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (timeout: @escaping () throws -> Double) -> Self {
+  func setTimeout (_ timeout: @escaping () throws -> Double) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -243,7 +243,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (interceptors: [any URLRequestInterceptor]) -> Self {
+  func setInterceptors (_ interceptors: [any URLRequestInterceptor]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -256,7 +256,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func set (interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
+  func setInterception (_ interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -271,7 +271,7 @@ public extension StandardURLRequestBuilder {
 }
 
 public extension StandardURLRequestBuilder {
-  func add (query: @escaping () throws -> [String: String]) -> Self {
+  func addQuery (_ query: @escaping () throws -> [String: String]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -284,7 +284,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func add (header: @escaping () throws -> [String: String]) -> Self {
+  func addHeader (_ header: @escaping () throws -> [String: String]) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -297,7 +297,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func add (interceptor: any URLRequestInterceptor) -> Self {
+  func addInterceptor (_ interceptor: any URLRequestInterceptor) -> Self {
     .init(
       scheme: scheme,
       address: address,
@@ -310,7 +310,7 @@ public extension StandardURLRequestBuilder {
     )
   }
 
-  func add (interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
+  func addInterception (_ interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
     .init(
       scheme: scheme,
       address: address,
