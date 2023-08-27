@@ -6,30 +6,18 @@ public struct StandardAsyncNetworkController {
 	private let urlRequestConfiguration: URLRequestConfiguration
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
-	private let urlRequestsInterceptors: [any URLRequestInterceptor]
-
-	public init (
-		urlRequestConfiguration: URLRequestConfiguration,
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder = .standard,
-		interceptors: [any URLRequestInterceptor] = []
-	) {
-		self.urlRequestConfiguration = urlRequestConfiguration
-		self.urlSessionBuilder = urlSessionBuilder
-		self.urlRequestBuilder = urlRequestBuilder
-		self.urlRequestsInterceptors = interceptors
-	}
+	private let urlRequestsInterception: URLRequestInterception
 
   public init (
 		urlRequestConfiguration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
     urlRequestBuilder: URLRequestBuilder = .standard,
-    interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
+		urlRequestsInterception: @escaping URLRequestInterception = { $0 }
   ) {
 		self.urlRequestConfiguration = urlRequestConfiguration
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
-    self.urlRequestsInterceptors = [.compact(interception)]
+    self.urlRequestsInterception = urlRequestsInterception
   }
 }
 
@@ -37,7 +25,7 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
-    interceptor: some URLRequestInterceptor = .empty()
+		interception: @escaping URLRequestInterception = { $0 }
 	) async throws -> RS {
 		let requestId = UUID()
 
@@ -46,11 +34,14 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 		do {
 			urlSession = try await urlSessionBuilder.build(request)
 
-			let buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
-			let interceptors = [interceptor] + [.compact(request.interception)] + urlRequestsInterceptors
-			let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
+			var buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
 
-			urlRequest = interceptedUrlRequest ?? buildUrlRequest
+			let interceptors = [urlRequestsInterception, request.interception, interception]
+			for i in interceptors {
+				buildUrlRequest = try await i(buildUrlRequest)
+			}
+
+			urlRequest = buildUrlRequest
 
 			logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 		} catch {

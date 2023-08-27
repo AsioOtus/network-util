@@ -114,30 +114,6 @@ public extension URLRequestConfiguration {
 			timeout: timeout
 		)
 	}
-
-	func setInterceptors (_ interceptors: [any URLRequestInterceptor]) -> Self {
-		.init(
-			scheme: scheme,
-			address: address,
-			port: port,
-			baseSubpath: baseSubpath,
-			query: query,
-			headers: headers,
-			timeout: timeout
-		)
-	}
-
-	func setInterception (_ interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
-		.init(
-			scheme: scheme,
-			address: address,
-			port: port,
-			baseSubpath: baseSubpath,
-			query: query,
-			headers: headers,
-			timeout: timeout
-		)
-	}
 }
 
 public extension URLRequestConfiguration {

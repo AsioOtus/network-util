@@ -7,52 +7,42 @@ public struct StandardCombineNetworkController {
 	private let urlRequestConfiguration: URLRequestConfiguration
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
-	private let urlRequestsInterceptors: [any URLRequestInterceptor]
+	private let urlRequestsInterception: URLRequestInterception
 
 	public init (
 		urlRequestConfiguration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
 		urlRequestBuilder: URLRequestBuilder,
-		interceptors: [any URLRequestInterceptor] = []
+		urlRequestsInterception: @escaping URLRequestInterception = { $0 }
 	) {
 		self.urlRequestConfiguration = urlRequestConfiguration
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
-		self.urlRequestsInterceptors = interceptors
+		self.urlRequestsInterception = urlRequestsInterception
 	}
-
-  public init (
-		urlRequestConfiguration: URLRequestConfiguration,
-    urlSessionBuilder: URLSessionBuilder = .standard(),
-    urlRequestBuilder: URLRequestBuilder,
-    interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-  ) {
-		self.urlRequestConfiguration = urlRequestConfiguration
-    self.urlSessionBuilder = urlSessionBuilder
-    self.urlRequestBuilder = urlRequestBuilder
-    self.urlRequestsInterceptors = [.compact(interception)]
-  }
 }
 
 extension StandardCombineNetworkController: CombineNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		interceptor: some URLRequestInterceptor = .empty()
+		interception: @escaping URLRequestInterception = { $0 }
 	) -> AnyPublisher<RS, ControllerError> {
 		let requestId = UUID()
 
 		return Just(request)
       .asyncTryMap { request in
         let urlSession = try await self.urlSessionBuilder.build(request)
-				let urlRequest = try await self.urlRequestBuilder.build(request, self.urlRequestConfiguration)
+				var urlRequest = try await self.urlRequestBuilder.build(request, self.urlRequestConfiguration)
 
         self.logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
-        let interceptors = [interceptor] + [.compact(request.interception)] + self.urlRequestsInterceptors
-				let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
+				let interceptors = [urlRequestsInterception, request.interception, interception]
+				for i in interceptors {
+					urlRequest = try await i(urlRequest)
+				}
 
-				return (urlSession, interceptedUrlRequest ?? urlRequest)
+				return (urlSession, urlRequest)
 			}
 			.mapError { ControllerError(requestId: requestId, request: request, category: .request($0)) }
 			.flatMap { urlSession, urlRequest in
