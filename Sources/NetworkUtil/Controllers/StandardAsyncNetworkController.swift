@@ -3,25 +3,30 @@ import Foundation
 public class StandardAsyncNetworkController {
 	private let logger = Logger()
 
+	private let urlRequestConfiguration: URLRequestConfiguration
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
 	private let urlRequestsInterceptors: [any URLRequestInterceptor]
 
 	public init (
+		urlRequestConfiguration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder,
+		urlRequestBuilder: URLRequestBuilder = .standard,
 		interceptors: [any URLRequestInterceptor] = []
 	) {
+		self.urlRequestConfiguration = urlRequestConfiguration
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
 		self.urlRequestsInterceptors = interceptors
 	}
 
   public init (
+		urlRequestConfiguration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    urlRequestBuilder: URLRequestBuilder,
+    urlRequestBuilder: URLRequestBuilder = .standard,
     interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
   ) {
+		self.urlRequestConfiguration = urlRequestConfiguration
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
     self.urlRequestsInterceptors = [.compact(interception)]
@@ -85,8 +90,8 @@ private extension StandardAsyncNetworkController {
 		do {
 			urlSession = try await urlSessionBuilder.build(request)
 
-			let buildUrlRequest = try await urlRequestBuilder.build(request)
-			let interceptors = (interceptor.map { [$0] } ?? []) + urlRequestsInterceptors
+			let buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
+			let interceptors = (interceptor.map { [$0] } ?? []) + [.compact(request.interception)] + urlRequestsInterceptors
 			let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
 
 			urlRequest = interceptedUrlRequest ?? buildUrlRequest

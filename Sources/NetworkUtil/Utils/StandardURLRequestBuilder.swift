@@ -1,15 +1,9 @@
 import Foundation
 
 public struct StandardURLRequestBuilder {
-	public var urlRequestConfiguration: URLRequestConfiguration { config }
+	public init () { }
 
-	private let config: URLRequestConfiguration
-
-	public init (urlRequestConfiguration: URLRequestConfiguration) {
-		self.config = urlRequestConfiguration
-	}
-
-	public func url (_ request: Request) throws -> URL {
+	public func url (_ request: Request, _ config: URLRequestConfiguration) throws -> URL {
     var basePath = ""
 
 		if let scheme = config.scheme { basePath = "\(scheme)://\(config.address)" }
@@ -34,8 +28,8 @@ public struct StandardURLRequestBuilder {
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build <R: Request> (_ request: R) async throws -> URLRequest {
-		let url = try url(request)
+	public func build <R: Request> (_ request: R, _ config: URLRequestConfiguration) async throws -> URLRequest {
+		let url = try url(request, config)
 		var urlRequest = URLRequest(url: url)
 
 		urlRequest.httpMethod = request.method.value
@@ -48,97 +42,12 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
       urlRequest.timeoutInterval = builderTimeout
     }
 
-		let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: config.interceptors)?.transform(urlRequest)
-    urlRequest = interceptedUrlRequest ?? urlRequest
-
 		return urlRequest
 	}
 }
 
-public extension StandardAsyncNetworkController {
-  convenience init (
-    urlSessionBuilder: URLSessionBuilder = .standard(),
-    scheme: String? = nil,
-    address: String,
-    port: Int? = nil,
-    baseSubpath: String? = nil,
-    query: [String: String] = [:],
-    headers: [String: String] = [:],
-    timeout: Double? = nil,
-    interceptors: [any URLRequestInterceptor] = []
-  ) {
-    self.init(
-      urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: StandardURLRequestBuilder(
-				urlRequestConfiguration: .init(
-					scheme: scheme,
-					address: address,
-					port: port,
-					baseSubpath: baseSubpath,
-					query: query,
-					headers: headers,
-					timeout: timeout
-				)
-			),
-      interceptors: interceptors
-    )
-  }
-
-	convenience init (
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestConfiguration: URLRequestConfiguration,
-		interceptors: [any URLRequestInterceptor] = []
-	) {
-		self.init(
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: StandardURLRequestBuilder(
-				urlRequestConfiguration: urlRequestConfiguration
-			),
-			interceptors: interceptors
-		)
-	}
-}
-
-public extension StandardCombineNetworkController {
-  convenience init (
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-		scheme: String? = nil,
-		address: String,
-		port: Int? = nil,
-		baseSubpath: String? = nil,
-		query: [String: String] = [:],
-		headers: [String: String] = [:],
-		timeout: Double? = nil,
-		interceptors: [any URLRequestInterceptor] = []
-  ) {
-    self.init(
-      urlSessionBuilder: urlSessionBuilder,
-      urlRequestBuilder: StandardURLRequestBuilder(
-				urlRequestConfiguration: .init(
-					scheme: scheme,
-					address: address,
-					port: port,
-					baseSubpath: baseSubpath,
-					query: query,
-					headers: headers,
-					timeout: timeout
-				)
-			),
-      interceptors: interceptors
-    )
-  }
-
-	convenience init (
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestConfiguration: URLRequestConfiguration,
-		interceptors: [any URLRequestInterceptor] = []
-	) {
-		self.init(
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: StandardURLRequestBuilder(
-				urlRequestConfiguration: urlRequestConfiguration
-			),
-			interceptors: interceptors
-		)
+public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
+	static var standard: Self {
+		.init()
 	}
 }

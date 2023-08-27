@@ -1,6 +1,8 @@
 import Foundation
 
 public struct URLRequestConfiguration {
+	public static let empty = Self(address: "")
+
 	public let scheme: String?
 	public let address: String
 	public let port: Int?
@@ -8,7 +10,6 @@ public struct URLRequestConfiguration {
 	public let query: [String: String]
 	public let headers: [String: String]
 	public let timeout: Double?
-	public let interceptors: [any URLRequestInterceptor]
 
 	public init (
 		scheme: String? = nil,
@@ -17,8 +18,7 @@ public struct URLRequestConfiguration {
 		baseSubpath: String? = nil,
 		query: [String: String] = [:],
 		headers: [String: String] = [:],
-		timeout: Double? = nil,
-		interceptors: [any URLRequestInterceptor] = []
+		timeout: Double? = nil
 	) {
 		self.scheme = scheme
 		self.address = address
@@ -27,7 +27,6 @@ public struct URLRequestConfiguration {
 		self.query = query
 		self.headers = headers
 		self.timeout = timeout
-		self.interceptors = interceptors
 	}
 }
 
@@ -40,8 +39,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -53,8 +51,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -66,8 +63,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -79,8 +75,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -92,8 +87,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -105,8 +99,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -118,8 +111,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -131,8 +123,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
@@ -144,8 +135,7 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers,
-			timeout: timeout,
-			interceptors: [.compact(interception)]
+			timeout: timeout
 		)
 	}
 }
@@ -159,8 +149,19 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: self.query.merging([key: value]) { _, new in new },
 			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
+		)
+	}
+
+	func addQuery (_ query: [String: String]) -> Self {
+		.init(
+			scheme: scheme,
+			address: address,
+			port: port,
+			baseSubpath: baseSubpath,
+			query: self.query.merging(query) { _, new in new },
+			headers: headers,
+			timeout: timeout
 		)
 	}
 
@@ -172,34 +173,19 @@ public extension URLRequestConfiguration {
 			baseSubpath: baseSubpath,
 			query: query,
 			headers: headers.merging([key: value]) { _, new in new },
-			timeout: timeout,
-			interceptors: interceptors
+			timeout: timeout
 		)
 	}
 
-	func addInterceptor (_ interceptor: any URLRequestInterceptor) -> Self {
+	func addHeaders (_ headers: [String: String]) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,
 			port: port,
 			baseSubpath: baseSubpath,
 			query: query,
-			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors + [interceptor]
-		)
-	}
-
-	func addInterception (_ interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest) -> Self {
-		.init(
-			scheme: scheme,
-			address: address,
-			port: port,
-			baseSubpath: baseSubpath,
-			query: query,
-			headers: headers,
-			timeout: timeout,
-			interceptors: interceptors + [.compact(interception)]
+			headers: self.headers.merging(headers) { _, new in new },
+			timeout: timeout
 		)
 	}
 }

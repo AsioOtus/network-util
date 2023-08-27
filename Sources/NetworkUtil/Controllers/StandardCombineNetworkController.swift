@@ -4,25 +4,30 @@ import Combine
 public class StandardCombineNetworkController {
 	private let logger = Logger()
 
+	private let urlRequestConfiguration: URLRequestConfiguration
 	private let urlSessionBuilder: URLSessionBuilder
 	private let urlRequestBuilder: URLRequestBuilder
 	private let urlRequestsInterceptors: [any URLRequestInterceptor]
 
 	public init (
+		urlRequestConfiguration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
 		urlRequestBuilder: URLRequestBuilder,
 		interceptors: [any URLRequestInterceptor] = []
 	) {
+		self.urlRequestConfiguration = urlRequestConfiguration
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
 		self.urlRequestsInterceptors = interceptors
 	}
 
   public init (
+		urlRequestConfiguration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
     urlRequestBuilder: URLRequestBuilder,
     interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
   ) {
+		self.urlRequestConfiguration = urlRequestConfiguration
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
     self.urlRequestsInterceptors = [.compact(interception)]
@@ -84,11 +89,11 @@ private extension StandardCombineNetworkController {
 		return Just(request)
       .asyncTryMap { request in
         let urlSession = try await self.urlSessionBuilder.build(request)
-        let urlRequest = try await self.urlRequestBuilder.build(request)
+				let urlRequest = try await self.urlRequestBuilder.build(request, self.urlRequestConfiguration)
 
         self.logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
-        let interceptors = (interceptor.map { [$0] } ?? []) + self.urlRequestsInterceptors
+        let interceptors = (interceptor.map { [$0] } ?? []) + [.compact(request.interception)] + self.urlRequestsInterceptors
 				let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
 
 				return (urlSession, interceptedUrlRequest ?? urlRequest)

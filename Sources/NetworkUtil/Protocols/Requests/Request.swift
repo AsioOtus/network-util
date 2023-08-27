@@ -9,6 +9,8 @@ public protocol Request: CustomStringConvertible {
 	var headers: [String: String] { get }
 
 	var body: Data? { get throws }
+
+	func interception (_ urlRequest: URLRequest) throws -> URLRequest
 }
 
 public extension Request {
@@ -20,4 +22,6 @@ public extension Request {
 	var headers: [String: String] { [:] }
 
 	var body: Data? { get throws { nil } }
+
+	func interception (_ urlRequest: URLRequest) throws -> URLRequest { urlRequest }
 }
