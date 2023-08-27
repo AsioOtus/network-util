@@ -1,6 +1,6 @@
 import Foundation
 
-public class StandardAsyncNetworkController {
+public struct StandardAsyncNetworkController {
 	private let logger = Logger()
 
 	private let urlRequestConfiguration: URLRequestConfiguration

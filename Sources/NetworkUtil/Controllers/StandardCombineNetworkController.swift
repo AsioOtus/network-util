@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-public class StandardCombineNetworkController {
+public struct StandardCombineNetworkController {
 	private let logger = Logger()
 
 	private let urlRequestConfiguration: URLRequestConfiguration
