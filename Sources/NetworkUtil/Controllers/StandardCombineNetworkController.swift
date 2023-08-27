@@ -35,55 +35,11 @@ public class StandardCombineNetworkController {
 }
 
 extension StandardCombineNetworkController: CombineNetworkController {
-	public func send <RQ: Request> (
-		_ request: RQ,
-		interceptor: some URLRequestInterceptor = .empty()
-	) -> AnyPublisher<StandardResponse, ControllerError> {
-		send(request, StandardResponse.self, interceptor)
-	}
-
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
 		interceptor: some URLRequestInterceptor = .empty()
 	) -> AnyPublisher<RS, ControllerError> {
-		send(request, RS.self, interceptor)
-	}
-
-	public func send <RQ: Request, RSM: ResponseModel> (
-		_ request: RQ,
-		responseModel: RSM.Type,
-		interceptor: some URLRequestInterceptor = .empty()
-	) -> AnyPublisher<StandardModelResponse<RSM>, ControllerError> {
-		send(request, StandardModelResponse<RSM>.self, interceptor)
-	}
-
-	public func send <RQ: Request> (
-		_ request: RQ,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) -> AnyPublisher<StandardResponse, ControllerError> {
-		send(request, StandardResponse.self, CompactURLRequestInterceptor(interception))
-	}
-
-	public func send <RQ: Request, RS: Response> (
-		_ request: RQ,
-		response: RS.Type,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) -> AnyPublisher<RS, ControllerError> {
-		send(request, RS.self, CompactURLRequestInterceptor(interception))
-	}
-
-	public func send <RQ: Request, RSM: ResponseModel> (
-		_ request: RQ,
-		responseModel: RSM.Type,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) -> AnyPublisher<StandardModelResponse<RSM>, ControllerError> {
-		send(request, StandardModelResponse<RSM>.self, CompactURLRequestInterceptor(interception))
-	}
-}
-
-private extension StandardCombineNetworkController {
-	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, _ interceptor: (some URLRequestInterceptor)?) -> AnyPublisher<RS, ControllerError> {
 		let requestId = UUID()
 
 		return Just(request)
@@ -93,7 +49,7 @@ private extension StandardCombineNetworkController {
 
         self.logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
-        let interceptors = (interceptor.map { [$0] } ?? []) + [.compact(request.interception)] + self.urlRequestsInterceptors
+        let interceptors = [interceptor] + [.compact(request.interception)] + self.urlRequestsInterceptors
 				let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(urlRequest)
 
 				return (urlSession, interceptedUrlRequest ?? urlRequest)

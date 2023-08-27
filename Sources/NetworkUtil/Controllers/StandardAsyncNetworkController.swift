@@ -34,55 +34,11 @@ public class StandardAsyncNetworkController {
 }
 
 extension StandardAsyncNetworkController: AsyncNetworkController {
-	public func send <RQ: Request> (
-		_ request: RQ,
-	interceptor: some URLRequestInterceptor = .empty()
-	) async throws -> StandardResponse {
-		try await send(request, StandardResponse.self, interceptor)
-	}
-
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
     interceptor: some URLRequestInterceptor = .empty()
 	) async throws -> RS {
-		try await send(request, RS.self, interceptor)
-	}
-
-	public func send <RQ: Request, RSM: ResponseModel> (
-		_ request: RQ,
-		responseModel: RSM.Type,
-		interceptor: some URLRequestInterceptor = .empty()
-	) async throws -> StandardModelResponse<RSM> {
-		try await send(request, StandardModelResponse<RSM>.self, interceptor)
-	}
-
-	public func send <RQ: Request> (
-		_ request: RQ,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) async throws -> StandardResponse {
-		try await send(request, StandardResponse.self, CompactURLRequestInterceptor(interception))
-	}
-
-	public func send <RQ: Request, RS: Response> (
-		_ request: RQ,
-		response: RS.Type,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) async throws -> RS {
-		try await send(request, RS.self, CompactURLRequestInterceptor(interception))
-	}
-
-	public func send <RQ: Request, RSM: ResponseModel> (
-		_ request: RQ,
-		responseModel: RSM.Type,
-		interception: @escaping (_ urlRequest: URLRequest) throws -> URLRequest
-	) async throws -> StandardModelResponse<RSM> {
-		try await send(request, StandardModelResponse<RSM>.self, CompactURLRequestInterceptor(interception))
-	}
-}
-
-private extension StandardAsyncNetworkController {
-	func send <RQ: Request, RS: Response> (_ request: RQ, _ response: RS.Type, _ interceptor: (some URLRequestInterceptor)?) async throws -> RS {
 		let requestId = UUID()
 
 		let urlSession: URLSession
@@ -91,7 +47,7 @@ private extension StandardAsyncNetworkController {
 			urlSession = try await urlSessionBuilder.build(request)
 
 			let buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
-			let interceptors = (interceptor.map { [$0] } ?? []) + [.compact(request.interception)] + urlRequestsInterceptors
+			let interceptors = [interceptor] + [.compact(request.interception)] + urlRequestsInterceptors
 			let interceptedUrlRequest = try await URLRequestInterceptorChain.create(chainUnits: interceptors)?.transform(buildUrlRequest)
 
 			urlRequest = interceptedUrlRequest ?? buildUrlRequest
