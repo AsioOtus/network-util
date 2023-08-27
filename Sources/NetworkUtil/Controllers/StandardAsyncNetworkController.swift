@@ -1,24 +1,40 @@
 import Foundation
 
 public struct StandardAsyncNetworkController {
-	private let logger = Logger()
+	private let logger: Logger
 
-	private let urlRequestConfiguration: URLRequestConfiguration
-	private let urlSessionBuilder: URLSessionBuilder
-	private let urlRequestBuilder: URLRequestBuilder
-	private let urlRequestsInterception: URLRequestInterception
+	let urlRequestConfiguration: URLRequestConfiguration
+	let urlSessionBuilder: URLSessionBuilder
+	let urlRequestBuilder: URLRequestBuilder
+	let urlRequestsInterception: URLRequestInterception
 
   public init (
-		urlRequestConfiguration: URLRequestConfiguration,
+		configuration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
     urlRequestBuilder: URLRequestBuilder = .standard,
-		urlRequestsInterception: @escaping URLRequestInterception = { $0 }
+		interception: @escaping URLRequestInterception = { $0 }
   ) {
-		self.urlRequestConfiguration = urlRequestConfiguration
+		self.urlRequestConfiguration = configuration
     self.urlSessionBuilder = urlSessionBuilder
     self.urlRequestBuilder = urlRequestBuilder
-    self.urlRequestsInterception = urlRequestsInterception
+    self.urlRequestsInterception = interception
+
+		self.logger = .init()
   }
+
+	private init (
+		configuration: URLRequestConfiguration,
+		urlSessionBuilder: URLSessionBuilder = .standard(),
+		urlRequestBuilder: URLRequestBuilder = .standard,
+		interception: @escaping URLRequestInterception = { $0 },
+		logger: Logger
+	) {
+		self.urlRequestConfiguration = configuration
+		self.urlSessionBuilder = urlSessionBuilder
+		self.urlRequestBuilder = urlRequestBuilder
+		self.urlRequestsInterception = interception
+		self.logger = logger
+	}
 }
 
 extension StandardAsyncNetworkController: AsyncNetworkController {
@@ -37,8 +53,8 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 			var buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
 
 			let interceptors = [urlRequestsInterception, request.interception, interception]
-			for i in interceptors {
-				buildUrlRequest = try await i(buildUrlRequest)
+			for interceptor in interceptors {
+				buildUrlRequest = try await interceptor(buildUrlRequest)
 			}
 
 			urlRequest = buildUrlRequest
@@ -88,6 +104,18 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: Request) -> ControllerError {
 		logger.log(message: .error(error), requestId: requestId, request: request)
 		return error
+	}
+}
+
+public extension StandardAsyncNetworkController {
+	func withConfiguration (_ update: (URLRequestConfiguration) -> URLRequestConfiguration) -> Self {
+		.init(
+			configuration: update(urlRequestConfiguration),
+			urlSessionBuilder: urlSessionBuilder,
+			urlRequestBuilder: urlRequestBuilder,
+			interception: urlRequestsInterception,
+			logger: logger
+		)
 	}
 }
 

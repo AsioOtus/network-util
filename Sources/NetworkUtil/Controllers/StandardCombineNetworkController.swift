@@ -2,23 +2,39 @@ import Foundation
 import Combine
 
 public struct StandardCombineNetworkController {
-	private let logger = Logger()
+	private let logger: Logger
 
-	private let urlRequestConfiguration: URLRequestConfiguration
-	private let urlSessionBuilder: URLSessionBuilder
-	private let urlRequestBuilder: URLRequestBuilder
-	private let urlRequestsInterception: URLRequestInterception
+	let urlRequestConfiguration: URLRequestConfiguration
+	let urlSessionBuilder: URLSessionBuilder
+	let urlRequestBuilder: URLRequestBuilder
+	let urlRequestsInterception: URLRequestInterception
 
 	public init (
-		urlRequestConfiguration: URLRequestConfiguration,
+		configuration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder,
-		urlRequestsInterception: @escaping URLRequestInterception = { $0 }
+		urlRequestBuilder: URLRequestBuilder = .standard,
+		interception: @escaping URLRequestInterception = { $0 }
 	) {
-		self.urlRequestConfiguration = urlRequestConfiguration
+		self.urlRequestConfiguration = configuration
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
-		self.urlRequestsInterception = urlRequestsInterception
+		self.urlRequestsInterception = interception
+
+		self.logger = .init()
+	}
+
+	private init (
+		configuration: URLRequestConfiguration,
+		urlSessionBuilder: URLSessionBuilder = .standard(),
+		urlRequestBuilder: URLRequestBuilder = .standard,
+		interception: @escaping URLRequestInterception = { $0 },
+		logger: Logger
+	) {
+		self.urlRequestConfiguration = configuration
+		self.urlSessionBuilder = urlSessionBuilder
+		self.urlRequestBuilder = urlRequestBuilder
+		self.urlRequestsInterception = interception
+		self.logger = logger
 	}
 }
 
@@ -38,8 +54,8 @@ extension StandardCombineNetworkController: CombineNetworkController {
         self.logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
 				let interceptors = [urlRequestsInterception, request.interception, interception]
-				for i in interceptors {
-					urlRequest = try await i(urlRequest)
+				for interceptor in interceptors {
+					buildUrlRequest = try await interceptor(buildUrlRequest)
 				}
 
 				return (urlSession, urlRequest)
@@ -65,6 +81,18 @@ extension StandardCombineNetworkController: CombineNetworkController {
 				}
 			)
 			.eraseToAnyPublisher()
+	}
+}
+
+public extension StandardCombineNetworkController {
+	func withConfiguration (_ update: (URLRequestConfiguration) -> URLRequestConfiguration) -> Self {
+		.init(
+			configuration: update(urlRequestConfiguration),
+			urlSessionBuilder: urlSessionBuilder,
+			urlRequestBuilder: urlRequestBuilder,
+			interception: urlRequestsInterception,
+			logger: logger
+		)
 	}
 }
 
