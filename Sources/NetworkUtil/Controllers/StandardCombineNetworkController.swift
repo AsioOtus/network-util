@@ -55,7 +55,7 @@ extension StandardCombineNetworkController: CombineNetworkController {
 
 				let interceptors = [urlRequestsInterception, request.interception, interception]
 				for interceptor in interceptors {
-					buildUrlRequest = try await interceptor(buildUrlRequest)
+          urlRequest = try await interceptor(urlRequest)
 				}
 
 				return (urlSession, urlRequest)
