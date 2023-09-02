@@ -50,3 +50,23 @@ public extension AsyncNetworkController {
     )
 	}
 }
+
+public protocol AsyncNetworkControllerDecorator: AsyncNetworkController {
+  var networkController: AsyncNetworkController { get }
+}
+
+public extension AsyncNetworkControllerDecorator {
+  func send <RQ: Request, RS: Response> (
+    _ request: RQ,
+    response: RS.Type,
+    configurationUpdate: URLRequestConfiguration.Update = { $0 },
+    interception: @escaping URLRequestInterception = { $0 }
+  ) async throws -> RS {
+    try await networkController.send(
+      request,
+      response: response,
+      configurationUpdate: configurationUpdate,
+      interception: interception
+    )
+  }
+}

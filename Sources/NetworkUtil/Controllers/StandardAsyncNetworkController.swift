@@ -114,7 +114,7 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
   }
 
   @discardableResult
-  public func logging (_ logging: (Logger) -> Void) -> Self {
+  public func logging (_ logging: (Logger) -> Void) -> LoggableAsyncNetworkController {
     logging(logger)
     return self
   }
