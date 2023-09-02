@@ -26,6 +26,8 @@ public extension LoggableAsyncNetworkControllerDecorator {
     )
   }
 
+  var logPublisher: LogPublisher { networkController.logPublisher }
+
   func logging (_ logging: (LogPublisher) -> Void) -> LoggableAsyncNetworkController {
     networkController.logging(logging)
   }

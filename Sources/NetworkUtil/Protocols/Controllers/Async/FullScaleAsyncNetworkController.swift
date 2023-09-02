@@ -30,6 +30,8 @@ public extension FullScaleAsyncNetworkControllerDecorator {
     networkController.withConfiguration(update: update)
   }
 
+  var logPublisher: LogPublisher { networkController.logPublisher }
+
   func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
     networkController.logging(logging)
   }
