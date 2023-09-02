@@ -37,7 +37,7 @@ public struct StandardAsyncNetworkController {
 	}
 }
 
-extension StandardAsyncNetworkController: ConfigurableAsyncNetworkController {
+extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
@@ -112,6 +112,12 @@ extension StandardAsyncNetworkController: ConfigurableAsyncNetworkController {
       logger: logger
     )
   }
+
+  @discardableResult
+  public func logging (_ logging: (Logger) -> Void) -> Self {
+    logging(logger)
+    return self
+  }
 }
 
 extension StandardAsyncNetworkController {
@@ -119,12 +125,4 @@ extension StandardAsyncNetworkController {
     logger.log(message: .error(error), requestId: requestId, request: request)
     return error
   }
-}
-
-public extension StandardAsyncNetworkController {
-	@discardableResult
-	func logging (_ logging: (Logger) -> Void) -> Self {
-		logging(logger)
-		return self
-	}
 }

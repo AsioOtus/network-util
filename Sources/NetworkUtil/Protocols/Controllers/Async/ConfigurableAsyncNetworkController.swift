@@ -1,3 +1,7 @@
+public protocol ConfigurableAsyncNetworkController: AsyncNetworkController {
+  func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController
+}
+
 public protocol ConfigurableAsyncNetworkControllerDecorator: ConfigurableAsyncNetworkController {
   var networkController: ConfigurableAsyncNetworkController { get }
 }

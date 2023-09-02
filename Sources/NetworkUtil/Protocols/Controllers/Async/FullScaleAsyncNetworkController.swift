@@ -1,0 +1,3 @@
+public typealias FullScaleAsyncNetworkController = ConfigurableAsyncNetworkController & LoggableAsyncNetworkController
+
+public typealias FullScaleAsyncNetworkControllerDecorator = ConfigurableAsyncNetworkControllerDecorator & LoggableAsyncNetworkControllerDecorator
