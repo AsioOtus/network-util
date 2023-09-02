@@ -103,7 +103,7 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
 		return response
 	}
 
-  public func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> ConfigurableAsyncNetworkController {
+  public func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> FullScaleAsyncNetworkController {
     Self(
       configuration: update(urlRequestConfiguration),
       urlSessionBuilder: urlSessionBuilder,
@@ -114,7 +114,7 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
   }
 
   @discardableResult
-  public func logging (_ logging: (Logger) -> Void) -> LoggableAsyncNetworkController {
+  public func logging (_ logging: (Logger) -> Void) -> FullScaleAsyncNetworkController {
     logging(logger)
     return self
   }
