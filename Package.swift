@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-	name: "NetworkUtil",
+	name: "network-util",
 	platforms: [
 		.iOS(.v13),
 		.macOS(.v13)
