@@ -1,6 +1,8 @@
 import Foundation
 
 public struct URLRequestConfiguration {
+public typealias Update = (URLRequestConfiguration) -> URLRequestConfiguration
+
 	public static let empty = Self(address: "")
 
 	public let scheme: String?

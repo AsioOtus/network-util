@@ -37,10 +37,11 @@ public struct StandardAsyncNetworkController {
 	}
 }
 
-extension StandardAsyncNetworkController: AsyncNetworkController {
+extension StandardAsyncNetworkController: ConfigurableAsyncNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
+    configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }
 	) async throws -> RS {
 		let requestId = UUID()
@@ -50,7 +51,8 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 		do {
 			urlSession = try await urlSessionBuilder.build(request)
 
-			var buildUrlRequest = try await urlRequestBuilder.build(request, urlRequestConfiguration)
+      let updatedConfiguration = configurationUpdate(urlRequestConfiguration)
+			var buildUrlRequest = try await urlRequestBuilder.build(request, updatedConfiguration)
 
 			let interceptors = [urlRequestsInterception, request.interception, interception]
 			for interceptor in interceptors {
@@ -101,22 +103,22 @@ extension StandardAsyncNetworkController: AsyncNetworkController {
 		return response
 	}
 
-	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: Request) -> ControllerError {
-		logger.log(message: .error(error), requestId: requestId, request: request)
-		return error
-	}
+  public func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> ConfigurableAsyncNetworkController {
+    Self(
+      configuration: update(urlRequestConfiguration),
+      urlSessionBuilder: urlSessionBuilder,
+      urlRequestBuilder: urlRequestBuilder,
+      interception: urlRequestsInterception,
+      logger: logger
+    )
+  }
 }
 
-public extension StandardAsyncNetworkController {
-	func withConfiguration (_ update: (URLRequestConfiguration) -> URLRequestConfiguration) -> Self {
-		.init(
-			configuration: update(urlRequestConfiguration),
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			interception: urlRequestsInterception,
-			logger: logger
-		)
-	}
+extension StandardAsyncNetworkController {
+  func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: Request) -> ControllerError {
+    logger.log(message: .error(error), requestId: requestId, request: request)
+    return error
+  }
 }
 
 public extension StandardAsyncNetworkController {
