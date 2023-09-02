@@ -1,12 +1,17 @@
+import Combine
 import Foundation
 
 public struct StandardAsyncNetworkController {
-	private let logger: Logger
+	let logger: Logger
 
 	let urlRequestConfiguration: URLRequestConfiguration
 	let urlSessionBuilder: URLSessionBuilder
 	let urlRequestBuilder: URLRequestBuilder
 	let urlRequestsInterception: URLRequestInterception
+
+  public var logPublisher: LogPublisher {
+    logger.eraseToAnyPublisher()
+  }
 
   public init (
 		configuration: URLRequestConfiguration,
@@ -114,8 +119,8 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
   }
 
   @discardableResult
-  public func logging (_ logging: (Logger) -> Void) -> FullScaleAsyncNetworkController {
-    logging(logger)
+  public func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
+    logging(logPublisher)
     return self
   }
 }

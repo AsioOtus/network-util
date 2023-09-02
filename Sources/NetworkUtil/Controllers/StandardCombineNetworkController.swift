@@ -9,6 +9,10 @@ public struct StandardCombineNetworkController {
 	let urlRequestBuilder: URLRequestBuilder
 	let urlRequestsInterception: URLRequestInterception
 
+  public var logPublisher: LogPublisher {
+    logger.eraseToAnyPublisher()
+  }
+
 	public init (
 		configuration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
@@ -98,8 +102,8 @@ public extension StandardCombineNetworkController {
 
 public extension StandardCombineNetworkController {
 	@discardableResult
-	func logging (_ logging: (Logger) -> Void) -> Self {
-		logging(logger)
+	func logging (_ logging: (LogPublisher) -> Void) -> Self {
+		logging(logPublisher)
 		return self
 	}
 }

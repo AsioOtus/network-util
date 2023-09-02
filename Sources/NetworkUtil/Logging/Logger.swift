@@ -1,12 +1,12 @@
 import Foundation
 import Combine
 
-public final class Logger {
+struct Logger {
 	private let subject = PassthroughSubject<LogRecord, Never>()
 
-	public init () { }
+	init () { }
 
-	internal func log (message: LogMessage, requestId: UUID, request: Request) {
+	func log (message: LogMessage, requestId: UUID, request: Request) {
 		let record = LogRecord(
 			requestId: requestId,
 			request: request,
@@ -18,10 +18,10 @@ public final class Logger {
 }
 
 extension Logger: Publisher {
-	public typealias Output = LogRecord
-	public typealias Failure = Never
+	typealias Output = LogRecord
+	typealias Failure = Never
 
-	public func receive <S> (subscriber: S) where S: Subscriber, S.Input == LogRecord, S.Failure == Never {
+	func receive <S> (subscriber: S) where S: Subscriber, S.Input == LogRecord, S.Failure == Never {
 		subject.receive(subscriber: subscriber)
 	}
 }

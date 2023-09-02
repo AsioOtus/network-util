@@ -1,8 +1,10 @@
 import Foundation
 
 public protocol LoggableAsyncNetworkController: AsyncNetworkController {
+  var logPublisher: LogPublisher { get }
+  
   @discardableResult
-  func logging (_ logging: (Logger) -> Void) -> LoggableAsyncNetworkController
+  func logging (_ logging: (LogPublisher) -> Void) -> LoggableAsyncNetworkController
 }
 
 public protocol LoggableAsyncNetworkControllerDecorator: LoggableAsyncNetworkController {
@@ -24,7 +26,7 @@ public extension LoggableAsyncNetworkControllerDecorator {
     )
   }
 
-  func logging (_ logging: (Logger) -> Void) -> LoggableAsyncNetworkController {
+  func logging (_ logging: (LogPublisher) -> Void) -> LoggableAsyncNetworkController {
     networkController.logging(logging)
   }
 }
