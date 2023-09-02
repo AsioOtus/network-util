@@ -2,7 +2,20 @@ import Foundation
 import Combine
 
 struct Logger {
-	private let subject = PassthroughSubject<LogRecord, Never>()
+	private let recordSubject = PassthroughSubject<LogRecord, Never>()
+
+  var logs: AsyncStream<LogRecord> {
+    .init { continuation in
+      let cancellable = recordSubject
+        .sink {
+          continuation.yield($0)
+        }
+
+      continuation.onTermination = { _ in
+        cancellable.cancel()
+      }
+    }
+  }
 
 	init () { }
 
@@ -13,7 +26,7 @@ struct Logger {
 			message: message
 		)
 
-		subject.send(record)
+		recordSubject.send(record)
 	}
 }
 
@@ -22,6 +35,6 @@ extension Logger: Publisher {
 	typealias Failure = Never
 
 	func receive <S> (subscriber: S) where S: Subscriber, S.Input == LogRecord, S.Failure == Never {
-		subject.receive(subscriber: subscriber)
+		recordSubject.receive(subscriber: subscriber)
 	}
 }

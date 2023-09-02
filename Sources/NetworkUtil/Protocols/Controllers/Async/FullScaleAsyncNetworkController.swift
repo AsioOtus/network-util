@@ -2,6 +2,7 @@ import Foundation
 
 public protocol FullScaleAsyncNetworkController: AsyncNetworkController {
   var logPublisher: LogPublisher { get }
+  var logs: AsyncStream<LogRecord> { get }
 
   func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleAsyncNetworkController
   func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController
@@ -31,6 +32,8 @@ public extension FullScaleAsyncNetworkControllerDecorator {
   }
 
   var logPublisher: LogPublisher { networkController.logPublisher }
+
+  var logs: AsyncStream<LogRecord> { networkController.logs }
 
   func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
     networkController.logging(logging)

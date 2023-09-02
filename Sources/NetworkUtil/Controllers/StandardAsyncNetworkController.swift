@@ -13,6 +13,10 @@ public struct StandardAsyncNetworkController {
     logger.eraseToAnyPublisher()
   }
 
+  public var logs: AsyncStream<LogRecord> {
+    logger.logs
+  }
+
   public init (
 		configuration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
