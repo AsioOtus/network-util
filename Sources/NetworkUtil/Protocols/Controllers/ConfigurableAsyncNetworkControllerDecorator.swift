@@ -2,7 +2,7 @@ public protocol ConfigurableAsyncNetworkControllerDecorator: ConfigurableAsyncNe
   var networkController: ConfigurableAsyncNetworkController { get }
 }
 
-extension ConfigurableAsyncNetworkControllerDecorator {
+public extension ConfigurableAsyncNetworkControllerDecorator {
   func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController {
     networkController.withConfiguration(update: update)
   }
