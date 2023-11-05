@@ -7,7 +7,14 @@ public struct LogRecord {
 }
 
 extension LogRecord: CustomStringConvertible {
+  public var info: String {
+    [
+      message.name.capitalized,
+      requestId.description
+    ].joined(separator: " | ")
+  }
+
 	public var description: String {
-		"Request – \(requestId) | \(message.name.capitalized) – \(message)"
+		"\(requestId) | \(message.name.capitalized) – \(message)"
 	}
 }
