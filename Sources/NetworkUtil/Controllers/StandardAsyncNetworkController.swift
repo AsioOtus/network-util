@@ -122,6 +122,19 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
     )
   }
 
+  public func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleAsyncNetworkController {
+    Self(
+      configuration: urlRequestConfiguration,
+      urlSessionBuilder: urlSessionBuilder,
+      urlRequestBuilder: urlRequestBuilder,
+      interception: { urlRequest in
+        let interceptedUrlRequest = try await interception(urlRequest)
+        return try await urlRequestsInterception(interceptedUrlRequest)
+      },
+      logger: logger
+    )
+  }
+
   @discardableResult
   public func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
     logging(logPublisher)
