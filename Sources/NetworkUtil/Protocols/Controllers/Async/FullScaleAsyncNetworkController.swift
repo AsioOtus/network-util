@@ -1,6 +1,7 @@
 import Foundation
 
 public protocol FullScaleAsyncNetworkController: AsyncNetworkController {
+	var urlRequestConfiguration: URLRequestConfiguration { get }
   var logPublisher: LogPublisher { get }
   var logs: AsyncStream<LogRecord> { get }
 

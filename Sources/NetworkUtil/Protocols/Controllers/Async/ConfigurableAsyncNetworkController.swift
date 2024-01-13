@@ -1,6 +1,8 @@
 import Foundation
 
 public protocol ConfigurableAsyncNetworkController: AsyncNetworkController {
+	var urlRequestConfiguration: URLRequestConfiguration { get }
+
   func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController
 }
 
