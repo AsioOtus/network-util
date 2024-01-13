@@ -25,6 +25,8 @@ public extension ConfigurableAsyncNetworkControllerDecorator {
     )
   }
 
+	var urlRequestConfiguration: URLRequestConfiguration { networkController.urlRequestConfiguration }
+
   func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController {
     networkController.withConfiguration(update: update)
   }
