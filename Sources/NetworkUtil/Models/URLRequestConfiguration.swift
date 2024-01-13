@@ -1,6 +1,6 @@
 import Foundation
 
-public struct URLRequestConfiguration {
+public struct URLRequestConfiguration: Hashable {
 public typealias Update = (URLRequestConfiguration) -> URLRequestConfiguration
 
 	public static let empty = Self(address: "")

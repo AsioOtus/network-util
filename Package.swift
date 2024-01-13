@@ -11,10 +11,13 @@ let package = Package(
 	products: [
 		.library(
 			name: "NetworkUtil",
-			targets: ["NetworkUtil"]),
+			targets: ["NetworkUtil"]
+		),
 	],
 	targets: [
-		.target(name: "NetworkUtil"),
+		.target(
+			name: "NetworkUtil"
+		),
 		.testTarget(
 			name: "NetworkUtilTests",
 			dependencies: ["NetworkUtil"]
