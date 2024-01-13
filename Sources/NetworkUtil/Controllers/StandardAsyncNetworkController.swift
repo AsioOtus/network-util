@@ -4,10 +4,10 @@ import Foundation
 public struct StandardAsyncNetworkController {
 	let logger: Logger
 
-	let urlRequestConfiguration: URLRequestConfiguration
-	let urlSessionBuilder: URLSessionBuilder
-	let urlRequestBuilder: URLRequestBuilder
-	let urlRequestsInterception: URLRequestInterception
+	public let urlRequestConfiguration: URLRequestConfiguration
+	public let urlSessionBuilder: URLSessionBuilder
+	public let urlRequestBuilder: URLRequestBuilder
+	public let urlRequestsInterception: URLRequestInterception
 
   public var logPublisher: LogPublisher {
     logger.eraseToAnyPublisher()
