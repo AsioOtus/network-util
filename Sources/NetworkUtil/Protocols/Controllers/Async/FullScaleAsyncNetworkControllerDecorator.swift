@@ -19,6 +19,8 @@ public extension FullScaleAsyncNetworkControllerDecorator {
     )
   }
 
+	var urlRequestConfiguration: URLRequestConfiguration { networkController.urlRequestConfiguration }
+
   func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleAsyncNetworkController {
     networkController.withConfiguration(update: update)
   }
