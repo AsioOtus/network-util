@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct Logger {
+class Logger {
 	private let recordSubject = PassthroughSubject<LogRecord, Never>()
 
   var logs: AsyncStream<LogRecord> {
