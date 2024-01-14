@@ -25,6 +25,10 @@ public extension FullScaleAsyncNetworkControllerDecorator {
     networkController.withConfiguration(update: update)
   }
 
+	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleAsyncNetworkController {
+		networkController.replaceConfiguration(configuration)
+	}
+
   func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleAsyncNetworkController {
     networkController.addInterception(interception)
   }

@@ -122,6 +122,10 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
     )
   }
 
+	public func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleAsyncNetworkController {
+		withConfiguration { _ in configuration }
+	}
+
   public func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleAsyncNetworkController {
     Self(
       configuration: urlRequestConfiguration,

@@ -4,6 +4,7 @@ public protocol ConfigurableAsyncNetworkController: AsyncNetworkController {
 	var urlRequestConfiguration: URLRequestConfiguration { get }
 
   func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController
+	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> ConfigurableAsyncNetworkController
 }
 
 public protocol ConfigurableAsyncNetworkControllerDecorator: ConfigurableAsyncNetworkController {
@@ -30,4 +31,8 @@ public extension ConfigurableAsyncNetworkControllerDecorator {
   func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableAsyncNetworkController {
     networkController.withConfiguration(update: update)
   }
+
+	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> ConfigurableAsyncNetworkController {
+		networkController.replaceConfiguration(configuration)
+	}
 }
