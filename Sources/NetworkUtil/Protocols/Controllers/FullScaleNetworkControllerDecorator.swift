@@ -1,10 +1,10 @@
 import Foundation
 
-public protocol FullScaleAsyncNetworkControllerDecorator: FullScaleAsyncNetworkController {
-  var networkController: FullScaleAsyncNetworkController { get }
+public protocol FullScaleNetworkControllerDecorator: FullScaleNetworkController {
+  var networkController: FullScaleNetworkController { get }
 }
 
-public extension FullScaleAsyncNetworkControllerDecorator {
+public extension FullScaleNetworkControllerDecorator {
   func send <RQ: Request, RS: Response> (
     _ request: RQ,
     response: RS.Type,
@@ -21,15 +21,15 @@ public extension FullScaleAsyncNetworkControllerDecorator {
 
 	var urlRequestConfiguration: URLRequestConfiguration { networkController.urlRequestConfiguration }
 
-  func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleAsyncNetworkController {
+  func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleNetworkController {
     networkController.withConfiguration(update: update)
   }
 
-	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleAsyncNetworkController {
+	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleNetworkController {
 		networkController.replaceConfiguration(configuration)
 	}
 
-  func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleAsyncNetworkController {
+  func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
     networkController.addInterception(interception)
   }
 
@@ -37,7 +37,7 @@ public extension FullScaleAsyncNetworkControllerDecorator {
 
   var logs: AsyncStream<LogRecord> { networkController.logs }
 
-  func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
+  func logging (_ logging: (LogPublisher) -> Void) -> FullScaleNetworkController {
     networkController.logging(logging)
   }
 }

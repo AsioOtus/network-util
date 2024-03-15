@@ -46,7 +46,7 @@ public struct StandardNetworkController {
 	}
 }
 
-extension StandardNetworkController: FullScaleAsyncNetworkController {
+extension StandardNetworkController: FullScaleNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
@@ -112,7 +112,7 @@ extension StandardNetworkController: FullScaleAsyncNetworkController {
 		return response
 	}
 
-  public func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> FullScaleAsyncNetworkController {
+  public func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> FullScaleNetworkController {
     Self(
       configuration: update(urlRequestConfiguration),
       urlSessionBuilder: urlSessionBuilder,
@@ -122,11 +122,11 @@ extension StandardNetworkController: FullScaleAsyncNetworkController {
     )
   }
 
-	public func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleAsyncNetworkController {
+	public func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleNetworkController {
 		withConfiguration { _ in configuration }
 	}
 
-  public func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleAsyncNetworkController {
+  public func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
     Self(
       configuration: urlRequestConfiguration,
       urlSessionBuilder: urlSessionBuilder,
@@ -140,7 +140,7 @@ extension StandardNetworkController: FullScaleAsyncNetworkController {
   }
 
   @discardableResult
-  public func logging (_ logging: (LogPublisher) -> Void) -> FullScaleAsyncNetworkController {
+  public func logging (_ logging: (LogPublisher) -> Void) -> FullScaleNetworkController {
     logging(logPublisher)
     return self
   }

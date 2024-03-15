@@ -1,18 +1,18 @@
 import Foundation
 
-public protocol LoggableAsyncNetworkController: NetworkController {
+public protocol LoggableNetworkController: NetworkController {
   var logPublisher: LogPublisher { get }
   var logs: AsyncStream<LogRecord> { get }
   
   @discardableResult
-  func logging (_ logging: (LogPublisher) -> Void) -> LoggableAsyncNetworkController
+  func logging (_ logging: (LogPublisher) -> Void) -> LoggableNetworkController
 }
 
-public protocol LoggableAsyncNetworkControllerDecorator: LoggableAsyncNetworkController {
-  var networkController: LoggableAsyncNetworkController { get }
+public protocol LoggableNetworkControllerDecorator: LoggableNetworkController {
+  var networkController: LoggableNetworkController { get }
 }
 
-public extension LoggableAsyncNetworkControllerDecorator {
+public extension LoggableNetworkControllerDecorator {
   func send <RQ: Request, RS: Response> (
     _ request: RQ,
     response: RS.Type,
@@ -30,7 +30,7 @@ public extension LoggableAsyncNetworkControllerDecorator {
   var logPublisher: LogPublisher { networkController.logPublisher }
   var logs: AsyncStream<LogRecord> { networkController.logs }
 
-  func logging (_ logging: (LogPublisher) -> Void) -> LoggableAsyncNetworkController {
+  func logging (_ logging: (LogPublisher) -> Void) -> LoggableNetworkController {
     networkController.logging(logging)
   }
 }

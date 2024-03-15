@@ -51,11 +51,11 @@ public extension NetworkController {
 	}
 }
 
-public protocol AsyncNetworkControllerDecorator: NetworkController {
+public protocol NetworkControllerDecorator: NetworkController {
   var networkController: NetworkController { get }
 }
 
-public extension AsyncNetworkControllerDecorator {
+public extension NetworkControllerDecorator {
   func send <RQ: Request, RS: Response> (
     _ request: RQ,
     response: RS.Type,
