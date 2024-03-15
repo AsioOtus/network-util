@@ -5,53 +5,51 @@ public protocol NetworkController {
 		_ request: RQ,
 		response: RS.Type,
 		encoding: ((Encodable) throws -> Data)?,
-    configurationUpdate: URLRequestConfiguration.Update,
+		decoding: ((Data) throws -> RS.Model)?,
+		configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception
 	) async throws -> RS
 
 	func send <RQ: Request> (
 		_ request: RQ,
 		encoding: ((Encodable) throws -> Data)?,
+		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
     configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception
-	) async throws -> StandardResponse
-
-	func send <RQ: Request, RSM: ResponseModel> (
-		_ request: RQ,
-		responseModel: RSM.Type,
-		encoding: ((Encodable) throws -> Data)?,
-    configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception
-	) async throws -> StandardModelResponse<RSM>
+	) async throws -> StandardResponse<Data>
 }
 
 public extension NetworkController {
 	func send <RQ: Request> (
 		_ request: RQ,
-		encoding: ((Encodable) throws -> Data)?,
+		encoding: ((Encodable) throws -> Data)? = nil,
+		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }
-	) async throws -> StandardResponse {
+	) async throws -> StandardResponse<Data> {
 		try await send(
       request,
-      response: StandardResponse.self,
+      response: StandardResponse<Data>.self,
 			encoding: encoding,
+			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception
     )
 	}
 
-	func send <RQ: Request, RSM: ResponseModel> (
+	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		encoding: ((Encodable) throws -> Data)?,
+		encoding: ((Encodable) throws -> Data)? = nil,
+		decoding: ((Data) throws -> RSM)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }
-	) async throws -> StandardModelResponse<RSM> {
+	) async throws -> StandardResponse<RSM> {
 		try await send(
       request,
-      response: StandardModelResponse<RSM>.self,
+      response: StandardResponse<RSM>.self,
 			encoding: encoding,
+			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception
     )
@@ -67,6 +65,7 @@ public extension NetworkControllerDecorator {
     _ request: RQ,
     response: RS.Type,
 		encoding: ((Encodable) throws -> Data)?,
+		decoding: ((Data) throws -> RS.Model)?,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
     interception: @escaping URLRequestInterception = { $0 }
   ) async throws -> RS {
@@ -74,6 +73,7 @@ public extension NetworkControllerDecorator {
       request,
       response: response,
 			encoding: encoding,
+			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception
     )

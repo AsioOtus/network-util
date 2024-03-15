@@ -16,6 +16,7 @@ public extension ConfigurableNetworkControllerDecorator {
     _ request: RQ,
     response: RS.Type,
 		encoding: ((Encodable) throws -> Data)?,
+		decoding: ((Data) throws -> RS.Model)?,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
     interception: @escaping URLRequestInterception = { $0 }
   ) async throws -> RS {
@@ -23,6 +24,7 @@ public extension ConfigurableNetworkControllerDecorator {
       request,
       response: response,
 			encoding: encoding,
+			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception
     )
