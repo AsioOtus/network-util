@@ -1,11 +1,7 @@
 import Foundation
 
 public struct StandardURLRequestBuilder {
-	let encoder: RequestBodyEncoder
-
-	public init (encoder: RequestBodyEncoder) {
-		self.encoder = encoder
-	}
+	public init () { }
 }
 
 public extension StandardURLRequestBuilder {
@@ -34,12 +30,12 @@ public extension StandardURLRequestBuilder {
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build (_ request: some Request, _ config: URLRequestConfiguration) async throws -> URLRequest {
+	public func build (_ request: some Request, _ body: Data, _ config: URLRequestConfiguration) throws -> URLRequest {
 		let url = try url(request, config)
 		var urlRequest = URLRequest(url: url)
 
 		urlRequest.httpMethod = request.method.value
-		urlRequest.httpBody = try JSONEncoder().encode(request.body)
+		urlRequest.httpBody = body
 
 		let headers = request.headers.merging(config.headers) { value, _ in value }
 		headers.forEach { key, value in urlRequest.setValue(value, forHTTPHeaderField: key) }
@@ -53,7 +49,7 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 }
 
 public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
-	static func standard (encoder: RequestBodyEncoder = JSONEncoder()) -> Self {
-		.init(encoder: encoder)
+	static func standard () -> Self {
+		.init()
 	}
 }
