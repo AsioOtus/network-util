@@ -1,8 +1,6 @@
 import Foundation
 
 public struct StandardURLSessionBuilder {
-	public static let standard = Self()
-
 	public let urlSession: URLSession
 
 	public init (_ urlSession: URLSession = .init(configuration: .default)) {
@@ -11,7 +9,7 @@ public struct StandardURLSessionBuilder {
 }
 
 extension StandardURLSessionBuilder: URLSessionBuilder {
-	public func build <R: Request> (_ request: R) throws -> URLSession {
+	public func build (_ request: some Request) throws -> URLSession {
 		urlSession
 	}
 }

@@ -19,7 +19,7 @@ struct Logger {
 
 	init () { }
 
-	func log (message: LogMessage, requestId: UUID, request: Request) {
+	func log (message: LogMessage, requestId: UUID, request: any Request) {
 		let record = LogRecord(
 			requestId: requestId,
 			request: request,

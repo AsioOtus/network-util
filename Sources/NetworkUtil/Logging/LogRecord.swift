@@ -2,7 +2,7 @@ import Foundation
 
 public struct LogRecord {
 	public let requestId: UUID
-	public let request: Request
+	public let request: any Request
 	public let message: LogMessage
 }
 

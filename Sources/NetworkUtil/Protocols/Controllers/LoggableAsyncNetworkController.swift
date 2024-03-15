@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol LoggableAsyncNetworkController: AsyncNetworkController {
+public protocol LoggableAsyncNetworkController: NetworkController {
   var logPublisher: LogPublisher { get }
   var logs: AsyncStream<LogRecord> { get }
   

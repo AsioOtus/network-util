@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol URLSessionBuilder {
-	func build <R: Request> (_ request: R) async throws -> URLSession
+	func build (_ request: some Request) async throws -> URLSession
 }

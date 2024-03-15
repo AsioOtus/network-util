@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol URLRequestBuilder {
-	func build <R: Request> (_ request: R, _ config: URLRequestConfiguration) async throws -> URLRequest
+	func build (_ request: some Request, _ config: URLRequestConfiguration) async throws -> URLRequest
 }

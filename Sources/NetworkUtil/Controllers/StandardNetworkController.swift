@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-public struct StandardAsyncNetworkController {
+public struct StandardNetworkController {
 	let logger: Logger
 
 	public let urlRequestConfiguration: URLRequestConfiguration
@@ -20,7 +20,7 @@ public struct StandardAsyncNetworkController {
   public init (
 		configuration: URLRequestConfiguration,
     urlSessionBuilder: URLSessionBuilder = .standard(),
-    urlRequestBuilder: URLRequestBuilder = .standard,
+    urlRequestBuilder: URLRequestBuilder = .standard(),
 		interception: @escaping URLRequestInterception = { $0 }
   ) {
 		self.urlRequestConfiguration = configuration
@@ -34,7 +34,7 @@ public struct StandardAsyncNetworkController {
 	private init (
 		configuration: URLRequestConfiguration,
 		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder = .standard,
+		urlRequestBuilder: URLRequestBuilder = .standard(),
 		interception: @escaping URLRequestInterception = { $0 },
 		logger: Logger
 	) {
@@ -46,7 +46,7 @@ public struct StandardAsyncNetworkController {
 	}
 }
 
-extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
+extension StandardNetworkController: FullScaleAsyncNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
     response: RS.Type,
@@ -146,8 +146,8 @@ extension StandardAsyncNetworkController: FullScaleAsyncNetworkController {
   }
 }
 
-extension StandardAsyncNetworkController {
-  func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: Request) -> ControllerError {
+extension StandardNetworkController {
+  func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
     logger.log(message: .error(error), requestId: requestId, request: request)
     return error
   }

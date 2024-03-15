@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol AsyncNetworkController {
+public protocol NetworkController {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
@@ -22,7 +22,7 @@ public protocol AsyncNetworkController {
 	) async throws -> StandardModelResponse<RSM>
 }
 
-public extension AsyncNetworkController {
+public extension NetworkController {
 	func send <RQ: Request> (
 		_ request: RQ,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
@@ -51,8 +51,8 @@ public extension AsyncNetworkController {
 	}
 }
 
-public protocol AsyncNetworkControllerDecorator: AsyncNetworkController {
-  var networkController: AsyncNetworkController { get }
+public protocol AsyncNetworkControllerDecorator: NetworkController {
+  var networkController: NetworkController { get }
 }
 
 public extension AsyncNetworkControllerDecorator {

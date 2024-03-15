@@ -1,7 +1,11 @@
 import Foundation
 
-public protocol JSONRequestModel: RequestModel { }
+public protocol JSONRequest: Request {
+	associatedtype Model: Encodable
 
-public extension JSONRequestModel {
-	func data () throws -> Data { try JSONEncoder().encode(self) }
+	var model: Model { get }
+}
+
+public extension JSONRequest {
+	func data () throws -> Data { try JSONEncoder().encode(model) }
 }

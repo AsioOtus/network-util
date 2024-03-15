@@ -6,7 +6,7 @@ var subscriptions = Set<AnyCancellable>()
 
 final class NetworkFlowUtilTests: XCTestCase {
 	func test () async throws {
-		let controller = StandardAsyncNetworkController(configuration: .empty)
+		let controller = StandardNetworkController(configuration: .empty)
 			.withConfiguration {
 				$0.addHeader(key: "auth", value: "token")
 			}

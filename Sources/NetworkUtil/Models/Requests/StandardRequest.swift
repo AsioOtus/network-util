@@ -1,26 +1,41 @@
 import Foundation
 
-public struct StandardRequest: Request {
+public struct StandardRequest <Body: Encodable>: Request {
 	public let method: HTTPMethod
 	public let path: String
 
 	public let query: [String: String]
 	public let headers: [String: String]
 
-	public let body: Data?
+	public let body: Body?
 
 	public init (
 		method: HTTPMethod = .get,
 		path: String,
 		query: [String : String] = [:],
 		headers: [String : String] = [:],
-		body: Data? = nil
+		body: Body? = nil
 	) {
 		self.method = method
 		self.path = path
 		self.query = query
 		self.headers = headers
 		self.body = body
+	}
+}
+
+public extension StandardRequest where Body == Data {
+	init (
+		method: HTTPMethod = .get,
+		path: String,
+		query: [String : String] = [:],
+		headers: [String : String] = [:]
+	) {
+		self.method = method
+		self.path = path
+		self.query = query
+		self.headers = headers
+		self.body = nil
 	}
 }
 
@@ -65,7 +80,7 @@ public extension StandardRequest {
 		)
 	}
 
-	func set (body: Data?) -> Self {
+	func set (body: Body?) -> Self {
 		.init(
 			method: method,
 			path: path,
@@ -76,14 +91,17 @@ public extension StandardRequest {
 	}
 }
 
-public extension Request where Self == StandardRequest {
-	static func request (
+public extension Request {
+	static func request <B> (
 		method: HTTPMethod,
 		path: String,
 		query: [String: String] = [:],
 		headers: [String: String] = [:],
-		body: Data? = nil
-	) -> StandardRequest {
+		body: B? = nil
+	)
+	-> StandardRequest<B>
+	where Self == StandardRequest<B>
+	{
 		.init(
 			method: method,
 			path: path,
@@ -96,24 +114,28 @@ public extension Request where Self == StandardRequest {
 	static func get (
 		_ path: String,
 		query: [String: String] = [:],
-		headers: [String: String] = [:],
-		body: Data? = nil
-	) -> StandardRequest {
+		headers: [String: String] = [:]
+	)
+	-> StandardRequest<Data>
+	where Self == StandardRequest<Data>
+	{
 		.init(
 			method: .get,
 			path: path,
 			query: query,
-			headers: headers,
-			body: body
+			headers: headers
 		)
 	}
 
-	static func post (
+	static func post <B> (
 		_ path: String,
 		query: [String: String] = [:],
 		headers: [String: String] = [:],
-		body: Data
-	) -> StandardRequest {
+		body: Body
+	)
+	-> StandardRequest<B>
+	where Self == StandardRequest<B>
+	{
 		.init(
 			method: .post,
 			path: path,
@@ -122,5 +144,4 @@ public extension Request where Self == StandardRequest {
 			body: body
 		)
 	}
-
 }

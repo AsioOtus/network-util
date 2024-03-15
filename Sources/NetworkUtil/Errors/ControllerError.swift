@@ -2,7 +2,7 @@ import Foundation
 
 public struct ControllerError: NetworkUtilError {
 	let requestId: UUID
-	let request: Request
+	let request: any Request
 	let category: Category
 }
 
