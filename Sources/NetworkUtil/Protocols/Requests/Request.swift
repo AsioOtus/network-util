@@ -10,7 +10,7 @@ public protocol Request <Body>: CustomStringConvertible {
 	var query: [String: String] { get }
 	var headers: [String: String] { get }
 
-	var body: Body? { get throws }
+	var body: Body? { get }
 
 	func interception (_ urlRequest: URLRequest) throws -> URLRequest
 }
@@ -23,7 +23,7 @@ public extension Request {
 	var query: [String: String] { [:] }
 	var headers: [String: String] { [:] }
 
-	var body: Body? { get throws { throw EmptyRequestBodyError() } }
+	var body: Body? { nil }
 
 	func interception (_ urlRequest: URLRequest) throws -> URLRequest { urlRequest }
 }
