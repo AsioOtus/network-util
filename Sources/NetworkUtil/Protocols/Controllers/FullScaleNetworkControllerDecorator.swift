@@ -33,6 +33,14 @@ public extension FullScaleNetworkControllerDecorator {
 		networkController.replaceConfiguration(configuration)
 	}
 
+	func withConfiguration (update: URLRequestConfiguration.Update) -> ConfigurableNetworkController {
+		networkController.withConfiguration(update: update)
+	}
+
+	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> ConfigurableNetworkController {
+		networkController.replaceConfiguration(configuration)
+	}
+
   func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
     networkController.addInterception(interception)
   }
@@ -44,4 +52,8 @@ public extension FullScaleNetworkControllerDecorator {
   func logging (_ logging: (LogPublisher) -> Void) -> FullScaleNetworkController {
     networkController.logging(logging)
   }
+
+	func logging (_ logging: (LogPublisher) -> Void) -> LoggableNetworkController {
+		networkController.logging(logging)
+	}
 }

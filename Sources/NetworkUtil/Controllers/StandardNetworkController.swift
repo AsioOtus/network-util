@@ -214,6 +214,16 @@ public extension StandardNetworkController {
 		withConfiguration { _ in configuration }
 	}
 
+	func withConfiguration(update: (URLRequestConfiguration) -> URLRequestConfiguration) -> ConfigurableNetworkController {
+		let nc: FullScaleNetworkController = withConfiguration(update: update)
+		return nc as ConfigurableNetworkController
+	}
+
+	func replaceConfiguration(_ configuration: URLRequestConfiguration) -> ConfigurableNetworkController {
+		let nc: FullScaleNetworkController = replaceConfiguration(configuration)
+		return nc as ConfigurableNetworkController
+	}
+
 	func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
 		Self(
 			configuration: urlRequestConfiguration,
@@ -233,6 +243,12 @@ public extension StandardNetworkController {
 	func logging (_ logging: (LogPublisher) -> Void) -> FullScaleNetworkController {
 		logging(logPublisher)
 		return self
+	}
+
+	@discardableResult
+	func logging(_ logging: (LogPublisher) -> Void) -> LoggableNetworkController {
+		let nc: FullScaleNetworkController = self.logging(logging)
+		return nc as LoggableNetworkController
 	}
 }
 
