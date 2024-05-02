@@ -23,7 +23,5 @@ public extension Request {
 	var query: [String: String] { [:] }
 	var headers: [String: String] { [:] }
 
-	var body: Body? { nil }
-
 	func interception (_ urlRequest: URLRequest) throws -> URLRequest { urlRequest }
 }
