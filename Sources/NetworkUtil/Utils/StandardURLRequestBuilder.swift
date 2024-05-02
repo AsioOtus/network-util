@@ -6,9 +6,9 @@ public struct StandardURLRequestBuilder {
 
 public extension StandardURLRequestBuilder {
 	func url (_ request: some Request, _ config: URLRequestConfiguration) throws -> URL {
-		var basePath = ""
+		var basePath = config.address
 
-		if let scheme = config.scheme { basePath = "\(scheme)://\(config.address)" }
+		if let scheme = config.scheme { basePath = "\(scheme)://\(basePath)" }
 		if let port = config.port { basePath = "\(basePath):\(port)" }
 		if let baseSubpath = config.baseSubpath { basePath = "\(basePath)/\(baseSubpath)" }
 
@@ -30,7 +30,7 @@ public extension StandardURLRequestBuilder {
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build (_ request: some Request, _ body: Data, _ config: URLRequestConfiguration) throws -> URLRequest {
+	public func build (_ request: some Request, _ body: Data?, _ config: URLRequestConfiguration) throws -> URLRequest {
 		let url = try url(request, config)
 		var urlRequest = URLRequest(url: url)
 

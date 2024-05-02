@@ -61,7 +61,7 @@ extension StandardNetworkController: FullScaleNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		encoding: ((Encodable) throws -> Data)? = nil,
+		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }
@@ -87,7 +87,8 @@ extension StandardNetworkController: FullScaleNetworkController {
 			data,
 			urlResponse,
 			requestId,
-			request
+			request,
+			decoding
 		)
 
 		return response
@@ -98,7 +99,7 @@ private extension StandardNetworkController {
 	func createUrlEntities <RQ: Request> (
 		_ requestId: UUID,
 		_ request: RQ,
-		_ encoding: ((Encodable) throws -> Data)? = nil,
+		_ encoding: ((RQ.Body) throws -> Data)? = nil,
 		_ configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		_ interception: @escaping URLRequestInterception = { $0 }
 	) async throws -> (URLSession, URLRequest) {
@@ -130,12 +131,14 @@ private extension StandardNetworkController {
 
 	func encodeRequestBody <RQ: Request> (
 		_ request: RQ,
-		_ encoding: ((Encodable) throws -> Data)?
-	) throws -> Data {
+		_ encoding: ((RQ.Body) throws -> Data)?
+	) throws -> Data? {
+		guard let body = request.body else { return nil }
+
 		if let encoding {
-			return try encoding(request.body)
+			return try encoding(body)
 		} else {
-			return try encoder.encode(request.body)
+			return try encoder.encode(body)
 		}
 	}
 
@@ -170,7 +173,7 @@ private extension StandardNetworkController {
 		_ urlResponse: URLResponse,
 		_ requestId: UUID,
 		_ request: RQ,
-		_ decoding: ((Data) throws -> RS.Model)? = nil
+		_ decoding: ((Data) throws -> RS.Model)?
 	) throws -> RS {
 		do {
 			let model = try decodeResponseData(data, decoding)
@@ -187,7 +190,7 @@ private extension StandardNetworkController {
 
 	func decodeResponseData <RSM: Decodable> (
 		_ data: Data,
-		_ decoding: ((Data) throws -> RSM)? = nil
+		_ decoding: ((Data) throws -> RSM)?
 	) throws -> RSM {
 		if let decoding {
 			return try decoding(data)

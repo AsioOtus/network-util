@@ -4,7 +4,7 @@ public protocol NetworkController {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		encoding: ((Encodable) throws -> Data)?,
+		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> RS.Model)?,
 		configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception
@@ -12,7 +12,7 @@ public protocol NetworkController {
 
 	func send <RQ: Request> (
 		_ request: RQ,
-		encoding: ((Encodable) throws -> Data)?,
+		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
     configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception
@@ -22,7 +22,7 @@ public protocol NetworkController {
 public extension NetworkController {
 	func send <RQ: Request> (
 		_ request: RQ,
-		encoding: ((Encodable) throws -> Data)? = nil,
+		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }
@@ -40,7 +40,7 @@ public extension NetworkController {
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		encoding: ((Encodable) throws -> Data)? = nil,
+		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RSM)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }

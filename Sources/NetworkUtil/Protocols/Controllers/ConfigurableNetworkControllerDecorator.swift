@@ -8,7 +8,7 @@ public extension ConfigurableNetworkControllerDecorator {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		encoding: ((Encodable) throws -> Data)?,
+		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> RS.Model)?,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 }

@@ -94,7 +94,7 @@ public extension StandardRequest {
 public extension Request {
 	static func request <B> (
 		method: HTTPMethod,
-		path: String,
+		path: String = "",
 		query: [String: String] = [:],
 		headers: [String: String] = [:],
 		body: B? = nil
@@ -112,7 +112,7 @@ public extension Request {
 	}
 
 	static func get (
-		_ path: String,
+		_ path: String = "",
 		query: [String: String] = [:],
 		headers: [String: String] = [:]
 	)
@@ -128,7 +128,7 @@ public extension Request {
 	}
 
 	static func post <B> (
-		_ path: String,
+		_ path: String = "",
 		query: [String: String] = [:],
 		headers: [String: String] = [:],
 		body: Body
