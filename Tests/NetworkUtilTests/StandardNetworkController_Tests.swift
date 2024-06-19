@@ -41,4 +41,27 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Act
 		_ = try await sut.send(request, decoding: { _ in Data() })
 	}
+
+	func test_urlSessionCreation () async throws {
+		// MARK: Assert
+		let expectedUrlSession = URLSession(configuration: .default)
+
+		let sendingDelegate: SendingDelegate = { resultUrlSession, _, _, _, _ in
+			XCTAssertEqual(resultUrlSession, expectedUrlSession)
+			
+			return (.init(), .init())
+		}
+
+		// MARK: Arrange
+		sut = StandardNetworkController(
+			configuration: baseConfiguration,
+			urlSessionBuilder: expectedUrlSession,
+			sendingDelegate: sendingDelegate
+		)
+
+		let request = baseRequest
+
+		// MARK: Act
+		_ = try await sut.send(request, decoding: { _ in Data() })
+	}
 }
