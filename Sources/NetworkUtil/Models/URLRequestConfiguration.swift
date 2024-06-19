@@ -9,8 +9,8 @@ public typealias Update = (URLRequestConfiguration) -> URLRequestConfiguration
 	public let address: String
 	public let port: Int?
 	public let baseSubpath: String?
-	public let query: [String: String]
-	public let headers: [String: String]
+	public let query: Query
+	public let headers: Headers
 	public let timeout: Double?
 
 	public init (
@@ -18,8 +18,8 @@ public typealias Update = (URLRequestConfiguration) -> URLRequestConfiguration
 		address: String,
 		port: Int? = nil,
 		baseSubpath: String? = nil,
-		query: [String: String] = [:],
-		headers: [String: String] = [:],
+		query: Query = [:],
+		headers: Headers = [:],
 		timeout: Double? = nil
 	) {
 		self.scheme = scheme
@@ -81,7 +81,7 @@ public extension URLRequestConfiguration {
 		)
 	}
 
-	func setQuery (_ query: [String: String]) -> Self {
+	func setQuery (_ query: Query) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,
@@ -93,7 +93,7 @@ public extension URLRequestConfiguration {
 		)
 	}
 
-	func setHeaders (_ headers: [String: String]) -> Self {
+	func setHeaders (_ headers: Headers) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,
@@ -119,7 +119,7 @@ public extension URLRequestConfiguration {
 }
 
 public extension URLRequestConfiguration {
-	func addQuery (key: String, value: String) -> Self {
+	func addQuery (key: String, value: String?) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,
@@ -131,7 +131,7 @@ public extension URLRequestConfiguration {
 		)
 	}
 
-	func addQuery (_ query: [String: String]) -> Self {
+	func addQuery (_ query: Query) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,
@@ -155,7 +155,7 @@ public extension URLRequestConfiguration {
 		)
 	}
 
-	func addHeaders (_ headers: [String: String]) -> Self {
+	func addHeaders (_ headers: Headers) -> Self {
 		.init(
 			scheme: scheme,
 			address: address,

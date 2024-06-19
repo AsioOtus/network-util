@@ -11,7 +11,8 @@ public extension ConfigurableNetworkControllerDecorator {
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 }
+		interception: @escaping URLRequestInterception = { $0 },
+		sendingDelegate: SendingDelegate? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,
@@ -19,7 +20,8 @@ public extension ConfigurableNetworkControllerDecorator {
 			encoding: encoding,
 			decoding: decoding,
 			configurationUpdate: configurationUpdate,
-			interception: interception
+			interception: interception,
+			sendingDelegate: sendingDelegate
 		)
 	}
 

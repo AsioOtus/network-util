@@ -7,8 +7,8 @@ public protocol Request <Body>: CustomStringConvertible {
 
 	var path: String { get }
 
-	var query: [String: String] { get }
-	var headers: [String: String] { get }
+	var query: Query { get }
+	var headers: Headers { get }
 
 	var body: Body? { get }
 
@@ -20,8 +20,8 @@ public extension Request {
 
 	var method: HTTPMethod { .get }
 
-	var query: [String: String] { [:] }
-	var headers: [String: String] { [:] }
+	var query: Query { [:] }
+	var headers: Headers { [:] }
 
 	func interception (_ urlRequest: URLRequest) throws -> URLRequest { urlRequest }
 }

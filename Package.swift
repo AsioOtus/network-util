@@ -18,6 +18,10 @@ let package = Package(
 		.target(
 			name: "NetworkUtil"
 		),
+		.executableTarget(
+			name: "Testground",
+			dependencies: ["NetworkUtil"]
+		),
 		.testTarget(
 			name: "NetworkUtilTests",
 			dependencies: ["NetworkUtil"]

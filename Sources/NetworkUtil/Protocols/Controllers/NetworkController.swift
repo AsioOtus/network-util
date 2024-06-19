@@ -7,7 +7,8 @@ public protocol NetworkController {
 		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> RS.Model)?,
 		configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception
+		interception: @escaping URLRequestInterception,
+		sendingDelegate: SendingDelegate?
 	) async throws -> RS
 
 	func send <RQ: Request> (
@@ -15,7 +16,8 @@ public protocol NetworkController {
 		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
     configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception
+		interception: @escaping URLRequestInterception,
+		sendingDelegate: SendingDelegate?
 	) async throws -> StandardResponse<Data>
 }
 
@@ -25,7 +27,8 @@ public extension NetworkController {
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 }
+		interception: @escaping URLRequestInterception = { $0 },
+		sendingDelegate: SendingDelegate? = nil
 	) async throws -> StandardResponse<Data> {
 		try await send(
       request,
@@ -33,7 +36,8 @@ public extension NetworkController {
 			encoding: encoding,
 			decoding: decoding,
       configurationUpdate: configurationUpdate,
-      interception: interception
+      interception: interception,
+			sendingDelegate: sendingDelegate
     )
 	}
 
@@ -43,7 +47,8 @@ public extension NetworkController {
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RSM)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 }
+		interception: @escaping URLRequestInterception = { $0 },
+		sendingDelegate: SendingDelegate? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(
       request,
@@ -51,7 +56,8 @@ public extension NetworkController {
 			encoding: encoding,
 			decoding: decoding,
       configurationUpdate: configurationUpdate,
-      interception: interception
+      interception: interception,
+			sendingDelegate: sendingDelegate
     )
 	}
 }
