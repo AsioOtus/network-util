@@ -82,15 +82,12 @@ extension StandardNetworkController: FullScaleNetworkController {
 			interception
 		)
 
-		let sendingDelegate = sendingDelegate ?? self.sendingDelegate ??  { try await $4() }
-		let (data, urlResponse) = try await sendingDelegate(urlSession, urlRequest, requestId, request) {
-			try await send(
-				urlSession,
-				urlRequest,
-				requestId,
-				request
-			)
-		}
+		let (data, urlResponse) = try await sendAction(
+			urlSession,
+			urlRequest,
+			requestId,
+			request
+		)
 
 		let response: RS = try createResponse(
 			data,
@@ -108,23 +105,19 @@ private extension StandardNetworkController {
 	func createUrlEntities <RQ: Request> (
 		_ requestId: UUID,
 		_ request: RQ,
-		_ encoding: ((RQ.Body) throws -> Data)? = nil,
-		_ configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		_ interception: @escaping URLRequestInterception = { $0 }
+		_ encoding: ((RQ.Body) throws -> Data)?,
+		_ configurationUpdate: URLRequestConfiguration.Update,
+		_ interception: @escaping URLRequestInterception
 	) async throws -> (URLSession, URLRequest) {
 		do {
-			let urlSession = try urlSessionBuilder.build(request)
+			let urlSession = try createUrlSession(request)
 
-			let body = try encodeRequestBody(request, encoding)
-			let updatedConfiguration = configurationUpdate(urlRequestConfiguration)
-			var buildUrlRequest = try urlRequestBuilder.build(request, body, updatedConfiguration)
-
-			let interceptors = [urlRequestsInterception, request.interception, interception]
-			for interceptor in interceptors {
-				buildUrlRequest = try await interceptor(buildUrlRequest)
-			}
-
-			let urlRequest = buildUrlRequest
+			let urlRequest = try await createUrlRequest(
+				request,
+				encoding,
+				configurationUpdate,
+				interception
+			)
 
 			logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
@@ -138,6 +131,28 @@ private extension StandardNetworkController {
 		}
 	}
 
+	func createUrlSession <RQ: Request> (_ request: RQ) throws -> URLSession {
+		try urlSessionBuilder.build(request)
+	}
+
+	func createUrlRequest <RQ: Request> (
+		_ request: RQ,
+		_ encoding: ((RQ.Body) throws -> Data)?,
+		_ configurationUpdate: URLRequestConfiguration.Update,
+		_ interception: @escaping URLRequestInterception
+	) async throws -> URLRequest {
+		let body = try encodeRequestBody(request, encoding)
+		let updatedConfiguration = configurationUpdate(urlRequestConfiguration)
+		var buildUrlRequest = try urlRequestBuilder.build(request, body, updatedConfiguration)
+
+		let interceptors = [urlRequestsInterception, request.interception, interception]
+		for interceptor in interceptors {
+			buildUrlRequest = try await interceptor(buildUrlRequest)
+		}
+
+		return buildUrlRequest
+	}
+
 	func encodeRequestBody <RQ: Request> (
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?
@@ -148,6 +163,24 @@ private extension StandardNetworkController {
 			return try encoding(body)
 		} else {
 			return try encoder.encode(body)
+		}
+	}
+
+	func sendAction <RQ: Request> (
+		_ urlSession: URLSession,
+		_ urlRequest: URLRequest,
+		_ requestId: UUID,
+		_ request: RQ
+	) async throws -> (Data, URLResponse) {
+		let sendingDelegate = sendingDelegate ?? self.sendingDelegate ?? { try await $4() }
+
+		return try await sendingDelegate(urlSession, urlRequest, requestId, request) {
+			try await send(
+				urlSession,
+				urlRequest,
+				requestId,
+				request
+			)
 		}
 	}
 
