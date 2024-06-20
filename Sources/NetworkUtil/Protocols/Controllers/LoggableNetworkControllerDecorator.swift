@@ -12,7 +12,7 @@ public extension LoggableNetworkControllerDecorator {
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 },
-		sendingDelegate: SendingDelegate? = nil
+		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,
@@ -27,8 +27,4 @@ public extension LoggableNetworkControllerDecorator {
 
 	var logPublisher: LogPublisher { networkController.logPublisher }
 	var logs: AsyncStream<LogRecord> { networkController.logs }
-
-	func logging (_ logging: (LogPublisher) -> Void) -> LoggableNetworkController {
-		networkController.logging(logging)
-	}
 }

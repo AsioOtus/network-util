@@ -12,7 +12,7 @@ public extension NetworkControllerDecorator {
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 },
-		sendingDelegate: SendingDelegate? = nil
+		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,

@@ -12,5 +12,5 @@ public protocol FullScaleNetworkController:
   func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleNetworkController
 	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleNetworkController
   func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController
-  func logging (_ logging: (LogPublisher) -> Void) -> FullScaleNetworkController
+	func setSendingDelegate (_ sendingDelegate: SendingDelegateTypeErased?) -> FullScaleNetworkController
 }

@@ -10,23 +10,23 @@ let (fileUrl, urlResponse) = try await urlSession.download(for: urlRequest)
 print(fileUrl)
 
 
-func attempts (count: Int) -> SendingDelegate {
-	{
-		var attemptCount = 0
-		var e: Error?
-
-		repeat {
-			do {
-				return try await $4()
-			} catch {
-				e = error
-				attemptCount += 1
-			}
-		} while e != nil || attemptCount < count
-
-		throw e!
-	}
-}
+//func attempts (count: Int) -> SendingDelegate {
+//	{
+//		var attemptCount = 0
+//		var e: Error?
+//
+//		repeat {
+//			do {
+//				return try await $4()
+//			} catch {
+//				e = error
+//				attemptCount += 1
+//			}
+//		} while e != nil || attemptCount < count
+//
+//		throw e!
+//	}
+//}
 
 actor AuthNetworkController: FullScaleNetworkControllerDecorator {
 	
@@ -52,7 +52,7 @@ struct AuthenticatedNetworkControllerDecorator: FullScaleNetworkControllerDecora
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 },
-		sendingDelegate: SendingDelegate? = nil
+		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> RS where RQ: NetworkUtil.Request, RS: NetworkUtil.Response {
 		try await networkController
 			.send(
@@ -84,5 +84,5 @@ struct UserRequest: Request {
 let request = UserRequest()
 
 // Send request
-let response = try await nc.send(.get(""), sendingDelegate: attempts(count: 3))
+//let response = try await nc.send(.get(""), sendingDelegate: attempts(count: 3))
 

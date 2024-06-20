@@ -8,7 +8,7 @@ public protocol NetworkController {
 		decoding: ((Data) throws -> RS.Model)?,
 		configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception,
-		sendingDelegate: SendingDelegate?
+		sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> RS
 
 	func send <RQ: Request> (
@@ -17,8 +17,18 @@ public protocol NetworkController {
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
     configurationUpdate: URLRequestConfiguration.Update,
 		interception: @escaping URLRequestInterception,
-		sendingDelegate: SendingDelegate?
+		sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> StandardResponse<Data>
+
+	func send <RQ: Request, RSM: Decodable> (
+		_ request: RQ,
+		responseModel: RSM.Type,
+		encoding: ((RQ.Body) throws -> Data)?,
+		decoding: ((Data) throws -> RSM)?,
+		configurationUpdate: URLRequestConfiguration.Update,
+		interception: @escaping URLRequestInterception,
+		sendingDelegate: SendingDelegate<RQ>?
+	) async throws -> StandardResponse<RSM>
 }
 
 public extension NetworkController {
@@ -28,7 +38,7 @@ public extension NetworkController {
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 },
-		sendingDelegate: SendingDelegate? = nil
+		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> StandardResponse<Data> {
 		try await send(
       request,
@@ -48,7 +58,7 @@ public extension NetworkController {
 		decoding: ((Data) throws -> RSM)? = nil,
     configurationUpdate: URLRequestConfiguration.Update = { $0 },
 		interception: @escaping URLRequestInterception = { $0 },
-		sendingDelegate: SendingDelegate? = nil
+		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(
       request,

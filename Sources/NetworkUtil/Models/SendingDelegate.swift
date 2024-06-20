@@ -1,11 +1,31 @@
 import Foundation
 
-public typealias SendAction = () async throws -> (Data, URLResponse)
+public typealias SendAction<RQ: Request> = (
+	URLSession,
+	URLRequest,
+	UUID,
+	RQ
+) async throws -> (Data, URLResponse)
 
-public typealias SendingDelegate = (
+public typealias SendingDelegate<RQ: Request> = (
+	URLSession,
+	URLRequest,
+	UUID,
+	RQ,
+	SendAction<RQ>
+) async throws -> (Data, URLResponse)
+
+public typealias SendActionTypeErased = (
+	URLSession,
+	URLRequest,
+	UUID,
+	any Request
+) async throws -> (Data, URLResponse)
+
+public typealias SendingDelegateTypeErased = (
 	URLSession,
 	URLRequest,
 	UUID,
 	any Request,
-	SendAction
+	SendActionTypeErased
 ) async throws -> (Data, URLResponse)

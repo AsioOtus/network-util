@@ -7,9 +7,9 @@ public enum LogMessage {
 
 	public var name: String {
 		switch self {
-		case .request: return "request"
-		case .response: return "response"
-		case .error: return "error"
+		case .request: "request"
+		case .response: "response"
+		case .error: "error"
 		}
 	}
 }
@@ -17,9 +17,9 @@ public enum LogMessage {
 extension LogMessage: CustomStringConvertible {
 	public var description: String {
 		switch self {
-		case .request(_, let urlRequest): return urlRequest.description
-		case .response(_, let urlResponse): return urlResponse.description
-		case .error(let error): return "\(error.name): \(error.innerError.localizedDescription)"
+		case .request(_, let urlRequest): urlRequest.description
+		case .response(_, let urlResponse): urlResponse.description
+		case .error(let error): "\(error.name): \(error.innerError.localizedDescription)"
 		}
 	}
 }
@@ -27,9 +27,9 @@ extension LogMessage: CustomStringConvertible {
 public extension LogMessage {
 	var urlRequest: URLRequest? {
 		if case .request(_, let urlRequest) = self {
-			return urlRequest
+			urlRequest
 		} else {
-			return nil
+			nil
 		}
 	}
 }
