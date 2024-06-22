@@ -10,8 +10,8 @@ public extension ConfigurableNetworkControllerDecorator {
 		response: RS.Type,
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 },
+		configurationUpdate: URLRequestConfiguration.Update? = nil,
+		interception: URLRequestInterception? = nil,
 		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> RS {
 		try await networkController.send(

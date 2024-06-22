@@ -6,8 +6,8 @@ public protocol NetworkController {
 		response: RS.Type,
 		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> RS.Model)?,
-		configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception,
+		configurationUpdate: URLRequestConfiguration.Update?,
+		interception: URLRequestInterception?,
 		sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> RS
 
@@ -15,8 +15,8 @@ public protocol NetworkController {
 		_ request: RQ,
 		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
-    configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception,
+    configurationUpdate: URLRequestConfiguration.Update?,
+		interception: URLRequestInterception?,
 		sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> StandardResponse<Data>
 
@@ -25,8 +25,8 @@ public protocol NetworkController {
 		responseModel: RSM.Type,
 		encoding: ((RQ.Body) throws -> Data)?,
 		decoding: ((Data) throws -> RSM)?,
-		configurationUpdate: URLRequestConfiguration.Update,
-		interception: @escaping URLRequestInterception,
+		configurationUpdate: URLRequestConfiguration.Update?,
+		interception: URLRequestInterception?,
 		sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> StandardResponse<RSM>
 }
@@ -36,8 +36,8 @@ public extension NetworkController {
 		_ request: RQ,
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
-    configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 },
+    configurationUpdate: URLRequestConfiguration.Update? = nil,
+		interception: URLRequestInterception? = nil,
 		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> StandardResponse<Data> {
 		try await send(
@@ -56,8 +56,8 @@ public extension NetworkController {
 		responseModel: RSM.Type,
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RSM)? = nil,
-    configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 },
+    configurationUpdate: URLRequestConfiguration.Update? = nil,
+		interception: URLRequestInterception? = nil,
 		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(

@@ -9,7 +9,7 @@ public struct StandardNetworkController {
 	public let urlRequestBuilder: URLRequestBuilder
 	public let encoder: RequestBodyEncoder
 	public let decoder: ResponseModelDecoder
-	public let urlRequestsInterception: URLRequestInterception
+	public let urlRequestsInterceptions: [URLRequestInterception]
 	public let sendingDelegate: SendingDelegateTypeErased?
 
 	public var logPublisher: LogPublisher {
@@ -26,7 +26,7 @@ public struct StandardNetworkController {
 		urlRequestBuilder: URLRequestBuilder = .standard(),
 		encoder: RequestBodyEncoder = JSONEncoder(),
 		decoder: ResponseModelDecoder = JSONDecoder(),
-		interception: @escaping URLRequestInterception = { $0 },
+		interception: URLRequestInterception? = nil,
 		sendingDelegate: SendingDelegateTypeErased? = nil
 	) {
 		self.urlRequestConfiguration = configuration
@@ -34,7 +34,7 @@ public struct StandardNetworkController {
 		self.urlRequestBuilder = urlRequestBuilder
 		self.encoder = encoder
 		self.decoder = decoder
-		self.urlRequestsInterception = interception
+		self.urlRequestsInterceptions = interception.map { [$0] } ?? []
 		self.sendingDelegate = sendingDelegate
 
 		self.logger = .init()
@@ -46,7 +46,7 @@ public struct StandardNetworkController {
 		urlRequestBuilder: URLRequestBuilder,
 		encoder: RequestBodyEncoder,
 		decoder: ResponseModelDecoder,
-		interception: @escaping URLRequestInterception,
+		interceptions: [URLRequestInterception],
 		sendingDelegate: SendingDelegateTypeErased? = nil,
 		logger: Logger
 	) {
@@ -55,7 +55,7 @@ public struct StandardNetworkController {
 		self.urlRequestBuilder = urlRequestBuilder
 		self.encoder = encoder
 		self.decoder = decoder
-		self.urlRequestsInterception = interception
+		self.urlRequestsInterceptions = interceptions
 		self.sendingDelegate = sendingDelegate
 
 		self.logger = logger
@@ -68,8 +68,8 @@ extension StandardNetworkController: FullScaleNetworkController {
 		response: RS.Type,
 		encoding: ((RQ.Body) throws -> Data)? = nil,
 		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update = { $0 },
-		interception: @escaping URLRequestInterception = { $0 },
+		configurationUpdate: URLRequestConfiguration.Update? = nil,
+		interception: URLRequestInterception? = nil,
 		sendingDelegate: SendingDelegate<RQ>? = nil
 	) async throws -> RS {
 		let requestId = UUID()
@@ -107,8 +107,8 @@ private extension StandardNetworkController {
 		_ requestId: UUID,
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?,
-		_ configurationUpdate: URLRequestConfiguration.Update,
-		_ interception: @escaping URLRequestInterception
+		_ configurationUpdate: URLRequestConfiguration.Update?,
+		_ interception: URLRequestInterception?
 	) async throws -> (URLSession, URLRequest) {
 		do {
 			let urlSession = try createUrlSession(request)
@@ -139,14 +139,14 @@ private extension StandardNetworkController {
 	func createUrlRequest <RQ: Request> (
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?,
-		_ configurationUpdate: URLRequestConfiguration.Update,
-		_ interception: @escaping URLRequestInterception
+		_ configurationUpdate: URLRequestConfiguration.Update?,
+		_ interception: URLRequestInterception?
 	) async throws -> URLRequest {
 		let body = try encodeRequestBody(request, encoding)
-		let updatedConfiguration = configurationUpdate(urlRequestConfiguration)
+		let updatedConfiguration = configurationUpdate?(urlRequestConfiguration) ?? urlRequestConfiguration
 		var buildUrlRequest = try urlRequestBuilder.build(request, body, updatedConfiguration)
 
-		let interceptors = [urlRequestsInterception, request.interception, interception]
+		let interceptors = urlRequestsInterceptions + [request.interception, interception].compactMap { $0 }
 		for interceptor in interceptors {
 			buildUrlRequest = try await interceptor(buildUrlRequest)
 		}
@@ -257,7 +257,7 @@ public extension StandardNetworkController {
 			urlRequestBuilder: urlRequestBuilder,
 			encoder: encoder,
 			decoder: decoder,
-			interception: urlRequestsInterception,
+			interceptions: urlRequestsInterceptions,
 			logger: logger
 		)
 	}
@@ -283,10 +283,7 @@ public extension StandardNetworkController {
 			urlRequestBuilder: urlRequestBuilder,
 			encoder: encoder,
 			decoder: decoder,
-			interception: { urlRequest in
-				let interceptedUrlRequest = try await interception(urlRequest)
-				return try await urlRequestsInterception(interceptedUrlRequest)
-			},
+			interceptions: urlRequestsInterceptions + [interception],
 			logger: logger
 		)
 	}
@@ -298,7 +295,7 @@ public extension StandardNetworkController {
 			urlRequestBuilder: urlRequestBuilder,
 			encoder: encoder,
 			decoder: decoder,
-			interception: urlRequestsInterception,
+			interceptions: urlRequestsInterceptions,
 			sendingDelegate: sendingDelegate,
 			logger: logger
 		)
