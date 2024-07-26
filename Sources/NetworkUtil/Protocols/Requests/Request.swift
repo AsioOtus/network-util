@@ -4,7 +4,7 @@ public protocol Request <Body>: CustomStringConvertible {
 	associatedtype Body: Encodable = Data
 
 	var method: HTTPMethod { get }
-
+	
 	var path: String { get }
 
 	var query: Query { get }
@@ -12,7 +12,8 @@ public protocol Request <Body>: CustomStringConvertible {
 
 	var body: Body? { get }
 
-	func interception (_ urlRequest: URLRequest) throws -> URLRequest
+	func configurationUpdate (_ configuration: URLRequestConfiguration) -> URLRequestConfiguration
+	func interception (_ urlRequest: URLRequest) async throws -> URLRequest
 }
 
 public extension Request {
@@ -23,5 +24,6 @@ public extension Request {
 	var query: Query { [:] }
 	var headers: Headers { [:] }
 
-	func interception (_ urlRequest: URLRequest) throws -> URLRequest { urlRequest }
+	func configurationUpdate (_ configuration: URLRequestConfiguration) -> URLRequestConfiguration { configuration }
+	func interception (_ urlRequest: URLRequest) async throws -> URLRequest { urlRequest }
 }

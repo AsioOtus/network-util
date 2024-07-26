@@ -143,7 +143,10 @@ private extension StandardNetworkController {
 		_ interception: URLRequestInterception?
 	) async throws -> URLRequest {
 		let body = try encodeRequestBody(request, encoding)
-		let updatedConfiguration = configurationUpdate?(urlRequestConfiguration) ?? urlRequestConfiguration
+
+		let requestUpdatedConfiguration = request.configurationUpdate(urlRequestConfiguration)
+		let updatedConfiguration = configurationUpdate?(requestUpdatedConfiguration) ?? requestUpdatedConfiguration
+
 		var buildUrlRequest = try urlRequestBuilder.build(request, body, updatedConfiguration)
 
 		let interceptors = urlRequestsInterceptions + [request.interception, interception].compactMap { $0 }
@@ -250,7 +253,7 @@ private extension StandardNetworkController {
 }
 
 public extension StandardNetworkController {
-	func withConfiguration (update: (URLRequestConfiguration) -> URLRequestConfiguration) -> FullScaleNetworkController {
+	func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleNetworkController {
 		Self(
 			configuration: update(urlRequestConfiguration),
 			urlSessionBuilder: urlSessionBuilder,
@@ -266,7 +269,7 @@ public extension StandardNetworkController {
 		withConfiguration { _ in configuration }
 	}
 
-	func withConfiguration(update: (URLRequestConfiguration) -> URLRequestConfiguration) -> ConfigurableNetworkController {
+	func withConfiguration(update: URLRequestConfiguration.Update) -> ConfigurableNetworkController {
 		let nc: FullScaleNetworkController = withConfiguration(update: update)
 		return nc as ConfigurableNetworkController
 	}
