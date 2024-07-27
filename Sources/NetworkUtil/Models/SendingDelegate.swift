@@ -18,8 +18,7 @@ public typealias SendingDelegate<RQ: Request> = (
 public typealias SendActionTypeErased = (
 	URLSession,
 	URLRequest,
-	UUID,
-	any Request
+	UUID
 ) async throws -> (Data, URLResponse)
 
 public typealias SendingDelegateTypeErased = (

@@ -32,6 +32,26 @@ public protocol NetworkController {
 }
 
 public extension NetworkController {
+	func send <RQ: Request, RS: Response> (
+		_ request: RQ,
+		responseType: RS.Type,
+		encoding: ((RQ.Body) throws -> Data)? = nil,
+		decoding: ((Data) throws -> RS.Model)? = nil,
+		configurationUpdate: URLRequestConfiguration.Update? = nil,
+		interception: URLRequestInterception? = nil,
+		sendingDelegate: SendingDelegate<RQ>? = nil
+	) async throws -> RS {
+		try await send(
+			request,
+			response: responseType,
+			encoding: encoding,
+			decoding: decoding,
+			configurationUpdate: configurationUpdate,
+			interception: interception,
+			sendingDelegate: sendingDelegate
+		)
+	}
+
 	func send <RQ: Request> (
 		_ request: RQ,
 		encoding: ((RQ.Body) throws -> Data)? = nil,

@@ -177,13 +177,11 @@ private extension StandardNetworkController {
 		_ request: RQ,
 		_ sendingDelegate: SendingDelegate<RQ>?
 	) async throws -> (Data, URLResponse) {
-		let rq = request
-
-		let selfSendingDelegate = self.sendingDelegate ?? { try await $4($0, $1, $2, $3) }
+		let selfSendingDelegate = self.sendingDelegate ?? { try await $4($0, $1, $2) }
 		let sendingDelegate = sendingDelegate ?? { try await $4($0, $1, $2, $3) }
 
-		return try await selfSendingDelegate(urlSession, urlRequest, requestId, rq) { urlSession, urlRequest, requestId, _ in
-			try await sendingDelegate(urlSession, urlRequest, requestId, rq) { urlSession, urlRequest, requestId, request in
+		return try await selfSendingDelegate(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
+			try await sendingDelegate(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
 				try await send(
 					urlSession,
 					urlRequest,
