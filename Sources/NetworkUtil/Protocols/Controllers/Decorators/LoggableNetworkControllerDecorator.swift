@@ -7,21 +7,15 @@ public protocol LoggableNetworkControllerDecorator: LoggableNetworkController {
 public extension LoggableNetworkControllerDecorator {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
+		responseType: RS.Type,
+		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,
-			response: response,
-			encoding: encoding,
-			decoding: decoding,
-			configurationUpdate: configurationUpdate,
-			interception: interception,
-			sending: sending
+			responseType: responseType,
+			delegate: delegate,
+			configurationUpdate: configurationUpdate
 		)
 	}
 

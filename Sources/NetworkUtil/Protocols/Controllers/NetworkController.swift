@@ -3,91 +3,76 @@ import Foundation
 public protocol NetworkController {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)?,
-		decoding: ((Data) throws -> RS.Model)?,
-		configurationUpdate: URLRequestConfiguration.Update?,
-		interception: URLRequestInterception?,
-		sending: Sending<RQ>?
+		responseType: RS.Type,
+		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		configurationUpdate: URLRequestConfiguration.Update?
 	) async throws -> RS
 
 	func send <RQ: Request> (
 		_ request: RQ,
-		encoding: ((RQ.Body) throws -> Data)?,
-		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
-    configurationUpdate: URLRequestConfiguration.Update?,
-		interception: URLRequestInterception?,
-		sending: Sending<RQ>?
+		_ delegate: some NetworkControllerSendingDelegate<RQ, StandardResponse<Data>.Model>,
+		configurationUpdate: URLRequestConfiguration.Update?
 	) async throws -> StandardResponse<Data>
 
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		encoding: ((RQ.Body) throws -> Data)?,
-		decoding: ((Data) throws -> RSM)?,
-		configurationUpdate: URLRequestConfiguration.Update?,
-		interception: URLRequestInterception?,
-		sending: Sending<RQ>?
+		_ delegate: some NetworkControllerSendingDelegate<RQ, RSM>,
+		configurationUpdate: URLRequestConfiguration.Update?
 	) async throws -> StandardResponse<RSM>
 }
 
 public extension NetworkController {
-	func send <RQ: Request, RS: Response> (
+	func send <RQ: Request> (
 		_ request: RQ,
-		responseType: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
-	) async throws -> RS {
+		_ delegate: some NetworkControllerSendingDelegate<RQ, StandardResponse<Data>.Model>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
+	) async throws -> StandardResponse<Data> {
 		try await send(
 			request,
-			response: responseType,
-			encoding: encoding,
-			decoding: decoding,
-			configurationUpdate: configurationUpdate,
-			interception: interception,
-			sending: sending
+			responseType: StandardResponse<Data>.self,
+			delegate: delegate,
+			configurationUpdate: configurationUpdate
 		)
 	}
 
 	func send <RQ: Request> (
 		_ request: RQ,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
-    configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
+		configurationUpdate: URLRequestConfiguration.Update? = nil
 	) async throws -> StandardResponse<Data> {
 		try await send(
-      request,
-      response: StandardResponse<Data>.self,
-			encoding: encoding,
-			decoding: decoding,
-      configurationUpdate: configurationUpdate,
-      interception: interception,
-			sending: sending
-    )
+			request,
+			responseType: StandardResponse<Data>.self,
+			delegate: .empty(),
+			configurationUpdate: configurationUpdate
+		)
 	}
 
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RSM)? = nil,
-    configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
+		_ delegate: some NetworkControllerSendingDelegate<RQ, RSM>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(
-      request,
-      response: StandardResponse<RSM>.self,
-			encoding: encoding,
-			decoding: decoding,
-      configurationUpdate: configurationUpdate,
-      interception: interception,
-			sending: sending
-    )
+			request,
+			responseType: StandardResponse<RSM>.self,
+			delegate: delegate,
+			configurationUpdate: configurationUpdate
+		)
 	}
+
+	func send <RQ: Request, RSM: Decodable> (
+		_ request: RQ,
+		responseModel: RSM.Type,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
+	) async throws -> StandardResponse<RSM> {
+		try await send(
+			request,
+			responseType: StandardResponse<RSM>.self,
+			delegate: .empty(),
+			configurationUpdate: configurationUpdate
+		)
+	}
+
 }

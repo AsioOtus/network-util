@@ -23,24 +23,18 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		self.networkController = networkController
 	}
 
-	public func send <RQ, RS> (
+	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
-	) async throws -> RS where RQ : Request, RS : Response {
+		responseType: RS.Type,
+		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
+	) async throws -> RS {
 		do {
 			_ = try await networkController.send(
 				request,
-				response: response,
-				encoding: encoding,
-				decoding: decoding,
-				configurationUpdate: configurationUpdate,
-				interception: interception,
-				sending: mockSendingDelegate(sending)
+				responseType: responseType,
+				delegate: delegate,
+				configurationUpdate: configurationUpdate
 			)
 		} catch let error as ControllerError {
 			guard case .response = error.category else { throw error }

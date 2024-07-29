@@ -1,9 +1,9 @@
-public protocol NetworkControllerSendingDelegate <RQ, RS> {
+public protocol NetworkControllerSendingDelegate <RQ, RSM> {
 	associatedtype RQ: Request
-	associatedtype RS: Response
+	associatedtype RSM: Decodable
 
 	var encoding: Encoding<RQ>? { get }
-	var decoding: Decoding<RS>? { get }
+	var decoding: Decoding<RSM>? { get }
 	var urlRequestInterception: URLRequestInterception? { get }
 	var urlResponseInterception: URLResponseInterception? { get }
 	var sending: Sending<RQ>? { get }

@@ -5,25 +5,19 @@ public protocol FullScaleNetworkControllerDecorator: FullScaleNetworkController 
 }
 
 public extension FullScaleNetworkControllerDecorator {
-  func send <RQ: Request, RS: Response> (
-    _ request: RQ,
-    response: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RS.Model)? = nil,
-    configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
-  ) async throws -> RS {
-    try await networkController.send(
-      request,
-      response: response,
-			encoding: encoding,
-			decoding: decoding,
-      configurationUpdate: configurationUpdate,
-			interception: interception,
-			sending: sending
-    )
-  }
+	func send <RQ: Request, RS: Response> (
+		_ request: RQ,
+		responseType: RS.Type,
+		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
+	) async throws -> RS {
+		try await networkController.send(
+			request,
+			responseType: responseType,
+			delegate: delegate,
+			configurationUpdate: configurationUpdate
+		)
+	}
 
 	var urlRequestConfiguration: URLRequestConfiguration { networkController.urlRequestConfiguration }
 
@@ -43,13 +37,13 @@ public extension FullScaleNetworkControllerDecorator {
 		networkController.replaceConfiguration(configuration)
 	}
 
-//	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
-//		networkController.setSendingDelegate(sending)
-//	}
-//
-//  func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
-//    networkController.addInterception(interception)
-//  }
+	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
+		networkController.addUrlRequestInterception(interception)
+	}
+
+	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> FullScaleNetworkController {
+		networkController.addUrlResponseInterception(interception)
+	}
 
   var logPublisher: LogPublisher { networkController.logPublisher }
 

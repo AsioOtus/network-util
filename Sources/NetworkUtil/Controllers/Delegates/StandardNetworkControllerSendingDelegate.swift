@@ -1,13 +1,13 @@
-public struct StandardNetworkControllerSendingDelegate <RQ: Request, RS: Response>: NetworkControllerSendingDelegate {
+public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decodable>: NetworkControllerSendingDelegate {
 	public let encoding: Encoding<RQ>?
-	public let decoding: Decoding<RS>?
+	public let decoding: Decoding<RSM>?
 	public let urlRequestInterception: URLRequestInterception?
 	public let urlResponseInterception: URLResponseInterception?
 	public let sending: Sending<RQ>?
 
 	public init (
 		encoding: Encoding<RQ>? = nil,
-		decoding: Decoding<RS>? = nil,
+		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,
 		sending: Sending<RQ>? = nil
@@ -21,13 +21,13 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RS: Respons
 }
 
 public extension NetworkControllerSendingDelegate {
-	static func delegate <RQ: Request, RS: Response> (
+	static func delegate <RQ: Request, RSM: Decodable> (
 		encoding: Encoding<RQ>? = nil,
-		decoding: Decoding<RS>? = nil,
+		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,
 		sending: Sending<RQ>? = nil
-	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RS> {
+	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
 		.init(
 			encoding: encoding,
 			decoding: decoding,
@@ -37,8 +37,8 @@ public extension NetworkControllerSendingDelegate {
 		)
 	}
 
-	static func empty <RQ: Request, RS: Response> (
-	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RS> {
+	static func empty <RQ: Request, RSM: Decodable> (
+	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
 		.init()
 	}
 }

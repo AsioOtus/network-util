@@ -40,21 +40,18 @@ public struct StandardNetworkController {
 extension StandardNetworkController: FullScaleNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS.Type,
-		encoding: ((RQ.Body) throws -> Data)? = nil,
-		decoding: ((Data) throws -> RS.Model)? = nil,
-		configurationUpdate: URLRequestConfiguration.Update? = nil,
-		interception: URLRequestInterception? = nil,
-		sending: Sending<RQ>? = nil
+		responseType: RS.Type,
+		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		configurationUpdate: URLRequestConfiguration.Update? = nil
 	) async throws -> RS {
 		let requestId = UUID()
 
 		let (urlSession, urlRequest) = try await createUrlEntities(
 			requestId,
 			request,
-			encoding,
+			delegate.encoding,
 			configurationUpdate,
-			interception
+			delegate.urlRequestInterception
 		)
 
 		let (data, urlResponse) = try await sendAction(
@@ -62,7 +59,7 @@ extension StandardNetworkController: FullScaleNetworkController {
 			urlRequest,
 			requestId,
 			request,
-			sending
+			delegate.sending
 		)
 
 		let response: RS = try createResponse(
@@ -70,7 +67,7 @@ extension StandardNetworkController: FullScaleNetworkController {
 			urlResponse,
 			requestId,
 			request,
-			decoding
+			delegate.decoding
 		)
 
 		return response
