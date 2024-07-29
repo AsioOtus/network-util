@@ -10,7 +10,7 @@ public struct StandardNetworkController {
 	public let encoder: RequestBodyEncoder
 	public let decoder: ResponseModelDecoder
 	public let urlRequestsInterceptions: [URLRequestInterception]
-	public let sendingDelegate: SendingDelegateTypeErased?
+	public let sending: SendingTypeErased?
 
 	public var logPublisher: LogPublisher {
 		logger.eraseToAnyPublisher()
@@ -27,7 +27,7 @@ public struct StandardNetworkController {
 		encoder: RequestBodyEncoder = JSONEncoder(),
 		decoder: ResponseModelDecoder = JSONDecoder(),
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegateTypeErased? = nil
+		sending: SendingTypeErased? = nil
 	) {
 		self.urlRequestConfiguration = configuration
 		self.urlSessionBuilder = urlSessionBuilder
@@ -35,7 +35,7 @@ public struct StandardNetworkController {
 		self.encoder = encoder
 		self.decoder = decoder
 		self.urlRequestsInterceptions = interception.map { [$0] } ?? []
-		self.sendingDelegate = sendingDelegate
+		self.sending = sending
 
 		self.logger = .init()
 	}
@@ -47,7 +47,7 @@ public struct StandardNetworkController {
 		encoder: RequestBodyEncoder,
 		decoder: ResponseModelDecoder,
 		interceptions: [URLRequestInterception],
-		sendingDelegate: SendingDelegateTypeErased? = nil,
+		sending: SendingTypeErased? = nil,
 		logger: Logger
 	) {
 		self.urlRequestConfiguration = configuration
@@ -56,7 +56,7 @@ public struct StandardNetworkController {
 		self.encoder = encoder
 		self.decoder = decoder
 		self.urlRequestsInterceptions = interceptions
-		self.sendingDelegate = sendingDelegate
+		self.sending = sending
 
 		self.logger = logger
 	}
@@ -70,7 +70,7 @@ extension StandardNetworkController: FullScaleNetworkController {
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> RS {
 		let requestId = UUID()
 
@@ -87,7 +87,7 @@ extension StandardNetworkController: FullScaleNetworkController {
 			urlRequest,
 			requestId,
 			request,
-			sendingDelegate
+			sending
 		)
 
 		let response: RS = try createResponse(
@@ -175,13 +175,13 @@ private extension StandardNetworkController {
 		_ urlRequest: URLRequest,
 		_ requestId: UUID,
 		_ request: RQ,
-		_ sendingDelegate: SendingDelegate<RQ>?
+		_ sending: Sending<RQ>?
 	) async throws -> (Data, URLResponse) {
-		let selfSendingDelegate = self.sendingDelegate ?? { try await $4($0, $1, $2) }
-		let sendingDelegate = sendingDelegate ?? { try await $4($0, $1, $2, $3) }
+		let selfSendingDelegate = self.sending ?? { try await $4($0, $1, $2) }
+		let sending = sending ?? { try await $4($0, $1, $2, $3) }
 
 		return try await selfSendingDelegate(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
-			try await sendingDelegate(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
+			try await sending(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
 				try await send(
 					urlSession,
 					urlRequest,
@@ -289,7 +289,7 @@ public extension StandardNetworkController {
 		)
 	}
 
-	func setSendingDelegate (_ sendingDelegate: SendingDelegateTypeErased?) -> FullScaleNetworkController {
+	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
 		Self(
 			configuration: urlRequestConfiguration,
 			urlSessionBuilder: urlSessionBuilder,
@@ -297,7 +297,7 @@ public extension StandardNetworkController {
 			encoder: encoder,
 			decoder: decoder,
 			interceptions: urlRequestsInterceptions,
-			sendingDelegate: sendingDelegate,
+			sending: sending,
 			logger: logger
 		)
 	}

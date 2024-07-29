@@ -7,7 +7,7 @@ public typealias SendAction<RQ: Request> = (
 	RQ
 ) async throws -> (Data, URLResponse)
 
-public typealias SendingDelegate<RQ: Request> = (
+public typealias Sending<RQ: Request> = (
 	URLSession,
 	URLRequest,
 	UUID,
@@ -21,7 +21,7 @@ public typealias SendActionTypeErased = (
 	UUID
 ) async throws -> (Data, URLResponse)
 
-public typealias SendingDelegateTypeErased = (
+public typealias SendingTypeErased = (
 	URLSession,
 	URLRequest,
 	UUID,

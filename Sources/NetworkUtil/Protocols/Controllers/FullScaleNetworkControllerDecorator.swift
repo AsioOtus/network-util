@@ -12,7 +12,7 @@ public extension FullScaleNetworkControllerDecorator {
 		decoding: ((Data) throws -> RS.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
   ) async throws -> RS {
     try await networkController.send(
       request,
@@ -21,7 +21,7 @@ public extension FullScaleNetworkControllerDecorator {
 			decoding: decoding,
       configurationUpdate: configurationUpdate,
 			interception: interception,
-			sendingDelegate: sendingDelegate
+			sending: sending
     )
   }
 
@@ -43,8 +43,8 @@ public extension FullScaleNetworkControllerDecorator {
 		networkController.replaceConfiguration(configuration)
 	}
 
-	func setSendingDelegate (_ sendingDelegate: SendingDelegateTypeErased?) -> FullScaleNetworkController {
-		networkController.setSendingDelegate(sendingDelegate)
+	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
+		networkController.setSendingDelegate(sending)
 	}
 
   func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {

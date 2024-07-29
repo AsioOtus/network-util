@@ -30,7 +30,7 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> RS where RQ : Request, RS : Response {
 		do {
 			_ = try await networkController.send(
@@ -40,7 +40,7 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 				decoding: decoding,
 				configurationUpdate: configurationUpdate,
 				interception: interception,
-				sendingDelegate: mockSendingDelegate(sendingDelegate)
+				sending: mockSendingDelegate(sending)
 			)
 		} catch let error as ControllerError {
 			guard case .response = error.category else { throw error }
@@ -53,11 +53,11 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 }
 
 extension MockNetworkController {
-	func mockSendingDelegate <RQ: Request> (_ sendingDelegate: SendingDelegate<RQ>?) -> SendingDelegate<RQ> {
+	func mockSendingDelegate <RQ: Request> (_ sending: Sending<RQ>?) -> Sending<RQ> {
 		{ urlSession, urlRequest, requestId, request, _ in
-			let sendingDelegate = sendingDelegate ?? { try await $4($0, $1, $2, $3) }
+			let sending = sending ?? { try await $4($0, $1, $2, $3) }
 
-			let (data, urlResponse) = try await sendingDelegate(urlSession, urlRequest, requestId, request) { _, _, _, _ in
+			let (data, urlResponse) = try await sending(urlSession, urlRequest, requestId, request) { _, _, _, _ in
 				self.resultUrlRequest = urlRequest
 				self.resultRequest = (request as! SRQ)
 

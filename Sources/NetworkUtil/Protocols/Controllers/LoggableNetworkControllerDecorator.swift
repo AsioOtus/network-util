@@ -12,7 +12,7 @@ public extension LoggableNetworkControllerDecorator {
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,
@@ -21,7 +21,7 @@ public extension LoggableNetworkControllerDecorator {
 			decoding: decoding,
 			configurationUpdate: configurationUpdate,
 			interception: interception,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 	}
 

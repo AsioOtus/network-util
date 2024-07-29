@@ -23,7 +23,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(url: .init(string: "site.com/subpath")!)
 
-		let sendingDelegate: SendingDelegateTypeErased = { _, resultUrlRequest, _, _, _ in
+		let sending: SendingTypeErased = { _, resultUrlRequest, _, _, _ in
 			self.assert(resultUrlRequest: resultUrlRequest, expectedUrlRequest: expectedUrlRequest)
 
 			return (.init(), .init())
@@ -32,7 +32,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Arrange
 		sut = .init(
 			configuration: baseConfiguration,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 
 		let request = baseRequest
@@ -46,7 +46,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Assert
 		let expectedUrlSession = URLSession(configuration: .default)
 
-		let sendingDelegate: SendingDelegateTypeErased = { resultUrlSession, _, _, _, _ in
+		let sending: SendingTypeErased = { resultUrlSession, _, _, _, _ in
 			XCTAssertEqual(resultUrlSession, expectedUrlSession)
 			
 			return (.init(), .init())
@@ -56,7 +56,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 		sut = .init(
 			configuration: baseConfiguration,
 			urlSessionBuilder: expectedUrlSession,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 
 		let request = baseRequest

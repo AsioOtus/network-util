@@ -24,13 +24,13 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 		let expectedObject = "test"
 		let expectedData = try JSONEncoder().encode(expectedObject)
 
-		let sendingDelegate: SendingDelegateTypeErased = { _, _, _, _, _ in
+		let sending: SendingTypeErased = { _, _, _, _, _ in
 			(expectedData, .init())
 		}
 
 		sut = .init(
 			configuration: baseConfiguration,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 
 		// MARK: Act
@@ -45,13 +45,13 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 		let expectedObject = "test"
 		let expectedData = try JSONEncoder().encode(expectedObject)
 
-		let sendingDelegate: SendingDelegateTypeErased = { _, _, _, _, _ in
+		let sending: SendingTypeErased = { _, _, _, _, _ in
 			(expectedData, .init())
 		}
 
 		sut = .init(
 			configuration: baseConfiguration,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 
 		// MARK: Act

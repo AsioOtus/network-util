@@ -8,7 +8,7 @@ public protocol NetworkController {
 		decoding: ((Data) throws -> RS.Model)?,
 		configurationUpdate: URLRequestConfiguration.Update?,
 		interception: URLRequestInterception?,
-		sendingDelegate: SendingDelegate<RQ>?
+		sending: Sending<RQ>?
 	) async throws -> RS
 
 	func send <RQ: Request> (
@@ -17,7 +17,7 @@ public protocol NetworkController {
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)?,
     configurationUpdate: URLRequestConfiguration.Update?,
 		interception: URLRequestInterception?,
-		sendingDelegate: SendingDelegate<RQ>?
+		sending: Sending<RQ>?
 	) async throws -> StandardResponse<Data>
 
 	func send <RQ: Request, RSM: Decodable> (
@@ -27,7 +27,7 @@ public protocol NetworkController {
 		decoding: ((Data) throws -> RSM)?,
 		configurationUpdate: URLRequestConfiguration.Update?,
 		interception: URLRequestInterception?,
-		sendingDelegate: SendingDelegate<RQ>?
+		sending: Sending<RQ>?
 	) async throws -> StandardResponse<RSM>
 }
 
@@ -39,7 +39,7 @@ public extension NetworkController {
 		decoding: ((Data) throws -> RS.Model)? = nil,
 		configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> RS {
 		try await send(
 			request,
@@ -48,7 +48,7 @@ public extension NetworkController {
 			decoding: decoding,
 			configurationUpdate: configurationUpdate,
 			interception: interception,
-			sendingDelegate: sendingDelegate
+			sending: sending
 		)
 	}
 
@@ -58,7 +58,7 @@ public extension NetworkController {
 		decoding: ((Data) throws -> StandardResponse<Data>.Model)? = nil,
     configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> StandardResponse<Data> {
 		try await send(
       request,
@@ -67,7 +67,7 @@ public extension NetworkController {
 			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception,
-			sendingDelegate: sendingDelegate
+			sending: sending
     )
 	}
 
@@ -78,7 +78,7 @@ public extension NetworkController {
 		decoding: ((Data) throws -> RSM)? = nil,
     configurationUpdate: URLRequestConfiguration.Update? = nil,
 		interception: URLRequestInterception? = nil,
-		sendingDelegate: SendingDelegate<RQ>? = nil
+		sending: Sending<RQ>? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(
       request,
@@ -87,7 +87,7 @@ public extension NetworkController {
 			decoding: decoding,
       configurationUpdate: configurationUpdate,
       interception: interception,
-			sendingDelegate: sendingDelegate
+			sending: sending
     )
 	}
 }
