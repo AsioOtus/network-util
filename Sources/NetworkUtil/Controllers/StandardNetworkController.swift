@@ -5,12 +5,7 @@ public struct StandardNetworkController {
 	let logger: Logger
 
 	public let urlRequestConfiguration: URLRequestConfiguration
-	public let urlSessionBuilder: URLSessionBuilder
-	public let urlRequestBuilder: URLRequestBuilder
-	public let encoder: RequestBodyEncoder
-	public let decoder: ResponseModelDecoder
-	public let urlRequestsInterceptions: [URLRequestInterception]
-	public let sending: SendingTypeErased?
+	public let delegate: NetworkControllerDelegate
 
 	public var logPublisher: LogPublisher {
 		logger.eraseToAnyPublisher()
@@ -22,41 +17,21 @@ public struct StandardNetworkController {
 
 	public init (
 		configuration: URLRequestConfiguration,
-		urlSessionBuilder: URLSessionBuilder = .standard(),
-		urlRequestBuilder: URLRequestBuilder = .standard(),
-		encoder: RequestBodyEncoder = JSONEncoder(),
-		decoder: ResponseModelDecoder = JSONDecoder(),
-		interception: URLRequestInterception? = nil,
-		sending: SendingTypeErased? = nil
+		delegate: NetworkControllerDelegate = .delegate()
 	) {
 		self.urlRequestConfiguration = configuration
-		self.urlSessionBuilder = urlSessionBuilder
-		self.urlRequestBuilder = urlRequestBuilder
-		self.encoder = encoder
-		self.decoder = decoder
-		self.urlRequestsInterceptions = interception.map { [$0] } ?? []
-		self.sending = sending
+		self.delegate = delegate
 
 		self.logger = .init()
 	}
 
 	private init (
 		configuration: URLRequestConfiguration,
-		urlSessionBuilder: URLSessionBuilder,
-		urlRequestBuilder: URLRequestBuilder,
-		encoder: RequestBodyEncoder,
-		decoder: ResponseModelDecoder,
-		interceptions: [URLRequestInterception],
-		sending: SendingTypeErased? = nil,
+		delegate: NetworkControllerDelegate,
 		logger: Logger
 	) {
 		self.urlRequestConfiguration = configuration
-		self.urlSessionBuilder = urlSessionBuilder
-		self.urlRequestBuilder = urlRequestBuilder
-		self.encoder = encoder
-		self.decoder = decoder
-		self.urlRequestsInterceptions = interceptions
-		self.sending = sending
+		self.delegate = delegate
 
 		self.logger = logger
 	}
@@ -254,11 +229,7 @@ public extension StandardNetworkController {
 	func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleNetworkController {
 		Self(
 			configuration: update(urlRequestConfiguration),
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			encoder: encoder,
-			decoder: decoder,
-			interceptions: urlRequestsInterceptions,
+			delegate: delegate,
 			logger: logger
 		)
 	}
@@ -277,33 +248,53 @@ public extension StandardNetworkController {
 		return nc as ConfigurableNetworkController
 	}
 
-	func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
+	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
 		Self(
 			configuration: urlRequestConfiguration,
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			encoder: encoder,
-			decoder: decoder,
-			interceptions: urlRequestsInterceptions + [interception],
+			delegate: delegate.addUrlRequestInterception(interception),
 			logger: logger
 		)
 	}
 
-	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
+	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> FullScaleNetworkController {
 		Self(
 			configuration: urlRequestConfiguration,
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			encoder: encoder,
-			decoder: decoder,
-			interceptions: urlRequestsInterceptions,
-			sending: sending,
+			delegate: delegate.addUrlResponseInterception(interception),
 			logger: logger
 		)
 	}
 }
 
 private extension StandardNetworkController {
+	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
+	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
+	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
+	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
+
+	var urlSessionBuilder: URLSessionBuilder {
+		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
+	}
+
+	var urlRequestBuilder: URLRequestBuilder {
+		delegate.urlRequestBuilder ?? Self.defaultUrlRequestBuilder
+	}
+
+	var encoder: RequestBodyEncoder {
+		delegate.encoder ?? Self.defaultEncoder
+	}
+
+	var decoder: ResponseModelDecoder {
+		delegate.decoder ?? Self.defaultDecoder
+	}
+
+	var urlRequestsInterceptions: [URLRequestInterception] {
+		delegate.urlRequestsInterceptions
+	}
+
+	var sending: SendingTypeErased? {
+		delegate.sending
+	}
+
 	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
 		logger.log(message: .error(error), requestId: requestId, request: request)
 		return error

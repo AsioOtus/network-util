@@ -30,7 +30,7 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 
 		sut = .init(
 			configuration: baseConfiguration,
-			sending: sending
+			delegate: .delegate(sending: sending)
 		)
 
 		// MARK: Act
@@ -51,7 +51,7 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 
 		sut = .init(
 			configuration: baseConfiguration,
-			sending: sending
+			delegate: .delegate(sending: sending)
 		)
 
 		// MARK: Act

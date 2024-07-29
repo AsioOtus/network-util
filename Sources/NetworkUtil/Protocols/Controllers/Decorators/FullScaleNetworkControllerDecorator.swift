@@ -43,13 +43,13 @@ public extension FullScaleNetworkControllerDecorator {
 		networkController.replaceConfiguration(configuration)
 	}
 
-	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
-		networkController.setSendingDelegate(sending)
-	}
-
-  func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
-    networkController.addInterception(interception)
-  }
+//	func setSendingDelegate (_ sending: SendingTypeErased?) -> FullScaleNetworkController {
+//		networkController.setSendingDelegate(sending)
+//	}
+//
+//  func addInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
+//    networkController.addInterception(interception)
+//  }
 
   var logPublisher: LogPublisher { networkController.logPublisher }
 

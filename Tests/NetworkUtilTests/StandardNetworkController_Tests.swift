@@ -32,7 +32,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Arrange
 		sut = .init(
 			configuration: baseConfiguration,
-			sending: sending
+			delegate: .delegate(sending: sending)
 		)
 
 		let request = baseRequest
@@ -55,8 +55,10 @@ final class StandardNetworkController_Tests: XCTestCase {
 		// MARK: Arrange
 		sut = .init(
 			configuration: baseConfiguration,
-			urlSessionBuilder: expectedUrlSession,
-			sending: sending
+			delegate: .delegate(
+				urlSessionBuilder: expectedUrlSession,
+				sending: sending
+			)
 		)
 
 		let request = baseRequest
