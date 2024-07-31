@@ -28,3 +28,11 @@ public typealias SendingTypeErased = (
 	any Request,
 	SendActionTypeErased
 ) async throws -> (Data, URLResponse)
+
+func defaultSending <RQ: Request> () -> Sending<RQ> {
+	{ try await $4($0, $1, $2, $3) }
+}
+
+func defaultSendingTypeErased () -> SendingTypeErased {
+	{ try await $4($0, $1, $2) }
+}

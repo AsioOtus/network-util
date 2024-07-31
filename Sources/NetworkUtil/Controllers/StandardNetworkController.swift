@@ -149,11 +149,8 @@ private extension StandardNetworkController {
 		_ request: RQ,
 		_ sending: Sending<RQ>?
 	) async throws -> (Data, URLResponse) {
-		let selfSendingDelegate = self.sending ?? { try await $4($0, $1, $2) }
-		let sending = sending ?? { try await $4($0, $1, $2, $3) }
-
-		return try await selfSendingDelegate(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
-			try await sending(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
+		try await (self.sending ?? defaultSendingTypeErased())(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
+			try await (sending ?? defaultSending())(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
 				try await send(
 					urlSession,
 					urlRequest,
@@ -295,5 +292,17 @@ private extension StandardNetworkController {
 	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
 		logger.log(message: .error(error), requestId: requestId, request: request)
 		return error
+	}
+}
+
+public extension NetworkController where Self == StandardNetworkController {
+	static func standard (
+		configuration: URLRequestConfiguration,
+		delegate: NetworkControllerDelegate = .delegate()
+	) -> Self {
+		.init(
+			configuration: configuration,
+			delegate: delegate
+		)
 	}
 }
