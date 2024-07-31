@@ -12,8 +12,14 @@ public extension StandardURLRequestBuilder {
 		if let port = config.port { basePath = "\(basePath):\(port)" }
 		if let baseSubpath = config.baseSubpath { basePath = "\(basePath)/\(baseSubpath)" }
 
+		let url = if basePath.isEmpty {
+			URL(string: request.path)
+		} else {
+			URL(string: basePath)?.appendingPathComponent(request.path)
+		}
+
 		guard
-			let path = URL(string: basePath)?.appendingPathComponent(request.path).absoluteString,
+			let path = url?.absoluteString,
 			var urlComponents = URLComponents(string: path)
 		else { throw GeneralError.urlComponentsCreationFailure("Base path: \(basePath) – Request path: \(request.path)") }
 
