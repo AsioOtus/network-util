@@ -52,6 +52,26 @@ extension RequestConfiguration {
 }
 
 public extension RequestConfiguration.URLElements {
+	var pathString: String {
+		path.joined(separator: "/")
+	}
+
+	var prefixedPathString: String {
+		let path = pathString
+
+		return !path.isEmpty && !path.hasPrefix("/")
+			? "/" + path
+			: path
+	}
+
+	var queryString: String? {
+		var urlComponents = URLComponents()
+		urlComponents.queryItems = query
+		return urlComponents.query
+	}
+}
+
+public extension RequestConfiguration.URLElements {
 	func setScheme (_ scheme: String?) -> Self {
 		var copy = self
 		copy.scheme = scheme
