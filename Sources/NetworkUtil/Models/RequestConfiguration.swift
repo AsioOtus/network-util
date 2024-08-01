@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RequestConfiguration {
+public struct RequestConfiguration: Hashable {
 	public var method: HTTPMethod?
 	public var url: URLElements
 	public var headers: Headers
@@ -75,7 +75,7 @@ public extension RequestConfiguration {
 		return copy
 	}
 
-	func setInfo (key: String, value: Any) -> Self {
+	func setInfo (key: String, value: AnyHashable) -> Self {
 		var copy = self
 		copy.info = [key: value]
 		return copy
@@ -87,7 +87,7 @@ public extension RequestConfiguration {
 		return copy
 	}
 
-	func addInfo (key: String, value: Any) -> Self {
+	func addInfo (key: String, value: AnyHashable) -> Self {
 		var copy = self
 		copy.info[key] = value
 		return copy

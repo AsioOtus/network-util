@@ -1,3 +1,3 @@
 extension RequestConfiguration {
-	public typealias Info = [String: Any]
+	public typealias Info = [String: AnyHashable]
 }

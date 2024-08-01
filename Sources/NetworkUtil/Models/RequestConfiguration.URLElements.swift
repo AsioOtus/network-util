@@ -1,7 +1,7 @@
 import Foundation
 
 extension RequestConfiguration {
-	public struct URLElements {
+	public struct URLElements: Hashable {
 		public var scheme: String?
 		public var user: String?
 		public var password: String?

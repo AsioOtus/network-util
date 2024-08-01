@@ -1,4 +1,4 @@
-public struct HTTPMethod {
+public struct HTTPMethod: Hashable {
 	public let value: String
 
 	public init (_ value: String) {
