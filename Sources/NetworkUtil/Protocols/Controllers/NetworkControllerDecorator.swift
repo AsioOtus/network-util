@@ -5,6 +5,14 @@ public protocol NetworkControllerDecorator: NetworkController {
 }
 
 public extension NetworkControllerDecorator {
+	var logPublisher: LogPublisher {
+		networkController.logPublisher
+	}
+
+	var logs: AsyncStream<LogRecord> {
+		networkController.logs
+	}
+
 	var configuration: RequestConfiguration { networkController.configuration }
 
 	func send <RQ: Request, RS: Response> (

@@ -1,6 +1,14 @@
 import Foundation
 
 public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: NetworkController {
+	public var logPublisher: LogPublisher {
+		Logger().eraseToAnyPublisher()
+	}
+
+	public var logs: AsyncStream<LogRecord> {
+		Logger().logs
+	}
+
 	public let configuration: RequestConfiguration = .empty
 	
 	public let networkController: NetworkController

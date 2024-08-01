@@ -1,6 +1,9 @@
 import Foundation
 
 public protocol NetworkController {
+	var logPublisher: LogPublisher { get }
+	var logs: AsyncStream<LogRecord> { get }
+
 	var configuration: RequestConfiguration { get }
 
 	func configuration (_ update: RequestConfiguration.Update) -> NetworkController

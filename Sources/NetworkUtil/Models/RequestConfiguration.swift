@@ -188,8 +188,8 @@ public extension RequestConfiguration {
 
 
 public extension RequestConfiguration {
-	func update (_ update: Update) -> Self {
-		update(self)
+	func update (_ update: Update?) -> Self {
+		update?(self) ?? self
 	}
 
 	func url (_ update: (URLElements) -> URLElements) -> Self {

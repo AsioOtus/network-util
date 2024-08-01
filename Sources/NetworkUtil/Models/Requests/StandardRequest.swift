@@ -58,7 +58,7 @@ public extension StandardRequest {
 		return copy
 	}
 
-	func configuration (_ update: RequestConfiguration.Update) -> Self {
+	func configuration (_ update: @escaping RequestConfiguration.Update) -> Self {
 		var copy = self
 		copy.configuration = copy.configuration.update(update)
 		return copy

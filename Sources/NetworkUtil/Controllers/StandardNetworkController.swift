@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-public struct StandardNetworkController: LoggableNetworkController {
+public struct StandardNetworkController: NetworkController {
 	let logger: Logger
 
 	public let configuration: RequestConfiguration
@@ -152,8 +152,9 @@ private extension StandardNetworkController {
 	) async throws -> URLRequest {
 		let body = try encodeRequestBody(request, encoding)
 
-		let requestUpdatedConfiguration = request.merge(with: configuration)
-		let updatedConfiguration = configurationUpdate?(requestUpdatedConfiguration) ?? requestUpdatedConfiguration
+		let updatedConfiguration = request
+			.merge(with: configuration)
+			.update(configurationUpdate ?? { $0 })
 
 		var buildUrlRequest = try urlRequestBuilder.build(request.address, updatedConfiguration, body)
 

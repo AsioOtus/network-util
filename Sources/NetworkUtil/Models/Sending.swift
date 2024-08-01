@@ -48,7 +48,6 @@ func mockSending <RQ: Request> (
 	}
 }
 
-
 func mockSending <RQ: Request> (
 	data: Data = .init(),
 	urlResponse: URLResponse = .init(),
