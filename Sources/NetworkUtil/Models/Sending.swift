@@ -36,3 +36,14 @@ func defaultSending <RQ: Request> () -> Sending<RQ> {
 func defaultSendingTypeErased () -> SendingTypeErased {
 	{ try await $4($0, $1, $2) }
 }
+
+func sendingMock <RQ: Request> (
+	data: Data = .init(),
+	urlResponse: URLResponse = .init(),
+	action: @escaping (URLRequest) -> Void
+) -> Sending<RQ> {
+	{ _, urlRequest, _, _, _ in
+		action(urlRequest)
+		return (.init(), .init())
+	}
+}

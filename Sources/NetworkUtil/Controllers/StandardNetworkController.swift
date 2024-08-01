@@ -1,10 +1,10 @@
 import Combine
 import Foundation
 
-public struct StandardNetworkController {
+public struct StandardNetworkController: LoggableNetworkController {
 	let logger: Logger
 
-	public let urlRequestConfiguration: URLRequestConfiguration
+	public let configuration: RequestConfiguration
 	public let delegate: NetworkControllerDelegate
 
 	public var logPublisher: LogPublisher {
@@ -16,33 +16,69 @@ public struct StandardNetworkController {
 	}
 
 	public init (
-		configuration: URLRequestConfiguration,
+		configuration: RequestConfiguration,
 		delegate: NetworkControllerDelegate = .delegate()
 	) {
-		self.urlRequestConfiguration = configuration
+		self.configuration = configuration
 		self.delegate = delegate
 
 		self.logger = .init()
 	}
 
 	private init (
-		configuration: URLRequestConfiguration,
+		configuration: RequestConfiguration,
 		delegate: NetworkControllerDelegate,
 		logger: Logger
 	) {
-		self.urlRequestConfiguration = configuration
+		self.configuration = configuration
 		self.delegate = delegate
 
 		self.logger = logger
 	}
 }
 
-extension StandardNetworkController: FullScaleNetworkController {
+private extension StandardNetworkController {
+	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
+	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
+	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
+	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
+
+	var urlSessionBuilder: URLSessionBuilder {
+		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
+	}
+
+	var urlRequestBuilder: URLRequestBuilder {
+		delegate.urlRequestBuilder ?? Self.defaultUrlRequestBuilder
+	}
+
+	var encoder: RequestBodyEncoder {
+		delegate.encoder ?? Self.defaultEncoder
+	}
+
+	var decoder: ResponseModelDecoder {
+		delegate.decoder ?? Self.defaultDecoder
+	}
+
+	var urlRequestsInterceptions: [URLRequestInterception] {
+		delegate.urlRequestsInterceptions
+	}
+
+	var sending: SendingTypeErased? {
+		delegate.sending
+	}
+
+	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
+		logger.log(message: .error(error), requestId: requestId, request: request)
+		return error
+	}
+}
+
+extension StandardNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		responseType: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: URLRequestConfiguration.Update? = nil
+		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		let requestId = UUID()
 
@@ -79,7 +115,7 @@ private extension StandardNetworkController {
 		_ requestId: UUID,
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?,
-		_ configurationUpdate: URLRequestConfiguration.Update?,
+		_ configurationUpdate: RequestConfiguration.Update?,
 		_ interception: URLRequestInterception?
 	) async throws -> (URLSession, URLRequest) {
 		do {
@@ -111,17 +147,17 @@ private extension StandardNetworkController {
 	func createUrlRequest <RQ: Request> (
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?,
-		_ configurationUpdate: URLRequestConfiguration.Update?,
-		_ interception: URLRequestInterception?
+		_ configurationUpdate: RequestConfiguration.Update?,
+		_ urlRequestInterception: URLRequestInterception?
 	) async throws -> URLRequest {
 		let body = try encodeRequestBody(request, encoding)
 
-		let requestUpdatedConfiguration = request.configurationUpdate(urlRequestConfiguration)
+		let requestUpdatedConfiguration = request.merge(with: configuration)
 		let updatedConfiguration = configurationUpdate?(requestUpdatedConfiguration) ?? requestUpdatedConfiguration
 
-		var buildUrlRequest = try urlRequestBuilder.build(request, body, updatedConfiguration)
+		var buildUrlRequest = try urlRequestBuilder.build(request.address, updatedConfiguration, body)
 
-		let interceptors = urlRequestsInterceptions + [request.interception, interception].compactMap { $0 }
+		let interceptors = urlRequestsInterceptions + [request.delegate.urlRequestInterception, urlRequestInterception].compactMap { $0 }
 		for interceptor in interceptors {
 			buildUrlRequest = try await interceptor(buildUrlRequest)
 		}
@@ -135,7 +171,11 @@ private extension StandardNetworkController {
 	) throws -> Data? {
 		guard let body = request.body else { return nil }
 
-		if let encoding {
+		if let data = body as? Data {
+			return data
+		} else if let encoding {
+			return try encoding(body)
+		} else if let encoding = request.delegate.encoding {
 			return try encoding(body)
 		} else {
 			return try encoder.encode(body)
@@ -211,7 +251,9 @@ private extension StandardNetworkController {
 		_ data: Data,
 		_ decoding: ((Data) throws -> RSM)?
 	) throws -> RSM {
-		if let decoding {
+		if let data = data as? RSM {
+			return data
+		} else if let decoding {
 			return try decoding(data)
 		} else {
 			return try decoder.decode(RSM.self, from: data)
@@ -220,84 +262,42 @@ private extension StandardNetworkController {
 }
 
 public extension StandardNetworkController {
-	func withConfiguration (update: URLRequestConfiguration.Update) -> FullScaleNetworkController {
+	func configuration (_ update: RequestConfiguration.Update) -> NetworkController {
 		Self(
-			configuration: update(urlRequestConfiguration),
+			configuration: update(configuration),
 			delegate: delegate,
 			logger: logger
 		)
 	}
 
-	func replaceConfiguration (_ configuration: URLRequestConfiguration) -> FullScaleNetworkController {
-		withConfiguration { _ in configuration }
-	}
-
-	func withConfiguration(update: URLRequestConfiguration.Update) -> ConfigurableNetworkController {
-		let nc: FullScaleNetworkController = withConfiguration(update: update)
-		return nc as ConfigurableNetworkController
-	}
-
-	func replaceConfiguration(_ configuration: URLRequestConfiguration) -> ConfigurableNetworkController {
-		let nc: FullScaleNetworkController = replaceConfiguration(configuration)
-		return nc as ConfigurableNetworkController
-	}
-
-	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
+	func replace (configuration: RequestConfiguration) -> NetworkController {
 		Self(
-			configuration: urlRequestConfiguration,
-			delegate: delegate.addUrlRequestInterception(interception),
+			configuration: configuration,
+			delegate: delegate,
 			logger: logger
 		)
 	}
 
-	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> FullScaleNetworkController {
-		Self(
-			configuration: urlRequestConfiguration,
-			delegate: delegate.addUrlResponseInterception(interception),
-			logger: logger
-		)
-	}
-}
-
-private extension StandardNetworkController {
-	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
-	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
-	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
-	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
-
-	var urlSessionBuilder: URLSessionBuilder {
-		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
-	}
-
-	var urlRequestBuilder: URLRequestBuilder {
-		delegate.urlRequestBuilder ?? Self.defaultUrlRequestBuilder
-	}
-
-	var encoder: RequestBodyEncoder {
-		delegate.encoder ?? Self.defaultEncoder
-	}
-
-	var decoder: ResponseModelDecoder {
-		delegate.decoder ?? Self.defaultDecoder
-	}
-
-	var urlRequestsInterceptions: [URLRequestInterception] {
-		delegate.urlRequestsInterceptions
-	}
-
-	var sending: SendingTypeErased? {
-		delegate.sending
-	}
-
-	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
-		logger.log(message: .error(error), requestId: requestId, request: request)
-		return error
-	}
+//	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
+//		Self(
+//			configuration: configuration,
+//			delegate: delegate.addUrlRequestInterception(interception),
+//			logger: logger
+//		)
+//	}
+//
+//	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> FullScaleNetworkController {
+//		Self(
+//			configuration: configuration,
+//			delegate: delegate.addUrlResponseInterception(interception),
+//			logger: logger
+//		)
+//	}
 }
 
 public extension NetworkController where Self == StandardNetworkController {
 	static func standard (
-		configuration: URLRequestConfiguration,
+		configuration: RequestConfiguration,
 		delegate: NetworkControllerDelegate = .delegate()
 	) -> Self {
 		.init(

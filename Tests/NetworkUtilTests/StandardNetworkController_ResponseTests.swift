@@ -2,16 +2,8 @@ import XCTest
 @testable import NetworkUtil
 
 final class StandardNetworkController_ResponseTests: XCTestCase {
-	let baseRequest = StandardRequest(path: "")
-	let baseConfiguration = URLRequestConfiguration(
-		scheme: nil,
-		address: "site.com",
-		port: nil,
-		baseSubpath: nil,
-		query: [:],
-		headers: [:],
-		timeout: nil
-	)
+	let baseRequest = StandardRequest()
+	let baseConfiguration = RequestConfiguration()
 
 	var sut: StandardNetworkController!
 
@@ -59,5 +51,25 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 
 		// MARK: Assert
 		XCTAssertEqual(standardResponse.model, expectedObject)
+	}
+
+	func test_plainDataResponse () async throws {
+		// MARK: Arrange
+		let expectedData = "test".data(using: .utf8)!
+
+		let sending: SendingTypeErased = { _, _, _, _, _ in
+			(expectedData, .init())
+		}
+
+		sut = .init(
+			configuration: baseConfiguration,
+			delegate: .delegate(sending: sending)
+		)
+
+		// MARK: Act
+		let standardResponse = try await sut.send(baseRequest)
+
+		// MARK: Assert
+		XCTAssertEqual(standardResponse.model, expectedData)
 	}
 }

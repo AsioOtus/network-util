@@ -5,11 +5,13 @@ public protocol NetworkControllerDecorator: NetworkController {
 }
 
 public extension NetworkControllerDecorator {
+	var configuration: RequestConfiguration { networkController.configuration }
+
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		responseType: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: URLRequestConfiguration.Update? = nil
+		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,
@@ -17,5 +19,13 @@ public extension NetworkControllerDecorator {
 			delegate: delegate,
 			configurationUpdate: configurationUpdate
 		)
+	}
+
+	func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> NetworkController {
+		networkController.configuration(update)
+	}
+
+	func replace (configuration: RequestConfiguration) -> NetworkController {
+		networkController.replace(configuration: configuration)
 	}
 }

@@ -26,27 +26,15 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 	}
 
 	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> NetworkControllerDelegate {
-		Self(
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			encoder: encoder,
-			decoder: decoder,
-			urlRequestsInterceptions: urlRequestsInterceptions + [interception],
-			urlResponsesInterceptions: urlResponsesInterceptions,
-			sending: sending
-		)
+		var copy = self
+		copy.urlRequestsInterceptions = [interception] + copy.urlRequestsInterceptions
+		return copy
 	}
 
 	public func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> NetworkControllerDelegate {
-		Self(
-			urlSessionBuilder: urlSessionBuilder,
-			urlRequestBuilder: urlRequestBuilder,
-			encoder: encoder,
-			decoder: decoder,
-			urlRequestsInterceptions: urlRequestsInterceptions,
-			urlResponsesInterceptions: urlResponsesInterceptions + [interception],
-			sending: sending
-		)
+		var copy = self
+		copy.urlResponsesInterceptions = [interception] + copy.urlResponsesInterceptions
+		return copy
 	}
 }
 

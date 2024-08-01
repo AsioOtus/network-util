@@ -2,16 +2,8 @@ import XCTest
 @testable import NetworkUtil
 
 final class StandardNetworkController_Tests: XCTestCase {
-	let baseRequest = StandardRequest(path: "")
-	let baseConfiguration = URLRequestConfiguration(
-		scheme: nil,
-		address: "site.com",
-		port: nil,
-		baseSubpath: nil,
-		query: [:],
-		headers: [:],
-		timeout: nil
-	)
+	let baseRequest = StandardRequest()
+	let baseConfiguration = RequestConfiguration()
 
 	var sut: StandardNetworkController!
 
@@ -21,7 +13,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 
 	func test_urlRequestCreation () async throws {
 		// MARK: Assert
-		let expectedUrlRequest = URLRequest(url: .init(string: "site.com/subpath")!)
+		let expectedUrlRequest = URLRequest(url: .init(string: "/subpath")!)
 
 		let sending: SendingTypeErased = { _, resultUrlRequest, _, _, _ in
 			self.assert(resultUrlRequest: resultUrlRequest, expectedUrlRequest: expectedUrlRequest)
@@ -36,10 +28,10 @@ final class StandardNetworkController_Tests: XCTestCase {
 		)
 
 		let request = baseRequest
-			.set(path: "subpath")
+			.configuration { $0.setPath("subpath") }
 
 		// MARK: Act
-		_ = try await sut.send(request, .delegate(decoding: { _ in Data() }))
+		_ = try await sut.send(request, delegate: .standard(decoding: { _ in Data() }))
 	}
 
 	func test_urlSessionCreation () async throws {
@@ -64,6 +56,6 @@ final class StandardNetworkController_Tests: XCTestCase {
 		let request = baseRequest
 
 		// MARK: Act
-		_ = try await sut.send(request, .delegate(decoding: { _ in Data() }))
+		_ = try await sut.send(request, delegate: .standard(decoding: { _ in Data() }))
 	}
 }

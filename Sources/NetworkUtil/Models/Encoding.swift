@@ -1,3 +1,3 @@
 import Foundation
 
-public typealias Encoding<RQ: Request> = (RQ.Body) throws -> Data
+public typealias Encoding<RQM: Encodable> = (RQM) throws -> Data

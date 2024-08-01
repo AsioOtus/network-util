@@ -1,12 +1,12 @@
 public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decodable>: NetworkControllerSendingDelegate {
-	public let encoding: Encoding<RQ>?
+	public let encoding: Encoding<RQ.Body>?
 	public let decoding: Decoding<RSM>?
 	public let urlRequestInterception: URLRequestInterception?
 	public let urlResponseInterception: URLResponseInterception?
 	public let sending: Sending<RQ>?
 
 	public init (
-		encoding: Encoding<RQ>? = nil,
+		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,
@@ -21,8 +21,8 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decoda
 }
 
 public extension NetworkControllerSendingDelegate {
-	static func delegate <RQ: Request, RSM: Decodable> (
-		encoding: Encoding<RQ>? = nil,
+	static func standard <RQ: Request, RSM: Decodable> (
+		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,

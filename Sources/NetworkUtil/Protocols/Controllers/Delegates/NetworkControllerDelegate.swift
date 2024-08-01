@@ -6,7 +6,4 @@ public protocol NetworkControllerDelegate {
 	var urlRequestsInterceptions: [URLRequestInterception] { get }
 	var urlResponsesInterceptions: [URLResponseInterception] { get }
 	var sending: SendingTypeErased? { get }
-
-	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> NetworkControllerDelegate
-	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> NetworkControllerDelegate
 }

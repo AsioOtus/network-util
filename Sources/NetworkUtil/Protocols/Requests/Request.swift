@@ -1,29 +1,26 @@
 import Foundation
 
-public protocol Request <Body>: CustomStringConvertible {
+public protocol Request <Body> {
 	associatedtype Body: Encodable = Data
 
-	var method: HTTPMethod { get }
-	
-	var path: String { get }
-
-	var query: Query { get }
-	var headers: Headers { get }
-
+	var address: String? { get }
 	var body: Body? { get }
+	var configuration: RequestConfiguration { get }
+	var delegate: any RequestDelegate<Body> { get }
 
-	func configurationUpdate (_ configuration: URLRequestConfiguration) -> URLRequestConfiguration
-	func interception (_ urlRequest: URLRequest) async throws -> URLRequest
+	func merge (with: RequestConfiguration) -> RequestConfiguration
 }
 
 public extension Request {
-	var description: String { "\(Self.self)" }
+	var address: String? { nil }
 
-	var method: HTTPMethod { .get }
+	var body: Body? { nil }
 
-	var query: Query { [:] }
-	var headers: Headers { [:] }
+	var configuration: RequestConfiguration { .init() }
 
-	func configurationUpdate (_ configuration: URLRequestConfiguration) -> URLRequestConfiguration { configuration }
-	func interception (_ urlRequest: URLRequest) async throws -> URLRequest { urlRequest }
+	var delegate: any RequestDelegate<Body> { StandardRequestDelegate() }
+
+	func merge (with configuration: RequestConfiguration) -> RequestConfiguration {
+		self.configuration.merge(with: configuration)
+	}
 }

@@ -1,6 +1,8 @@
 import Foundation
 
 public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: NetworkController {
+	public let configuration: RequestConfiguration = .empty
+	
 	public let networkController: NetworkController
 
 	public let stubResponseModel: SRSM
@@ -27,7 +29,7 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		_ request: RQ,
 		responseType: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: URLRequestConfiguration.Update? = nil
+		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		do {
 			_ = try await networkController.send(
@@ -44,6 +46,9 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 
 		return try StandardResponse(stubData, stubUrlResponse, stubResponseModel) as! RS
 	}
+
+	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> NetworkController { self }
+	public func replace (configuration: RequestConfiguration) -> NetworkController { self }
 }
 
 extension MockNetworkController {

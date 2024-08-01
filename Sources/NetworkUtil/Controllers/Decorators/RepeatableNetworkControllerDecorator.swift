@@ -1,15 +1,15 @@
 import Foundation
 
-public struct RepeatableNetworkControllerDecorator: FullScaleNetworkControllerDecorator {
+public struct RepeatableNetworkControllerDecorator: NetworkControllerDecorator {
 	public let maxAttempts: Int?
 	public let delayStrategy: (Int) -> Int
 
-	public let networkController: FullScaleNetworkController
+	public let networkController: NetworkController
 
 	public init (
 		maxAttempts: Int?,
 		delayStrategy: @escaping (Int) -> Int,
-		networkController: FullScaleNetworkController
+		networkController: NetworkController
 	) {
 		self.maxAttempts = maxAttempts
 		self.delayStrategy = delayStrategy
@@ -20,12 +20,12 @@ public struct RepeatableNetworkControllerDecorator: FullScaleNetworkControllerDe
 		_ request: RQ,
 		responseType: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: URLRequestConfiguration.Update?
+		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
 		try await networkController.send(
 			request,
 			responseType: responseType,
-			delegate: .delegate(
+			delegate: .standard(
 				encoding: delegate.encoding,
 				decoding: delegate.decoding,
 				urlRequestInterception: delegate.urlRequestInterception,
@@ -68,11 +68,11 @@ public struct RepeatableNetworkControllerDecorator: FullScaleNetworkControllerDe
 	}
 }
 
-public extension FullScaleNetworkController {
+public extension NetworkController {
 	func repeatable (
 		maxAttempts: Int?,
 		delayStrategy: @escaping (Int) -> Int
-	) -> FullScaleNetworkController {
+	) -> RepeatableNetworkControllerDecorator {
 		RepeatableNetworkControllerDecorator(
 			maxAttempts: maxAttempts,
 			delayStrategy: delayStrategy,

@@ -9,7 +9,7 @@ public extension LoggableNetworkControllerDecorator {
 		_ request: RQ,
 		responseType: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: URLRequestConfiguration.Update? = nil
+		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		try await networkController.send(
 			request,

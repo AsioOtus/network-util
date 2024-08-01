@@ -17,7 +17,13 @@ final class StandardNetworkController_InitTests: XCTestCase {
 //		}
 //
 //		let sut = StandardNetworkController(
-//			configuration: .init(address: "test.com"),
+//			configuration: .init(
+//				method: <#T##HTTPMethod?#>,
+//				urlElements: <#T##RequestConfiguration.URLElements#>,
+//				headers: <#T##RequestConfiguration.Headers#>,
+//				timeout: <#T##Double?#>,
+//				info: <#T##RequestConfiguration.Info#>
+//			),
 //			delegate: .delegate(sending: sending)
 //		)
 //
