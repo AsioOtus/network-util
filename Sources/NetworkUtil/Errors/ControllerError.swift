@@ -12,7 +12,7 @@ extension ControllerError {
 		case network(NetworkError)
 		case response(Error)
 
-		case general(GeneralError)
+		case general(Error)
 	}
 }
 
@@ -20,9 +20,9 @@ public extension ControllerError {
 	var innerError: Error {
 		switch category {
 		case .request(let error): fallthrough
-		case .network(let error as Error): return error
+		case .network(let error as Error): fallthrough
 		case .response(let error): fallthrough
-		case .general(let error as Error): return error
+		case .general(let error): return error
 		}
 	}
 

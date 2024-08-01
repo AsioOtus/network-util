@@ -5,7 +5,7 @@ public enum LogMessage {
 	case response(Data, URLResponse)
 	case error(ControllerError)
 
-	public var name: String {
+	public var debugName: String {
 		switch self {
 		case .request: "request"
 		case .response: "response"

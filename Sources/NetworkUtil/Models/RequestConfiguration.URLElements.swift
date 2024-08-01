@@ -30,6 +30,24 @@ extension RequestConfiguration {
 			self.query = query
 			self.fragment = fragment
 		}
+
+		public init (urlComponents: URLComponents) {
+			self.init(
+				scheme: urlComponents.scheme,
+				user: urlComponents.user,
+				password: urlComponents.password,
+				host: urlComponents.host,
+				port: urlComponents.port,
+				path: urlComponents.path.split(separator: "/").map(String.init),
+				query: urlComponents.queryItems ?? [],
+				fragment: urlComponents.fragment
+			)
+		}
+
+		public init? (address: String) {
+			guard let urlComponents = URLComponents(string: address) else { return nil }
+			self.init(urlComponents: urlComponents)
+		}
 	}
 }
 

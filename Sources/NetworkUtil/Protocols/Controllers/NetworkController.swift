@@ -8,7 +8,7 @@ public protocol NetworkController {
 
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		responseType: RS.Type,
+		response: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS
@@ -35,7 +35,7 @@ public extension NetworkController {
 	) async throws -> StandardResponse<Data> {
 		try await send(
 			request,
-			responseType: StandardResponse<Data>.self,
+			response: StandardResponse<Data>.self,
 			delegate: delegate,
 			configurationUpdate: configurationUpdate
 		)
@@ -47,7 +47,7 @@ public extension NetworkController {
 	) async throws -> StandardResponse<Data> {
 		try await send(
 			request,
-			responseType: StandardResponse<Data>.self,
+			response: StandardResponse<Data>.self,
 			delegate: .empty(),
 			configurationUpdate: configurationUpdate
 		)
@@ -61,7 +61,7 @@ public extension NetworkController {
 	) async throws -> StandardResponse<RSM> {
 		try await send(
 			request,
-			responseType: StandardResponse<RSM>.self,
+			response: StandardResponse<RSM>.self,
 			delegate: delegate,
 			configurationUpdate: configurationUpdate
 		)
@@ -74,7 +74,7 @@ public extension NetworkController {
 	) async throws -> StandardResponse<RSM> {
 		try await send(
 			request,
-			responseType: StandardResponse<RSM>.self,
+			response: StandardResponse<RSM>.self,
 			delegate: .empty(),
 			configurationUpdate: configurationUpdate
 		)

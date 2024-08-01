@@ -16,7 +16,7 @@ public struct StandardNetworkController: LoggableNetworkController {
 	}
 
 	public init (
-		configuration: RequestConfiguration,
+		configuration: RequestConfiguration = .empty,
 		delegate: NetworkControllerDelegate = .delegate()
 	) {
 		self.configuration = configuration
@@ -76,7 +76,7 @@ private extension StandardNetworkController {
 extension StandardNetworkController {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		responseType: RS.Type,
+		response: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
@@ -220,7 +220,7 @@ private extension StandardNetworkController {
 			)
 		} catch {
 			throw controllerError(
-				.init(requestId: requestId, request: request, category: .general(.other(error))),
+				.init(requestId: requestId, request: request, category: .general(error)),
 				requestId,
 				request
 			)

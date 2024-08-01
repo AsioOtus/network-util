@@ -39,6 +39,12 @@ public extension RequestConfiguration {
 		return copy
 	}
 
+	func setUrl (_ urlComponents: URLComponents) -> Self {
+		var copy = self
+		copy.url = .init(urlComponents: urlComponents)
+		return copy
+	}
+
 	func setHeaders (_ headers: Headers) -> Self {
 		var copy = self
 		copy.headers = headers

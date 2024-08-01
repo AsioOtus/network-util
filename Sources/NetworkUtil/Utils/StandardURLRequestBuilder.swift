@@ -25,11 +25,11 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 
 	func buildUrl (_ address: String?, _ configuration: RequestConfiguration) throws -> URL {
 		if let address {
-			guard let url = URL(string: address) else { throw GeneralError.urlCreationFailure(address: address) }
+			guard let url = URL(string: address) else { throw URLCreationError.addressFailure(address) }
 			return url
 		} else {
 			let urlComponents = configuration.url.urlComponents()
-			guard let url = urlComponents.url else { throw GeneralError.urlCreationFailure(urlComponents) }
+			guard let url = urlComponents.url else { throw URLCreationError.urlComponentsFailure(urlComponents) }
 			return url
 		}
 	}

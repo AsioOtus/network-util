@@ -27,7 +27,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 			)!
 		)
 
-		let sending: Sending<StandardRequest<Data>> = sendingMock { urlRequest in
+		let sending: Sending<StandardRequest<Data>> = mockSending { urlRequest in
 			self.assert(resultUrlRequest: urlRequest, expectedUrlRequest: expectedUrlRequest)
 		}
 
@@ -63,7 +63,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 			)!
 		)
 
-		let sending: Sending<StandardRequest<Data>> = sendingMock { urlRequest in
+		let sending: Sending<StandardRequest<Data>> = mockSending { urlRequest in
 			self.assert(resultUrlRequest: urlRequest, expectedUrlRequest: expectedUrlRequest)
 		}
 
@@ -99,7 +99,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 			)!
 		)
 
-		let sending: Sending<StandardRequest<Data>> = sendingMock { urlRequest in
+		let sending: Sending<StandardRequest<Data>> = mockSending { urlRequest in
 			self.assert(resultUrlRequest: urlRequest, expectedUrlRequest: expectedUrlRequest)
 		}
 

@@ -27,14 +27,14 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		responseType: RS.Type,
+		response: RS.Type,
 		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		do {
 			_ = try await networkController.send(
 				request,
-				responseType: responseType,
+				response: response,
 				delegate: delegate,
 				configurationUpdate: configurationUpdate
 			)
