@@ -43,7 +43,13 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 			_ = try await networkController.send(
 				request,
 				response: response,
-				delegate: delegate,
+				delegate: .standard(
+					encoding: delegate.encoding,
+					decoding: delegate.decoding,
+					urlRequestInterception: delegate.urlRequestInterception,
+					urlResponseInterception: delegate.urlResponseInterception,
+					sending: mockSendingDelegate(delegate.sending)
+				),
 				configurationUpdate: configurationUpdate
 			)
 		} catch let error as ControllerError {

@@ -1,8 +1,11 @@
+import Foundation
+
 public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decodable>: NetworkControllerSendingDelegate {
 	public let encoding: Encoding<RQ.Body>?
 	public let decoding: Decoding<RSM>?
 	public let urlRequestInterception: URLRequestInterception?
 	public let urlResponseInterception: URLResponseInterception?
+	public let urlSessionTaskDelegate: URLSessionTaskDelegate?
 	public let sending: Sending<RQ>?
 
 	public init (
@@ -10,12 +13,14 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decoda
 		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,
+		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
 	) {
 		self.encoding = encoding
 		self.decoding = decoding
 		self.urlRequestInterception = urlRequestInterception
 		self.urlResponseInterception = urlResponseInterception
+		self.urlSessionTaskDelegate = urlSessionTaskDelegate
 		self.sending = sending
 	}
 }
@@ -26,6 +31,7 @@ public extension NetworkControllerSendingDelegate {
 		decoding: Decoding<RSM>? = nil,
 		urlRequestInterception: URLRequestInterception? = nil,
 		urlResponseInterception: URLResponseInterception? = nil,
+		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
 	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
 		.init(
@@ -33,6 +39,7 @@ public extension NetworkControllerSendingDelegate {
 			decoding: decoding,
 			urlRequestInterception: urlRequestInterception,
 			urlResponseInterception: urlResponseInterception,
+			urlSessionTaskDelegate: urlSessionTaskDelegate,
 			sending: sending
 		)
 	}

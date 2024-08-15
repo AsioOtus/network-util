@@ -11,7 +11,7 @@ public struct StandardRequest <Body: Encodable>: Request {
 		address: String? = nil,
 		body: Body?,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: any RequestDelegate<Body> = StandardRequestDelegate.empty(),
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	) {
 		self.address = address
@@ -24,7 +24,7 @@ public struct StandardRequest <Body: Encodable>: Request {
 	public init (
 		address: String? = nil,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: any RequestDelegate<Body> = StandardRequestDelegate.empty(),
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	) where Body == Data {
 		self.address = address
@@ -70,12 +70,6 @@ public extension StandardRequest {
 		return copy
 	}
 
-	func updateDelegate (_ update: (any RequestDelegate<Body>) -> any RequestDelegate<Body>) -> Self {
-		var copy = self
-		copy.delegate = update(delegate)
-		return copy
-	}
-
 	func setConfigurationUpdate (_ configurationUpdate: @escaping RequestConfiguration.Update) -> Self {
 		var copy = self
 		copy.configurationUpdate = configurationUpdate
@@ -88,7 +82,7 @@ public extension Request {
 		address: String? = nil,
 		body: Body? = nil,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: some RequestDelegate<Body>,
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	)
 	-> StandardRequest<B>
@@ -103,10 +97,28 @@ public extension Request {
 		)
 	}
 
+	static func request <B> (
+		address: String? = nil,
+		body: Body? = nil,
+		configuration: RequestConfiguration = .init(),
+		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
+	)
+	-> StandardRequest<B>
+	where Self == StandardRequest<B>
+	{
+		.init(
+			address: address,
+			body: body,
+			configuration: configuration,
+			delegate: StandardRequestDelegate.empty(),
+			configurationUpdate: configurationUpdate
+		)
+	}
+
 	static func get (
 		path: String,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	)
 	-> StandardRequest<Data>
@@ -127,9 +139,9 @@ public extension Request {
 	}
 
 	static func get (
-		_ address: String,
+		_ address: String? = nil,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	)
 	-> StandardRequest<Data>
@@ -148,7 +160,7 @@ public extension Request {
 		body: Body? = nil,
 		path: String,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	)
 	-> StandardRequest<Data>
@@ -172,7 +184,7 @@ public extension Request {
 		_ address: String? = nil,
 		body: Body? = nil,
 		configuration: RequestConfiguration = .init(),
-		delegate: any RequestDelegate<Body> = StandardRequestDelegate.delegate(),
+		delegate: some RequestDelegate<Body>,
 		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
 	)
 	-> StandardRequest<B>
@@ -183,6 +195,24 @@ public extension Request {
 			body: body,
 			configuration: .init(method: .post).merge(with: configuration),
 			delegate: delegate,
+			configurationUpdate: configurationUpdate
+		)
+	}
+
+	static func post <B> (
+		_ address: String? = nil,
+		body: Body? = nil,
+		configuration: RequestConfiguration = .init(),
+		configurationUpdate: @escaping RequestConfiguration.Update = { $0 }
+	)
+	-> StandardRequest<B>
+	where Self == StandardRequest<B>
+	{
+		.init(
+			address: address,
+			body: body,
+			configuration: .init(method: .post).merge(with: configuration),
+			delegate: StandardRequestDelegate.empty(),
 			configurationUpdate: configurationUpdate
 		)
 	}

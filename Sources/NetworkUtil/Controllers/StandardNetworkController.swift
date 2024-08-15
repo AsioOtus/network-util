@@ -17,7 +17,7 @@ public struct StandardNetworkController: NetworkController {
 
 	public init (
 		configuration: RequestConfiguration = .empty,
-		delegate: NetworkControllerDelegate = .delegate()
+		delegate: NetworkControllerDelegate = .standard()
 	) {
 		self.configuration = configuration
 		self.delegate = delegate
@@ -95,6 +95,7 @@ extension StandardNetworkController {
 			urlRequest,
 			requestId,
 			request,
+			delegate.urlSessionTaskDelegate,
 			delegate.sending
 		)
 
@@ -188,15 +189,19 @@ private extension StandardNetworkController {
 		_ urlRequest: URLRequest,
 		_ requestId: UUID,
 		_ request: RQ,
+		_ urlSessionTaskDelegate: URLSessionTaskDelegate?,
 		_ sending: Sending<RQ>?
 	) async throws -> (Data, URLResponse) {
-		try await (self.sending ?? defaultSendingTypeErased())(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
+		let urlSessionTaskDelegate = urlSessionTaskDelegate ?? request.delegate.urlSessionTaskDelegate
+
+		return try await (self.sending ?? defaultSendingTypeErased())(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId in
 			try await (sending ?? defaultSending())(urlSession, urlRequest, requestId, request) { urlSession, urlRequest, requestId, request in
 				try await send(
 					urlSession,
 					urlRequest,
 					requestId,
-					request
+					request,
+					urlSessionTaskDelegate
 				)
 			}
 		}
@@ -206,10 +211,11 @@ private extension StandardNetworkController {
 		_ urlSession: URLSession,
 		_ urlRequest: URLRequest,
 		_ requestId: UUID,
-		_ request: RQ
+		_ request: RQ,
+		_ urlSessionTaskDelegate: URLSessionTaskDelegate?
 	) async throws -> (Data, URLResponse) {
 		do {
-			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
+			let (data, urlResponse) = try await urlSession.data(for: urlRequest, delegate: urlSessionTaskDelegate)
 			logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
 
 			return (data, urlResponse)
@@ -278,28 +284,12 @@ public extension StandardNetworkController {
 			logger: logger
 		)
 	}
-
-//	func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> FullScaleNetworkController {
-//		Self(
-//			configuration: configuration,
-//			delegate: delegate.addUrlRequestInterception(interception),
-//			logger: logger
-//		)
-//	}
-//
-//	func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> FullScaleNetworkController {
-//		Self(
-//			configuration: configuration,
-//			delegate: delegate.addUrlResponseInterception(interception),
-//			logger: logger
-//		)
-//	}
 }
 
 public extension NetworkController where Self == StandardNetworkController {
 	static func standard (
 		configuration: RequestConfiguration,
-		delegate: NetworkControllerDelegate = .delegate()
+		delegate: NetworkControllerDelegate = .standard()
 	) -> Self {
 		.init(
 			configuration: configuration,

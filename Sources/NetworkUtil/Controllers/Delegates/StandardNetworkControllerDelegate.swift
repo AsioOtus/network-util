@@ -39,7 +39,7 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 }
 
 public extension NetworkControllerDelegate where Self == StandardNetworkControllerDelegate {
-	static func delegate (
+	static func standard (
 		urlSessionBuilder: URLSessionBuilder? = nil,
 		urlRequestBuilder: URLRequestBuilder? = nil,
 		encoder: RequestBodyEncoder? = nil,
@@ -57,5 +57,9 @@ public extension NetworkControllerDelegate where Self == StandardNetworkControll
 			urlResponsesInterceptions: urlResponsesInterceptions,
 			sending: sending
 		)
+	}
+
+	static func empty () -> Self {
+		.init()
 	}
 }

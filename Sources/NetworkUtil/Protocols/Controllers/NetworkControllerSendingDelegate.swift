@@ -1,3 +1,5 @@
+import Foundation
+
 public protocol NetworkControllerSendingDelegate <RQ, RSM> {
 	associatedtype RQ: Request
 	associatedtype RSM: Decodable
@@ -6,5 +8,6 @@ public protocol NetworkControllerSendingDelegate <RQ, RSM> {
 	var decoding: Decoding<RSM>? { get }
 	var urlRequestInterception: URLRequestInterception? { get }
 	var urlResponseInterception: URLResponseInterception? { get }
+	var urlSessionTaskDelegate: URLSessionTaskDelegate? { get }
 	var sending: Sending<RQ>? { get }
 }
