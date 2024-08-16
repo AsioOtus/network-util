@@ -52,6 +52,50 @@ extension RequestConfiguration {
 }
 
 public extension RequestConfiguration.URLElements {
+	static func http (
+		user: String? = nil,
+		password: String? = nil,
+		host: String? = nil,
+		port: Int? = nil,
+		path: Path = [],
+		query: [URLQueryItem] = [],
+		fragment: String? = nil
+	) -> Self {
+		.init(
+			scheme: "http",
+			user: user,
+			password: password,
+			host: host,
+			port: port,
+			path: path,
+			query: query,
+			fragment: fragment
+		)
+	}
+
+	static func https (
+		user: String? = nil,
+		password: String? = nil,
+		host: String? = nil,
+		port: Int? = nil,
+		path: Path = [],
+		query: [URLQueryItem] = [],
+		fragment: String? = nil
+	) -> Self {
+		.init(
+			scheme: "https",
+			user: user,
+			password: password,
+			host: host,
+			port: port,
+			path: path,
+			query: query,
+			fragment: fragment
+		)
+	}
+}
+
+public extension RequestConfiguration.URLElements {
 	var pathString: String {
 		path.joined(separator: "/")
 	}
