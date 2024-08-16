@@ -1,60 +1,83 @@
 import Foundation
 
-public typealias SendAction<RQ: Request> = (
-	URLSession,
-	URLRequest,
-	UUID,
-	RQ
-) async throws -> (Data, URLResponse)
+public struct SendingModel<RQ: Request> {
+	public let urlSession: URLSession
+	public let urlRequest: URLRequest
+	public let requestId: UUID
+	public let request: RQ
+	public let configuration: RequestConfiguration
 
-public typealias Sending<RQ: Request> = (
-	URLSession,
-	URLRequest,
-	UUID,
-	RQ,
-	SendAction<RQ>
-) async throws -> (Data, URLResponse)
-
-public typealias SendActionTypeErased = (
-	URLSession,
-	URLRequest,
-	UUID
-) async throws -> (Data, URLResponse)
-
-public typealias SendingTypeErased = (
-	URLSession,
-	URLRequest,
-	UUID,
-	any Request,
-	SendActionTypeErased
-) async throws -> (Data, URLResponse)
-
-func defaultSending <RQ: Request> () -> Sending<RQ> {
-	{ try await $4($0, $1, $2, $3) }
+	public init (
+		urlSession: URLSession,
+		urlRequest: URLRequest,
+		requestId: UUID,
+		request: RQ,
+		configuration: RequestConfiguration
+	) {
+		self.urlSession = urlSession
+		self.urlRequest = urlRequest
+		self.requestId = requestId
+		self.request = request
+		self.configuration = configuration
+	}
 }
 
-func defaultSendingTypeErased () -> SendingTypeErased {
-	{ try await $4($0, $1, $2) }
+public struct AnySendingModel {
+	public let urlSession: URLSession
+	public let urlRequest: URLRequest
+	public let requestId: UUID
+	public let request: any Request
+	public let configuration: RequestConfiguration
+
+	public init (
+		urlSession: URLSession,
+		urlRequest: URLRequest,
+		requestId: UUID,
+		request: any Request,
+		configuration: RequestConfiguration
+	) {
+		self.urlSession = urlSession
+		self.urlRequest = urlRequest
+		self.requestId = requestId
+		self.request = request
+		self.configuration = configuration
+	}
 }
 
-func mockSending <RQ: Request> (
+public typealias SendAction<RQ: Request> = (URLSession, URLRequest) async throws -> (Data, URLResponse)
+
+public typealias Sending<RQ: Request> = (SendingModel<RQ>, SendAction<RQ>) async throws -> (Data, URLResponse)
+
+public typealias AnySendAction = (URLSession, URLRequest) async throws -> (Data, URLResponse)
+
+public typealias AnySending = (AnySendingModel, AnySendAction) async throws -> (Data, URLResponse)
+
+public func emptySending <RQ: Request> () -> Sending<RQ> {
+	{ try await $1($0.urlSession, $0.urlRequest) }
+}
+
+public func emptyAnySending () -> AnySending {
+	{ try await $1($0.urlSession, $0.urlRequest) }
+}
+
+public func mockSending <RQ: Request> (
 	data: Data = .init(),
 	urlResponse: URLResponse = .init(),
 	action: @escaping () -> Void = { }
 ) -> Sending<RQ> {
-	{ _, _, _, _, _ in
+	{ _, _ in
 		action()
 		return (data, urlResponse)
 	}
 }
 
-func mockSending <RQ: Request> (
+public func mockSending <RQ: Request> (
 	data: Data = .init(),
 	urlResponse: URLResponse = .init(),
 	action: @escaping (URLRequest) -> Void
 ) -> Sending<RQ> {
-	{ _, urlRequest, _, _, _ in
-		action(urlRequest)
+	{ sendActionModel, _ in
+		action(sendActionModel.urlRequest)
 		return (data, urlResponse)
 	}
 }

@@ -16,9 +16,7 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 		let expectedObject = "test"
 		let expectedData = try JSONEncoder().encode(expectedObject)
 
-		let sending: SendingTypeErased = { _, _, _, _, _ in
-			(expectedData, .init())
-		}
+		let sending: AnySending = { _, _ in (expectedData, .init()) }
 
 		sut = .init(
 			configuration: baseConfiguration,
@@ -37,7 +35,7 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 		let expectedObject = "test"
 		let expectedData = try JSONEncoder().encode(expectedObject)
 
-		let sending: SendingTypeErased = { _, _, _, _, _ in
+		let sending: AnySending = { _, _ in
 			(expectedData, .init())
 		}
 
@@ -57,7 +55,7 @@ final class StandardNetworkController_ResponseTests: XCTestCase {
 		// MARK: Arrange
 		let expectedData = "test".data(using: .utf8)!
 
-		let sending: SendingTypeErased = { _, _, _, _, _ in
+		let sending: AnySending = { _, _ in
 			(expectedData, .init())
 		}
 

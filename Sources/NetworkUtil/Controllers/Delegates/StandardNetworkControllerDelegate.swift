@@ -5,7 +5,7 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 	public var decoder: ResponseModelDecoder?
 	public var urlRequestsInterceptions: [URLRequestInterception]
 	public var urlResponsesInterceptions: [URLResponseInterception]
-	public var sending: SendingTypeErased?
+	public var sending: AnySending?
 
 	public init (
 		urlSessionBuilder: URLSessionBuilder? = nil,
@@ -14,7 +14,7 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 		decoder: ResponseModelDecoder? = nil,
 		urlRequestsInterceptions: [URLRequestInterception] = [],
 		urlResponsesInterceptions: [URLResponseInterception] = [],
-		sending: SendingTypeErased? = nil
+		sending: AnySending? = nil
 	) {
 		self.urlSessionBuilder = urlSessionBuilder
 		self.urlRequestBuilder = urlRequestBuilder
@@ -38,6 +38,20 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 	}
 }
 
+public extension StandardNetworkControllerDelegate {
+	func merge (with another: NetworkControllerDelegate) -> StandardNetworkControllerDelegate {
+		StandardNetworkControllerDelegate(
+			urlSessionBuilder: self.urlSessionBuilder ?? another.urlSessionBuilder,
+			urlRequestBuilder: self.urlRequestBuilder ?? another.urlRequestBuilder,
+			encoder: self.encoder ?? another.encoder,
+			decoder: self.decoder ?? another.decoder,
+			urlRequestsInterceptions: another.urlRequestsInterceptions + self.urlRequestsInterceptions,
+			urlResponsesInterceptions: another.urlResponsesInterceptions + self.urlResponsesInterceptions,
+			sending: self.sending ?? another.sending
+		)
+	}
+}
+
 public extension NetworkControllerDelegate where Self == StandardNetworkControllerDelegate {
 	static func standard (
 		urlSessionBuilder: URLSessionBuilder? = nil,
@@ -46,7 +60,7 @@ public extension NetworkControllerDelegate where Self == StandardNetworkControll
 		decoder: ResponseModelDecoder? = nil,
 		urlRequestsInterceptions: [URLRequestInterception] = [],
 		urlResponsesInterceptions: [URLResponseInterception] = [],
-		sending: SendingTypeErased? = nil
+		sending: AnySending? = nil
 	) -> Self {
 		.init(
 			urlSessionBuilder: urlSessionBuilder,

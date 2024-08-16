@@ -3,8 +3,8 @@ import Foundation
 public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decodable>: NetworkControllerSendingDelegate {
 	public let encoding: Encoding<RQ.Body>?
 	public let decoding: Decoding<RSM>?
-	public let urlRequestInterception: URLRequestInterception?
-	public let urlResponseInterception: URLResponseInterception?
+	public let urlRequestInterceptions: [URLRequestInterception]
+	public let urlResponseInterceptions: [URLResponseInterception]
 	public let urlSessionTaskDelegate: URLSessionTaskDelegate?
 	public let sending: Sending<RQ>?
 
@@ -18,10 +18,52 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decoda
 	) {
 		self.encoding = encoding
 		self.decoding = decoding
-		self.urlRequestInterception = urlRequestInterception
-		self.urlResponseInterception = urlResponseInterception
+		self.urlRequestInterceptions = urlRequestInterception.map { [$0] } ?? []
+		self.urlResponseInterceptions = urlResponseInterception.map { [$0] } ?? []
 		self.urlSessionTaskDelegate = urlSessionTaskDelegate
 		self.sending = sending
+	}
+
+	init (
+		encoding: Encoding<RQ.Body>?,
+		decoding: Decoding<RSM>?,
+		urlRequestInterceptions: [URLRequestInterception],
+		urlResponseInterceptions: [URLResponseInterception],
+		urlSessionTaskDelegate: URLSessionTaskDelegate?,
+		sending: Sending<RQ>?
+	) {
+		self.encoding = encoding
+		self.decoding = decoding
+		self.urlRequestInterceptions = urlRequestInterceptions
+		self.urlResponseInterceptions = urlResponseInterceptions
+		self.urlSessionTaskDelegate = urlSessionTaskDelegate
+		self.sending = sending
+	}
+}
+
+public extension StandardNetworkControllerSendingDelegate {
+	func merge (with another: some NetworkControllerSendingDelegate<RQ, RSM>) -> Self where Self.RQ == RQ, Self.RSM == RSM {
+		Self(
+			encoding: self.encoding ?? another.encoding,
+			decoding: self.decoding ?? another.decoding,
+			urlRequestInterceptions: another.urlRequestInterceptions + self.urlRequestInterceptions,
+			urlResponseInterceptions: another.urlResponseInterceptions + self.urlResponseInterceptions,
+			urlSessionTaskDelegate: self.urlSessionTaskDelegate ?? another.urlSessionTaskDelegate,
+			sending: { sendingModel, sendingAction in
+				try await (another.sending ?? emptySending())(sendingModel) { urlSession, urlRequest in
+					try await (self.sending ?? emptySending())(
+						.init(
+							urlSession: urlSession,
+							urlRequest: urlRequest,
+							requestId: sendingModel.requestId,
+							request: sendingModel.request,
+							configuration: sendingModel.configuration
+						),
+						sendingAction
+					)
+				}
+			}
+		)
 	}
 }
 

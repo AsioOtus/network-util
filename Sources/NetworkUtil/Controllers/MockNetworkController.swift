@@ -2,11 +2,11 @@ import Foundation
 
 public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: NetworkController {
 	public var logPublisher: LogPublisher {
-		Logger().eraseToAnyPublisher()
+		networkController.logPublisher
 	}
 
 	public var logs: AsyncStream<LogRecord> {
-		Logger().logs
+		networkController.logs
 	}
 
 	public let configuration: RequestConfiguration = .empty
@@ -20,12 +20,25 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 	public var resultUrlRequest: URLRequest?
 	public var resultRequest: SRQ?
 
-	public init(
+	public init (
 		stubResponseModel: SRSM,
 		stubData: Data = .init(),
 		stubUrlResponse: URLResponse = .init(),
-		networkController: NetworkController = StandardNetworkController(configuration: .empty)
+		networkController: NetworkController = StandardNetworkController()
 	) {
+		self.stubData = stubData
+		self.stubUrlResponse = stubUrlResponse
+		self.stubResponseModel = stubResponseModel
+
+		self.networkController = networkController
+	}
+
+	public init (
+		stubResponseModel: SRSM,
+		stubData: Data = .init(),
+		stubUrlResponse: URLResponse = .init(),
+		networkController: NetworkController = StandardNetworkController()
+	) where SRQ == StandardRequest<Data> {
 		self.stubData = stubData
 		self.stubUrlResponse = stubUrlResponse
 		self.stubResponseModel = stubResponseModel
@@ -40,25 +53,23 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		do {
-			_ = try await networkController.send(
+			let delegate = StandardNetworkControllerSendingDelegate<RQ, RS.Model>(
+				decoding: { _ in self.stubResponseModel as! RS.Model },
+				sending: mockSending(delegate.sending)
+			)
+			.merge(with: delegate)
+
+			let response = try await networkController.send(
 				request,
 				response: response,
-				delegate: .standard(
-					encoding: delegate.encoding,
-					decoding: delegate.decoding,
-					urlRequestInterception: delegate.urlRequestInterception,
-					urlResponseInterception: delegate.urlResponseInterception,
-					sending: mockSendingDelegate(delegate.sending)
-				),
+				delegate: delegate,
 				configurationUpdate: configurationUpdate
 			)
-		} catch let error as ControllerError {
-			guard case .response = error.category else { throw error }
+
+			return response
 		} catch {
 			throw error
 		}
-
-		return try StandardResponse(stubData, stubUrlResponse, stubResponseModel) as! RS
 	}
 
 	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> NetworkController { self }
@@ -66,15 +77,15 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 }
 
 extension MockNetworkController {
-	func mockSendingDelegate <RQ: Request> (_ sending: Sending<RQ>?) -> Sending<RQ> {
-		{ urlSession, urlRequest, requestId, request, _ in
-			let sending = sending ?? { try await $4($0, $1, $2, $3) }
+	func mockSending <RQ: Request> (_ sending: Sending<RQ>?) -> Sending<RQ> {
+		{ sendingModel, _ in
+			let sending = sending ?? emptySending()
 
-			let (data, urlResponse) = try await sending(urlSession, urlRequest, requestId, request) { _, _, _, _ in
+			let (data, urlResponse) = try await sending(sendingModel) { _, urlRequest in
 				self.resultUrlRequest = urlRequest
-				self.resultRequest = (request as! SRQ)
+				self.resultRequest = (sendingModel.request as! SRQ)
 
-				return (.init(), .init())
+				return (self.stubData, self.stubUrlResponse)
 			}
 
 			return (data, urlResponse)

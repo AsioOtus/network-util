@@ -5,5 +5,5 @@ public protocol NetworkControllerDelegate {
 	var decoder: ResponseModelDecoder? { get }
 	var urlRequestsInterceptions: [URLRequestInterception] { get }
 	var urlResponsesInterceptions: [URLResponseInterception] { get }
-	var sending: SendingTypeErased? { get }
+	var sending: AnySending? { get }
 }

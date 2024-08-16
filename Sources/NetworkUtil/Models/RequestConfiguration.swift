@@ -200,10 +200,10 @@ public extension RequestConfiguration {
 public extension RequestConfiguration {
 	func merge (with another: Self) -> Self {
 		.init(
-			method: another.method ?? self.method,
+			method: self.method ?? another.method,
 			url: self.url.merge(with: another.url),
 			headers: another.headers.merging(self.headers) { $1 },
-			timeout: another.timeout ?? self.timeout,
+			timeout: self.timeout ?? another.timeout,
 			info: another.info.merging(self.info) { $1 }
 		)
 	}

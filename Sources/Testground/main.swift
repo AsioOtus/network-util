@@ -1,51 +1,33 @@
 import NetworkUtil
 import Foundation
 
-// Declare custom network controller decorator
-struct AuthenticatedNetworkControllerDecorator: NetworkControllerDecorator {
-	let networkController: NetworkController
-
-	func send <RQ, RS> (
-		_ request: RQ,
-		response: RS.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: RequestConfiguration.Update?
-	) async throws -> RS where RS : Response {
-		try await networkController.send(request, response: response, delegate: delegate) {
-			let updatedConfiguration = $0.addHeader(key: "Authrorization", value: "token")
-			return configurationUpdate?(updatedConfiguration) ?? updatedConfiguration
-		}
-	}
-}
-
-// Create a network controller
 let nc = StandardNetworkController(
 	configuration: .init(
-		url: .init(
-			scheme: "https",
-			host: "api.github.com"
-		)
-	)
+		url: .http(host: "google.com")
+	),
+	delegate: .standard()
+		.addUrlResponseInterception {
+			if ($1 as? HTTPURLResponse)?.statusCode != 200 {
+				throw ""
+			}
+			return ($0, $1)
+		}
 )
 
-let authorizedNC = AuthenticatedNetworkControllerDecorator(
-	networkController: nc
+_ = try await nc.send(
+	.get()
 )
 
-// Declare custom request
-struct UserRequest: Request {
-	var configuration: RequestConfiguration {
-		.init()
-		.setPath("user")
+class TestDelegate: NSObject, URLSessionTaskDelegate {
+	static let test = "123"
+
+	func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+		print(#function)
+	}
+
+	func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+		dump(metrics)
 	}
 }
 
-// Create request
-let request = UserRequest()
-
-
-// Send request
-let response = try await authorizedNC.send(request)
-
-
-print(response.data)
+extension String: Error { }

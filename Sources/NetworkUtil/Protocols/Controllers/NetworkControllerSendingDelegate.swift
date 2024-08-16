@@ -6,8 +6,8 @@ public protocol NetworkControllerSendingDelegate <RQ, RSM> {
 
 	var encoding: Encoding<RQ.Body>? { get }
 	var decoding: Decoding<RSM>? { get }
-	var urlRequestInterception: URLRequestInterception? { get }
-	var urlResponseInterception: URLResponseInterception? { get }
+	var urlRequestInterceptions: [URLRequestInterception] { get }
+	var urlResponseInterceptions: [URLResponseInterception] { get }
 	var urlSessionTaskDelegate: URLSessionTaskDelegate? { get }
 	var sending: Sending<RQ>? { get }
 }
