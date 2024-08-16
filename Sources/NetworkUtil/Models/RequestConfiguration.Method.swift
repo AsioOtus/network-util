@@ -1,18 +1,20 @@
-public struct HTTPMethod: Hashable {
-	public let value: String
+extension RequestConfiguration {
+	public struct Method: Hashable {
+		public let value: String
 
-	public init (_ value: String) {
-		self.value = value.uppercased()
+		public init (_ value: String) {
+			self.value = value.uppercased()
+		}
 	}
 }
 
-extension HTTPMethod: ExpressibleByStringLiteral {
+extension RequestConfiguration.Method: ExpressibleByStringLiteral {
 	public init (stringLiteral: String) {
 		self.init(stringLiteral)
 	}
 }
 
-public extension HTTPMethod {
+public extension RequestConfiguration.Method {
 	static let get = Self("get")
 	static let head = Self("head")
 	static let post = Self("post")

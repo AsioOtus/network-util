@@ -1,14 +1,14 @@
 import Foundation
 
 public struct RequestConfiguration: Hashable {
-	public var method: HTTPMethod?
+	public var method: Method?
 	public var url: URLElements
 	public var headers: Headers
 	public var timeout: Double?
 	public var info: Info
 
 	public init (
-		method: HTTPMethod? = nil,
+		method: Method? = nil,
 		url: URLElements = .init(),
 		headers: Headers = [:],
 		timeout: Double? = nil,
@@ -27,7 +27,7 @@ public extension RequestConfiguration {
 }
 
 public extension RequestConfiguration {
-	func setMethod (_ method: HTTPMethod) -> Self {
+	func setMethod (_ method: Method) -> Self {
 		var copy = self
 		copy.method = method
 		return copy
