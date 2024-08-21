@@ -14,6 +14,7 @@ public extension NetworkControllerDecorator {
 	}
 
 	var configuration: RequestConfiguration { networkController.configuration }
+	var delegate: NetworkControllerDelegate { networkController.delegate }
 
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
@@ -35,5 +36,9 @@ public extension NetworkControllerDecorator {
 
 	func replace (configuration: RequestConfiguration) -> NetworkController {
 		networkController.replace(configuration: configuration)
+	}
+
+	func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController {
+		networkController.delegate(delegate)
 	}
 }

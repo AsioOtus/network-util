@@ -10,7 +10,8 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 	}
 
 	public let configuration: RequestConfiguration = .empty
-	
+	public var delegate: NetworkControllerDelegate = .standard()
+
 	public let networkController: NetworkController
 
 	public let stubResponseModel: SRSM
@@ -74,6 +75,7 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 
 	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> NetworkController { self }
 	public func replace (configuration: RequestConfiguration) -> NetworkController { self }
+	public func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController { self }
 }
 
 extension MockNetworkController {

@@ -5,9 +5,11 @@ public protocol NetworkController {
 	var logs: AsyncStream<LogRecord> { get }
 
 	var configuration: RequestConfiguration { get }
+	var delegate: NetworkControllerDelegate { get }
 
 	func configuration (_ update: RequestConfiguration.Update) -> NetworkController
 	func replace (configuration: RequestConfiguration) -> NetworkController
+	func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController
 
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
@@ -82,5 +84,4 @@ public extension NetworkController {
 			configurationUpdate: configurationUpdate
 		)
 	}
-
 }

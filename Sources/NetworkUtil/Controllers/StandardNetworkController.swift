@@ -356,6 +356,14 @@ public extension StandardNetworkController {
 			logger: logger
 		)
 	}
+
+	func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController {
+		Self(
+			configuration: configuration,
+			delegate: delegate,
+			logger: logger
+		)
+	}
 }
 
 public extension NetworkController where Self == StandardNetworkController {

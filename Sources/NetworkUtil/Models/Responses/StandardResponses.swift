@@ -5,6 +5,10 @@ public struct StandardResponse <Model: Decodable>: Response {
 	public let urlResponse: URLResponse
 	public let model: Model
 
+	public var httpUrlResponse: HTTPURLResponse? {
+		urlResponse as? HTTPURLResponse
+	}
+
 	public init (_ data: Data, _ urlResponse: URLResponse, _ model: Model) throws {
 		self.data = data
 		self.urlResponse = urlResponse

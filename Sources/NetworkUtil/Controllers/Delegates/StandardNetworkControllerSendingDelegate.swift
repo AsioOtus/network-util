@@ -11,26 +11,10 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decoda
 	public init (
 		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
-		urlRequestInterception: URLRequestInterception? = nil,
-		urlResponseInterception: URLResponseInterception? = nil,
+		urlRequestInterceptions: [URLRequestInterception] = [],
+		urlResponseInterceptions: [URLResponseInterception] = [],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
-	) {
-		self.encoding = encoding
-		self.decoding = decoding
-		self.urlRequestInterceptions = urlRequestInterception.map { [$0] } ?? []
-		self.urlResponseInterceptions = urlResponseInterception.map { [$0] } ?? []
-		self.urlSessionTaskDelegate = urlSessionTaskDelegate
-		self.sending = sending
-	}
-
-	init (
-		encoding: Encoding<RQ.Body>?,
-		decoding: Decoding<RSM>?,
-		urlRequestInterceptions: [URLRequestInterception],
-		urlResponseInterceptions: [URLResponseInterception],
-		urlSessionTaskDelegate: URLSessionTaskDelegate?,
-		sending: Sending<RQ>?
 	) {
 		self.encoding = encoding
 		self.decoding = decoding
@@ -71,16 +55,16 @@ public extension NetworkControllerSendingDelegate {
 	static func standard <RQ: Request, RSM: Decodable> (
 		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
-		urlRequestInterception: URLRequestInterception? = nil,
-		urlResponseInterception: URLResponseInterception? = nil,
+		urlRequestInterceptions: [URLRequestInterception] = [],
+		urlResponseInterceptions: [URLResponseInterception] = [],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
 	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
 		.init(
 			encoding: encoding,
 			decoding: decoding,
-			urlRequestInterception: urlRequestInterception,
-			urlResponseInterception: urlResponseInterception,
+			urlRequestInterceptions: urlRequestInterceptions,
+			urlResponseInterceptions: urlResponseInterceptions,
 			urlSessionTaskDelegate: urlSessionTaskDelegate,
 			sending: sending
 		)
