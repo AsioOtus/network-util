@@ -1,3 +1,3 @@
 import Foundation
 
-public typealias Decoding<RSM: Decodable> = (Data, URLResponse) throws -> RSM
+public typealias Decoding<RSM: Decodable> = (Data, URLResponse, ResponseModelDecoder) throws -> RSM

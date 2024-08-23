@@ -37,12 +37,14 @@ public struct StandardNetworkController: NetworkController {
 	}
 }
 
-private extension StandardNetworkController {
+public extension StandardNetworkController {
 	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
 	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
 	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
 	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
+}
 
+private extension StandardNetworkController {
 	var urlSessionBuilder: URLSessionBuilder {
 		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
 	}
@@ -336,7 +338,8 @@ private extension StandardNetworkController {
 		} else if let decoding {
 			return try decoding(
 				data,
-				urlResponse
+				urlResponse,
+				decoder
 			)
 		} else {
 			return try decoder.decode(
