@@ -293,12 +293,12 @@ private extension StandardNetworkController {
 		_ urlResponse: URLResponse,
 		_ requestId: UUID,
 		_ request: RQ,
-		_ decoding: ((Data) throws -> RS.Model)?,
+		_ decoding: Decoding<RS.Model>?,
 		_ urlResponseInterceptions: [URLResponseInterception]
 	) throws -> RS {
 		do {
 			let (interceptedData, interceptedUrlResponse) = try interceptUrlResponse(data, urlResponse, urlResponseInterceptions)
-			let model = try decodeResponseData(interceptedData, decoding)
+			let model = try decodeResponseData(interceptedData, decoding, interceptedUrlResponse)
 			let response = try RS(interceptedData, interceptedUrlResponse, model)
 			return response
 		} catch {
@@ -328,14 +328,22 @@ private extension StandardNetworkController {
 
 	func decodeResponseData <RSM: Decodable> (
 		_ data: Data,
-		_ decoding: ((Data) throws -> RSM)?
+		_ decoding: Decoding<RSM>?,
+		_ urlResponse: URLResponse
 	) throws -> RSM {
 		if let data = data as? RSM {
 			return data
 		} else if let decoding {
-			return try decoding(data)
+			return try decoding(
+				data,
+				urlResponse
+			)
 		} else {
-			return try decoder.decode(RSM.self, from: data)
+			return try decoder.decode(
+				RSM.self,
+				from: data,
+				urlResponse: urlResponse
+			)
 		}
 	}
 }

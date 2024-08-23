@@ -55,7 +55,7 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 	) async throws -> RS {
 		do {
 			let delegate = StandardNetworkControllerSendingDelegate<RQ, RS.Model>(
-				decoding: { _ in self.stubResponseModel as! RS.Model },
+				decoding: { _, _ in self.stubResponseModel as! RS.Model },
 				sending: mockSending(delegate.sending)
 			)
 			.merge(with: delegate)
