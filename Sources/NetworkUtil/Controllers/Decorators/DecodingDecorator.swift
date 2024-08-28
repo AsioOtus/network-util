@@ -1,6 +1,6 @@
 import Foundation
 
-struct TestDecorator: NetworkControllerDecorator {
+struct DecodingDecorator: NetworkControllerDecorator {
 	let networkController: NetworkController
 
 	func send <RQ: Request, RSM: Decodable> (
@@ -25,9 +25,13 @@ struct TestDecorator: NetworkControllerDecorator {
 
 		return if response.httpUrlResponse?.statusCode == 200 {
 			if let decoding = delegate.decoding {
-				try decoding(response.data)
+				try decoding(response.data, response.urlResponse, networkController.delegate.decoder ?? StandardNetworkController.defaultDecoder)
 			} else {
-				try networkController.delegate.decoder?.decode(RSM.self, from: response.data)
+				try networkController.delegate.decoder?.decode(
+					RSM.self,
+					from: response.data,
+					urlResponse: response.urlResponse
+				)
 			}
 		} else {
 			nil

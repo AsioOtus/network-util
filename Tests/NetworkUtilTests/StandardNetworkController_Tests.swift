@@ -31,7 +31,7 @@ final class StandardNetworkController_Tests: XCTestCase {
 			.configuration { $0.setPath("subpath") }
 
 		// MARK: Act
-		_ = try await sut.send(request, delegate: .standard(decoding: { _, _ in Data() }))
+		_ = try await sut.send(request, delegate: .standard(decoding: { _, _, _ in Data() }))
 	}
 
 	func test_urlSessionCreation () async throws {
@@ -56,6 +56,6 @@ final class StandardNetworkController_Tests: XCTestCase {
 		let request = baseRequest
 
 		// MARK: Act
-		_ = try await sut.send(request, delegate: .standard(decoding: { _, _ in Data() }))
+		_ = try await sut.send(request, delegate: .standard(decoding: { _, _, _ in Data() }))
 	}
 }
