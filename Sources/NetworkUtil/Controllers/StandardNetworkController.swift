@@ -271,7 +271,11 @@ private extension StandardNetworkController {
 		_ urlSessionTaskDelegate: URLSessionTaskDelegate?
 	) async throws -> (Data, URLResponse) {
 		do {
-			let (data, urlResponse) = try await urlSession.data(for: urlRequest, delegate: urlSessionTaskDelegate)
+			let (data, urlResponse) = if #available(iOS 15.0, *) {
+				try await urlSession.data(for: urlRequest, delegate: urlSessionTaskDelegate)
+			} else {
+				try await urlSession.data(for: urlRequest)
+			}
 			logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
 
 			return (data, urlResponse)
