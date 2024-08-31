@@ -1,9 +1,9 @@
 import Foundation
 
 public struct ControllerError: NetworkUtilError {
-	let requestId: UUID
-	let request: any Request
-	let category: Category
+	public let requestId: UUID
+	public let request: any Request
+	public let category: Category
 }
 
 extension ControllerError {
