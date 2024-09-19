@@ -5,7 +5,7 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	public typealias ErrorHandler = (Error, Int, Int?) throws -> Void
 
 	public let maxAttempts: Int?
-	public let delayStrategy: DelayStrategy
+	public let delayStrategy: DelayStrategy?
 	public let errorHandler: ErrorHandler?
 
 	public let urlClient: URLClient
@@ -13,7 +13,7 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	public init (
 		maxAttempts: Int?,
 		urlClient: URLClient,
-		delayStrategy: @escaping DelayStrategy,
+		delayStrategy: DelayStrategy? = nil,
 		errorHandler: ErrorHandler? = nil
 	) {
 		self.maxAttempts = maxAttempts
@@ -61,7 +61,7 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	}
 
 	func delayInNanoseconds (_ attemptCount: Int) -> UInt64 {
-		UInt64(delayStrategy(attemptCount)) * NSEC_PER_SEC
+		UInt64(delayStrategy?(attemptCount) ?? 0) * NSEC_PER_SEC
 	}
 }
 
@@ -74,7 +74,7 @@ public extension RequestConfiguration.InfoKey {
 public extension URLClient {
 	func repeatable (
 		maxAttempts: Int?,
-		delayStrategy: @escaping RepeatableURLClientDecorator.DelayStrategy,
+		delayStrategy: RepeatableURLClientDecorator.DelayStrategy? = nil,
 		errorHandler: RepeatableURLClientDecorator.ErrorHandler? = nil
 	) -> RepeatableURLClientDecorator {
 		RepeatableURLClientDecorator(
