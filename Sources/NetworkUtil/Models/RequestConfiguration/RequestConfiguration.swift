@@ -69,19 +69,19 @@ public extension RequestConfiguration {
 		return copy
 	}
 
-	func setInfo (key: String, value: AnyHashable) -> Self {
+	func setInfo (key: InfoKey, value: AnyHashable) -> Self {
 		var copy = self
 		copy.info = [key: value]
 		return copy
 	}
 
-	func addInfo (_ info: Headers) -> Self {
+	func addInfo (_ info: Info) -> Self {
 		var copy = self
 		copy.info.merge(info) { $1 }
 		return copy
 	}
 
-	func addInfo (key: String, value: AnyHashable) -> Self {
+	func addInfo (key: InfoKey, value: AnyHashable) -> Self {
 		var copy = self
 		copy.info[key] = value
 		return copy

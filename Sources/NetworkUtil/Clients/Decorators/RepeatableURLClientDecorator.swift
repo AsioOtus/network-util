@@ -34,7 +34,7 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 		_ sendingModel: SendingModel<RQ>,
 		_ sendingAction: SendAction<RQ>
 	) async throws -> (Data, URLResponse) {
-		let maxAttempts = (sendingModel.configuration.info[RequestConfiguration.repeatAttemptCountInfoKey] as? Int) ?? maxAttempts
+		let maxAttempts = (sendingModel.configuration.info[.repeatAttemptCount] as? Int) ?? maxAttempts
 		var attempts = 0
 
 		repeat {
@@ -56,8 +56,8 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	}
 }
 
-public extension RequestConfiguration {
-	static var repeatAttemptCountInfoKey: String {
+public extension RequestConfiguration.InfoKey {
+	static var repeatAttemptCount: Self {
 		"infoKey.RepeatableURLClientDecorator.repeatAttemptCount"
 	}
 }
