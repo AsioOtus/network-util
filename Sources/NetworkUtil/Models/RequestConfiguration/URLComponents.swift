@@ -187,7 +187,7 @@ public extension URLComponents {
 	}
 }
 
-func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
+fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
 	switch (lhs, rhs) {
 	case (.none, .none): nil
 	case (.none, _): rhs
