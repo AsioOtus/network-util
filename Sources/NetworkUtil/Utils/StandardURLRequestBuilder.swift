@@ -28,7 +28,7 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
 			guard let url = URL(string: address) else { throw URLCreationError.addressFailure(address) }
 			return url
 		} else {
-			let urlComponents = configuration.url.urlComponents()
+			let urlComponents = configuration.urlComponents
 			guard let url = urlComponents.url else { throw URLCreationError.urlComponentsFailure(urlComponents) }
 			return url
 		}

@@ -2,20 +2,20 @@ import Foundation
 
 public struct RequestConfiguration: Hashable {
 	public var method: Method?
-	public var url: URLElements
+	public var urlComponents: URLComponents
 	public var headers: Headers
 	public var timeout: Double?
 	public var info: Info
 
 	public init (
 		method: Method? = nil,
-		url: URLElements = .init(),
+		urlComponents: URLComponents = .init(),
 		headers: Headers = [:],
 		timeout: Double? = nil,
 		info: Info = [:]
 	) {
 		self.method = method
-		self.url = url
+		self.urlComponents = urlComponents
 		self.headers = headers
 		self.timeout = timeout
 		self.info = info
@@ -33,15 +33,9 @@ public extension RequestConfiguration {
 		return copy
 	}
 
-	func setUrl (_ url: URLElements) -> Self {
+	func setUrlComponents (_ urlComponents: URLComponents) -> Self {
 		var copy = self
-		copy.url = url
-		return copy
-	}
-
-	func setUrl (_ urlComponents: URLComponents) -> Self {
-		var copy = self
-		copy.url = .init(urlComponents: urlComponents)
+		copy.urlComponents = urlComponents
 		return copy
 	}
 
@@ -103,85 +97,73 @@ public extension RequestConfiguration {
 public extension RequestConfiguration {
 	func setScheme (_ scheme: String?) -> Self {
 		var copy = self
-		copy.url = url.setScheme(scheme)
+		copy.urlComponents = urlComponents.setScheme(scheme)
 		return copy
 	}
 
 	func setUser (_ user: String?) -> Self {
 		var copy = self
-		copy.url = url.setUser(user)
+		copy.urlComponents = urlComponents.setUser(user)
 		return copy
 	}
 
 	func setPassword (_ password: String?) -> Self {
 		var copy = self
-		copy.url = url.setPassword(password)
+		copy.urlComponents = urlComponents.setPassword(password)
 		return copy
 	}
 
 	func setHost (_ host: String?) -> Self {
 		var copy = self
-		copy.url = url.setHost(host)
+		copy.urlComponents = urlComponents.setHost(host)
 		return copy
 	}
 
 	func setPort (_ port: Int?) -> Self {
 		var copy = self
-		copy.url = url.setPort(port)
-		return copy
-	}
-
-	func setPath (_ path: URLElements.Path) -> Self {
-		var copy = self
-		copy.url = url.setPath(path)
+		copy.urlComponents = urlComponents.setPort(port)
 		return copy
 	}
 
 	func setPath (_ path: String) -> Self {
 		var copy = self
-		copy.url = url.setPath(path)
-		return copy
-	}
-
-	func addPath (_ path: URLElements.Path) -> Self {
-		var copy = self
-		copy.url = url.addPath(path)
+		copy.urlComponents = urlComponents.setPath(path)
 		return copy
 	}
 
 	func addPath (_ path: String) -> Self {
 		var copy = self
-		copy.url = url.addPath(path)
+		copy.urlComponents = urlComponents.addPath(path)
 		return copy
 	}
 
-	func setQuery (_ query: [URLQueryItem]) -> Self {
+	func setQueryItems (_ queryItems: [URLQueryItem]) -> Self {
 		var copy = self
-		copy.url = url.setQuery(query)
+		copy.urlComponents = urlComponents.setQueryItems(queryItems)
 		return copy
 	}
 
-	func setQuery (_ query: URLQueryItem) -> Self {
+	func setQueryItem (_ queryItem: URLQueryItem) -> Self {
 		var copy = self
-		copy.url = url.setQuery(query)
+		copy.urlComponents = urlComponents.setQueryItem(queryItem)
 		return copy
 	}
 
-	func addQuery (_ query: [URLQueryItem]) -> Self {
+	func addQueryItems (_ queryItems: [URLQueryItem]) -> Self {
 		var copy = self
-		copy.url = url.addQuery(query)
+		copy.urlComponents = urlComponents.addQueryItems(queryItems)
 		return copy
 	}
 
-	func addQuery (_ query: URLQueryItem) -> Self {
+	func addQueryItem (_ queryItem: URLQueryItem) -> Self {
 		var copy = self
-		copy.url = url.addQuery(query)
+		copy.urlComponents = urlComponents.addQueryItem(queryItem)
 		return copy
 	}
 
 	func setFragment (_ fragment: String?) -> Self {
 		var copy = self
-		copy.url = url.setFragment(fragment)
+		copy.urlComponents = urlComponents.setFragment(fragment)
 		return copy
 	}
 }
@@ -192,8 +174,8 @@ public extension RequestConfiguration {
 		update?(self) ?? self
 	}
 
-	func url (_ update: (URLElements) -> URLElements) -> Self {
-		setUrl(update(self.url))
+	func url (_ update: (URLComponents) -> URLComponents) -> Self {
+		setUrlComponents(update(self.urlComponents))
 	}
 }
 
@@ -201,7 +183,7 @@ public extension RequestConfiguration {
 	func merge (with another: Self) -> Self {
 		.init(
 			method: self.method ?? another.method,
-			url: self.url.merge(with: another.url),
+			urlComponents: self.urlComponents.merge(with: another.urlComponents),
 			headers: another.headers.merging(self.headers) { $1 },
 			timeout: self.timeout ?? another.timeout,
 			info: another.info.merging(self.info) { $1 }

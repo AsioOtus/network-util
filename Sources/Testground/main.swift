@@ -1,33 +1,12 @@
 import NetworkUtil
 import Foundation
 
-let nc = StandardURLClient(
-	configuration: .init(
-		url: .http(host: "google.com")
-	),
-	delegate: .standard()
-		.addUrlResponseInterception {
-			if ($1 as? HTTPURLResponse)?.statusCode != 200 {
-				throw ""
-			}
-			return ($0, $1)
-		}
-)
+let urlComponents = URLComponents()
+	.setQueryItems([
+		.init(name: "key1", value: "value1"),
+		.init(name: "key2", value: "value2"),
+	])
+	.addQueryItem(.init(name: "key3", value: "value3"))
 
-_ = try await nc.send(
-	.get()
-)
+dump(urlComponents)
 
-class TestDelegate: NSObject, URLSessionTaskDelegate {
-	static let test = "123"
-
-	func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
-		print(#function)
-	}
-
-	func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-		dump(metrics)
-	}
-}
-
-extension String: Error { }

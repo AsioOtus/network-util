@@ -2,7 +2,7 @@ import XCTest
 @testable import NetworkUtil
 
 final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
-	let baseConfiguration = RequestConfiguration(url: .init(host: "site.com"))
+	let baseConfiguration = RequestConfiguration(urlComponents: .init(host: "site.com"))
 
 	var sut: StandardURLRequestBuilder!
 
@@ -27,7 +27,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_subpath () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.setPath("base-subpath")
+			.setPath("/base-subpath")
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(nil, configuration, nil)
