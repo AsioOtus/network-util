@@ -86,7 +86,7 @@ extension StandardURLClient {
 		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
-		let requestId = UUID()
+		let requestId = delegate.id?() ?? .init()
 
 		let configuration = createConfiguration(
 			request,
