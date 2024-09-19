@@ -1,4 +1,4 @@
-public protocol NetworkControllerDelegate {
+public protocol URLClientDelegate {
 	var urlSessionBuilder: URLSessionBuilder? { get }
 	var urlRequestBuilder: URLRequestBuilder? { get }
 	var encoder: RequestBodyEncoder? { get }

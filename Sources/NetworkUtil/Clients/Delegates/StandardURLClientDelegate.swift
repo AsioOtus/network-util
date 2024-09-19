@@ -1,4 +1,4 @@
-public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
+public struct StandardURLClientDelegate: URLClientDelegate {
 	public var urlSessionBuilder: URLSessionBuilder?
 	public var urlRequestBuilder: URLRequestBuilder?
 	public var encoder: RequestBodyEncoder?
@@ -25,22 +25,22 @@ public struct StandardNetworkControllerDelegate: NetworkControllerDelegate {
 		self.sending = sending
 	}
 
-	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> NetworkControllerDelegate {
+	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> URLClientDelegate {
 		var copy = self
 		copy.urlRequestsInterceptions = [interception] + copy.urlRequestsInterceptions
 		return copy
 	}
 
-	public func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> NetworkControllerDelegate {
+	public func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> URLClientDelegate {
 		var copy = self
 		copy.urlResponsesInterceptions = [interception] + copy.urlResponsesInterceptions
 		return copy
 	}
 }
 
-public extension StandardNetworkControllerDelegate {
-	func merge (with another: NetworkControllerDelegate) -> StandardNetworkControllerDelegate {
-		StandardNetworkControllerDelegate(
+public extension StandardURLClientDelegate {
+	func merge (with another: URLClientDelegate) -> StandardURLClientDelegate {
+		StandardURLClientDelegate(
 			urlSessionBuilder: self.urlSessionBuilder ?? another.urlSessionBuilder,
 			urlRequestBuilder: self.urlRequestBuilder ?? another.urlRequestBuilder,
 			encoder: self.encoder ?? another.encoder,
@@ -52,7 +52,7 @@ public extension StandardNetworkControllerDelegate {
 	}
 }
 
-public extension NetworkControllerDelegate where Self == StandardNetworkControllerDelegate {
+public extension URLClientDelegate where Self == StandardURLClientDelegate {
 	static func standard (
 		urlSessionBuilder: URLSessionBuilder? = nil,
 		urlRequestBuilder: URLRequestBuilder? = nil,

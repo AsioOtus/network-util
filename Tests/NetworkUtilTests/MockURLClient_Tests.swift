@@ -2,14 +2,14 @@ import XCTest
 
 @testable import NetworkUtil
 
-final class MockNetworkController_Tests: XCTestCase {
+final class MockURLClient_Tests: XCTestCase {
 	func test_sendGetRequest_shouldReturnExpectedStubResponse () async throws {
 		// MARK: Arrange
 		let expectedResponseModel = "test"
 		let expectedResultRequest = StandardRequest.get()
 		let expectedUrlRequest = URLRequest(url: URLComponents().url!)
 
-		let sut = MockNetworkController(stubResponseModel: expectedResponseModel)
+		let sut = MockURLClient(stubResponseModel: expectedResponseModel)
 
 		// MARK: Act
 		let response = try await sut.send(.get(), responseModel: String.self)

@@ -1,15 +1,15 @@
 import Foundation
 
-struct DecodingDecorator: NetworkControllerDecorator {
-	let networkController: NetworkController
+struct DecodingDecorator: URLClientDecorator {
+	let urlClient: URLClient
 
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM?.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RSM>,
+		delegate: some URLClientSendingDelegate<RQ, RSM>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RSM? {
-		let response = try await networkController.send(
+		let response = try await urlClient.send(
 			request,
 			response: StandardResponse<Data>.self,
 			delegate: .standard(
@@ -25,9 +25,9 @@ struct DecodingDecorator: NetworkControllerDecorator {
 
 		return if response.httpUrlResponse?.statusCode == 200 {
 			if let decoding = delegate.decoding {
-				try decoding(response.data, response.urlResponse, networkController.delegate.decoder ?? StandardNetworkController.defaultDecoder)
+				try decoding(response.data, response.urlResponse, urlClient.delegate.decoder ?? StandardURLClient.defaultDecoder)
 			} else {
-				try networkController.delegate.decoder?.decode(
+				try urlClient.delegate.decoder?.decode(
 					RSM.self,
 					from: response.data,
 					urlResponse: response.urlResponse

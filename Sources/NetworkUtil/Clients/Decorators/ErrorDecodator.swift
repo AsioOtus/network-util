@@ -1,22 +1,22 @@
 import Foundation
 
-public struct ErrorDecorator: NetworkControllerDecorator {
-	public let networkController: NetworkController
+public struct ErrorDecorator: URLClientDecorator {
+	public let urlClient: URLClient
 
 	public let error: Error?
 
 	public init (
 		error: Error?,
-		networkController: NetworkController
+		urlClient: URLClient
 	) {
 		self.error = error
-		self.networkController = networkController
+		self.urlClient = urlClient
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
 		if let error { throw error }
@@ -30,8 +30,8 @@ public struct ErrorDecorator: NetworkControllerDecorator {
 	}
 }
 
-public extension NetworkController {
+public extension URLClient {
 	func error (_ error: Error?) -> ErrorDecorator {
-		.init(error: error, networkController: self)
+		.init(error: error, urlClient: self)
 	}
 }

@@ -1,11 +1,11 @@
 import Combine
 import Foundation
 
-public struct StandardNetworkController: NetworkController {
+public struct StandardURLClient: URLClient {
 	let logger: Logger
 
 	public let configuration: RequestConfiguration
-	public let delegate: NetworkControllerDelegate
+	public let delegate: URLClientDelegate
 
 	public var logPublisher: LogPublisher {
 		logger.eraseToAnyPublisher()
@@ -17,7 +17,7 @@ public struct StandardNetworkController: NetworkController {
 
 	public init (
 		configuration: RequestConfiguration = .empty,
-		delegate: NetworkControllerDelegate = .standard()
+		delegate: URLClientDelegate = .standard()
 	) {
 		self.configuration = configuration
 		self.delegate = delegate
@@ -27,7 +27,7 @@ public struct StandardNetworkController: NetworkController {
 
 	private init (
 		configuration: RequestConfiguration,
-		delegate: NetworkControllerDelegate,
+		delegate: URLClientDelegate,
 		logger: Logger
 	) {
 		self.configuration = configuration
@@ -37,14 +37,14 @@ public struct StandardNetworkController: NetworkController {
 	}
 }
 
-public extension StandardNetworkController {
+public extension StandardURLClient {
 	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
 	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
 	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
 	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
 }
 
-private extension StandardNetworkController {
+private extension StandardURLClient {
 	var urlSessionBuilder: URLSessionBuilder {
 		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
 	}
@@ -79,11 +79,11 @@ private extension StandardNetworkController {
 	}
 }
 
-extension StandardNetworkController {
+extension StandardURLClient {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		let requestId = UUID()
@@ -124,7 +124,7 @@ extension StandardNetworkController {
 	}
 }
 
-private extension StandardNetworkController {
+private extension StandardURLClient {
 	func createConfiguration <RQ: Request> (
 		_ request: RQ,
 		_ configurationUpdate: RequestConfiguration.Update?
@@ -238,9 +238,9 @@ private extension StandardNetworkController {
 			configuration: configuration
 		)
 
-		let controllerSending = self.sending ?? emptyAnySending()
+		let clientSending = self.sending ?? emptyAnySending()
 
-		return try await controllerSending(anySendingModel) { urlSession, urlRequest in
+		return try await clientSending(anySendingModel) { urlSession, urlRequest in
 			let sendingModel = SendingModel(
 				urlSession: urlSession,
 				urlRequest: urlRequest,
@@ -355,8 +355,8 @@ private extension StandardNetworkController {
 	}
 }
 
-public extension StandardNetworkController {
-	func configuration (_ update: RequestConfiguration.Update) -> NetworkController {
+public extension StandardURLClient {
+	func configuration (_ update: RequestConfiguration.Update) -> URLClient {
 		Self(
 			configuration: update(configuration),
 			delegate: delegate,
@@ -364,7 +364,7 @@ public extension StandardNetworkController {
 		)
 	}
 
-	func replace (configuration: RequestConfiguration) -> NetworkController {
+	func replace (configuration: RequestConfiguration) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -372,7 +372,7 @@ public extension StandardNetworkController {
 		)
 	}
 
-	func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController {
+	func delegate (_ delegate: URLClientDelegate) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -381,10 +381,10 @@ public extension StandardNetworkController {
 	}
 }
 
-public extension NetworkController where Self == StandardNetworkController {
+public extension URLClient where Self == StandardURLClient {
 	static func standard (
 		configuration: RequestConfiguration,
-		delegate: NetworkControllerDelegate = .standard()
+		delegate: URLClientDelegate = .standard()
 	) -> Self {
 		.init(
 			configuration: configuration,

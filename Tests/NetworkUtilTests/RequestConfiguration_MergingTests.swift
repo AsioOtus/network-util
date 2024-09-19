@@ -2,7 +2,7 @@ import XCTest
 @testable import NetworkUtil
 
 final class RequestConfiguration_MergingTests: XCTestCase {
-	func test_mergingOfControllerAndRequestConfigurations_differentQueryMerging () async throws {
+	func test_mergingOfUrlClientAndRequestConfigurations_differentQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
@@ -12,18 +12,18 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardNetworkController(
+		let nc = StandardURLClient(
 			configuration: .empty
 				.setQuery([
-					.init(name: "controller.key1", value: "controller.value1"),
-					.init(name: "controller.key2", value: "controller.value2"),
+					.init(name: "client.key1", value: "client.value1"),
+					.init(name: "client.key2", value: "client.value2"),
 				])
 		)
 
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(
 			url: .init(
-				string: "?controller.key1=controller.value1&controller.key2=controller.value2&request.key1=request.value1&request.key2=request.value2"
+				string: "?client.key1=client.value1&client.key2=client.value2&request.key1=request.value1&request.key2=request.value2"
 			)!
 		)
 
@@ -38,7 +38,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		)
 	}
 
-	func test_mergingOfControllerAndRequestConfigurations_equalQueryMerging () async throws {
+	func test_mergingOfUrlClientAndRequestConfigurations_equalQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
@@ -48,7 +48,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardNetworkController(
+		let nc = StandardURLClient(
 			configuration: .empty
 				.setQuery([
 					.init(name: "key1", value: "value1"),
@@ -74,7 +74,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		)
 	}
 
-	func test_mergingOfControllerAndRequestAndSendingConfigurations_equalQueryMerging () async throws {
+	func test_mergingOfUrlClientAndRequestAndSendingConfigurations_equalQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
@@ -84,7 +84,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardNetworkController(
+		let nc = StandardURLClient(
 			configuration: .empty
 				.setQuery([
 					.init(name: "key1", value: "value1"),

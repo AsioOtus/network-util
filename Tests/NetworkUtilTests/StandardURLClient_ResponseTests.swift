@@ -1,11 +1,11 @@
 import XCTest
 @testable import NetworkUtil
 
-final class StandardNetworkController_ResponseTests: XCTestCase {
+final class StandardURLClient_ResponseTests: XCTestCase {
 	let baseRequest = StandardRequest()
 	let baseConfiguration = RequestConfiguration()
 
-	var sut: StandardNetworkController!
+	var sut: StandardURLClient!
 
 	override func tearDown () {
 		sut = nil

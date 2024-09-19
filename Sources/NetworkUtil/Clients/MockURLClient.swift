@@ -1,18 +1,18 @@
 import Foundation
 
-public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: NetworkController {
+public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 	public var logPublisher: LogPublisher {
-		networkController.logPublisher
+		urlClient.logPublisher
 	}
 
 	public var logs: AsyncStream<LogRecord> {
-		networkController.logs
+		urlClient.logs
 	}
 
 	public let configuration: RequestConfiguration = .empty
-	public var delegate: NetworkControllerDelegate = .standard()
+	public var delegate: URLClientDelegate = .standard()
 
-	public let networkController: NetworkController
+	public let urlClient: URLClient
 
 	public let stubResponseModel: SRSM
 	public let stubData: Data
@@ -25,42 +25,42 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		stubResponseModel: SRSM,
 		stubData: Data = .init(),
 		stubUrlResponse: URLResponse = .init(),
-		networkController: NetworkController = StandardNetworkController()
+		urlClient: URLClient = StandardURLClient()
 	) {
 		self.stubData = stubData
 		self.stubUrlResponse = stubUrlResponse
 		self.stubResponseModel = stubResponseModel
 
-		self.networkController = networkController
+		self.urlClient = urlClient
 	}
 
 	public init (
 		stubResponseModel: SRSM,
 		stubData: Data = .init(),
 		stubUrlResponse: URLResponse = .init(),
-		networkController: NetworkController = StandardNetworkController()
+		urlClient: URLClient = StandardURLClient()
 	) where SRQ == StandardRequest<Data> {
 		self.stubData = stubData
 		self.stubUrlResponse = stubUrlResponse
 		self.stubResponseModel = stubResponseModel
 
-		self.networkController = networkController
+		self.urlClient = urlClient
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
 		do {
-			let delegate = StandardNetworkControllerSendingDelegate<RQ, RS.Model>(
+			let delegate = StandardURLClientSendingDelegate<RQ, RS.Model>(
 				decoding: { _, _, _ in self.stubResponseModel as! RS.Model },
 				sending: mockSending(delegate.sending)
 			)
 			.merge(with: delegate)
 
-			let response = try await networkController.send(
+			let response = try await urlClient.send(
 				request,
 				response: response,
 				delegate: delegate,
@@ -73,12 +73,12 @@ public final class MockNetworkController <SRQ: Request, SRSM: Decodable>: Networ
 		}
 	}
 
-	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> NetworkController { self }
-	public func replace (configuration: RequestConfiguration) -> NetworkController { self }
-	public func delegate (_ delegate: NetworkControllerDelegate) -> NetworkController { self }
+	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
+	public func replace (configuration: RequestConfiguration) -> URLClient { self }
+	public func delegate (_ delegate: URLClientDelegate) -> URLClient { self }
 }
 
-extension MockNetworkController {
+extension MockURLClient {
 	func mockSending <RQ: Request> (_ sending: Sending<RQ>?) -> Sending<RQ> {
 		{ sendingModel, _ in
 			let sending = sending ?? emptySending()

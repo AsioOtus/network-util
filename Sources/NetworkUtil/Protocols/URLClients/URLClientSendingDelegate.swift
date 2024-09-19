@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol NetworkControllerSendingDelegate <RQ, RSM> {
+public protocol URLClientSendingDelegate <RQ, RSM> {
 	associatedtype RQ: Request
 	associatedtype RSM: Decodable
 

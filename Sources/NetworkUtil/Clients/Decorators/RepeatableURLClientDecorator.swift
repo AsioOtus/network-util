@@ -1,28 +1,28 @@
 import Foundation
 
-public struct RepeatableNetworkControllerDecorator: NetworkControllerDecorator {
+public struct RepeatableURLClientDecorator: URLClientDecorator {
 	public let maxAttempts: Int?
 	public let delayStrategy: (Int) -> Int
 
-	public let networkController: NetworkController
+	public let urlClient: URLClient
 
 	public init (
 		maxAttempts: Int?,
 		delayStrategy: @escaping (Int) -> Int,
-		networkController: NetworkController
+		urlClient: URLClient
 	) {
 		self.maxAttempts = maxAttempts
 		self.delayStrategy = delayStrategy
-		self.networkController = networkController
+		self.urlClient = urlClient
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
-		try await networkController.send(
+		try await urlClient.send(
 			request,
 			response: response,
 			delegate: .standard(sending: self.sending).merge(with: delegate),
@@ -58,19 +58,19 @@ public struct RepeatableNetworkControllerDecorator: NetworkControllerDecorator {
 
 public extension RequestConfiguration {
 	static var repeatAttemptCountInfoKey: String {
-		"infoKey.RepeatableNetworkControllerDecorator.repeatAttemptCount"
+		"infoKey.RepeatableURLClientDecorator.repeatAttemptCount"
 	}
 }
 
-public extension NetworkController {
+public extension URLClient {
 	func repeatable (
 		maxAttempts: Int?,
 		delayStrategy: @escaping (Int) -> Int
-	) -> RepeatableNetworkControllerDecorator {
-		RepeatableNetworkControllerDecorator(
+	) -> RepeatableURLClientDecorator {
+		RepeatableURLClientDecorator(
 			maxAttempts: maxAttempts,
 			delayStrategy: delayStrategy,
-			networkController: self
+			urlClient: self
 		)
 	}
 }

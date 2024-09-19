@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decodable>: NetworkControllerSendingDelegate {
+public struct StandardURLClientSendingDelegate <RQ: Request, RSM: Decodable>: URLClientSendingDelegate {
 	public let encoding: Encoding<RQ.Body>?
 	public let decoding: Decoding<RSM>?
 	public let urlRequestInterceptions: [URLRequestInterception]
@@ -25,8 +25,8 @@ public struct StandardNetworkControllerSendingDelegate <RQ: Request, RSM: Decoda
 	}
 }
 
-public extension StandardNetworkControllerSendingDelegate {
-	func merge (with another: some NetworkControllerSendingDelegate<RQ, RSM>) -> Self where Self.RQ == RQ, Self.RSM == RSM {
+public extension StandardURLClientSendingDelegate {
+	func merge (with another: some URLClientSendingDelegate<RQ, RSM>) -> Self where Self.RQ == RQ, Self.RSM == RSM {
 		Self(
 			encoding: self.encoding ?? another.encoding,
 			decoding: self.decoding ?? another.decoding,
@@ -51,7 +51,7 @@ public extension StandardNetworkControllerSendingDelegate {
 	}
 }
 
-public extension NetworkControllerSendingDelegate {
+public extension URLClientSendingDelegate {
 	static func standard <RQ: Request, RSM: Decodable> (
 		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
@@ -59,7 +59,7 @@ public extension NetworkControllerSendingDelegate {
 		urlResponseInterceptions: [URLResponseInterception] = [],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
-	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
+	) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
 		.init(
 			encoding: encoding,
 			decoding: decoding,
@@ -71,7 +71,7 @@ public extension NetworkControllerSendingDelegate {
 	}
 
 	static func empty <RQ: Request, RSM: Decodable> (
-	) -> Self where Self == StandardNetworkControllerSendingDelegate<RQ, RSM> {
+	) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
 		.init()
 	}
 }

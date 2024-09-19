@@ -1,7 +1,7 @@
 import NetworkUtil
 import Foundation
 
-let nc = StandardNetworkController(
+let nc = StandardURLClient(
 	configuration: .init(
 		url: .http(host: "google.com")
 	),

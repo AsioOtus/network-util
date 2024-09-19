@@ -5,8 +5,8 @@
 ## Basic example:
 
 ```swift
-// Create a network controller
-let nc = StandardNetworkController()
+// Create a URLClient
+let nc = StandardURLClient()
 
 // Send request
 let response = try await nc.send(.get("https://api.github.com/user"))
@@ -15,8 +15,8 @@ let response = try await nc.send(.get("https://api.github.com/user"))
 ## Intermediate example:
 
 ```swift
-// Create a network controller
-let nc = StandardNetworkController(
+// Create a URLClient
+let nc = StandardURLClient(
 	configuration: .init(
 		url: .init(
 			scheme: "https",
@@ -39,8 +39,8 @@ let response = try await nc.send(request)
 ## Advanced example:
 
 ```swift
-// Create a network controller
-let nc = StandardNetworkController(
+// Create a URLClient
+let nc = StandardURLClient(
 	configuration: .init(
 		url: .init(
 			scheme: "https",
@@ -67,25 +67,25 @@ let response = try await nc.send(request)
 ## Expert example:
 
 ```swift
-// Declare custom network controller decorator
-struct AuthenticatedNetworkControllerDecorator: NetworkControllerDecorator {
-	let networkController: NetworkController
+// Declare custom URLClient decorator
+struct AuthenticatedURLClientDecorator: URLClientDecorator {
+	let urlClient: URLClient
 
 	func send <RQ, RS> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some NetworkControllerSendingDelegate<RQ, RS.Model>,
+		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS where RS : Response {
-		try await networkController.send(request, response: response, delegate: delegate) {
+		try await urlClient.send(request, response: response, delegate: delegate) {
 			let updatedConfiguration = $0.addHeader(key: "Authrorization", value: "token")
 			return configurationUpdate?(updatedConfiguration) ?? updatedConfiguration
 		}
 	}
 }
 
-// Create a network controller
-let nc = StandardNetworkController(
+// Create a URLClient
+let nc = StandardURLClient(
 	configuration: .init(
 		url: .init(
 			scheme: "https",
@@ -94,8 +94,8 @@ let nc = StandardNetworkController(
 	)
 )
 
-let authorizedNC = AuthenticatedNetworkControllerDecorator(
-	networkController: nc
+let authorizedNC = AuthenticatedURLClientDecorator(
+	urlClient: nc
 )
 
 // Declare custom request
