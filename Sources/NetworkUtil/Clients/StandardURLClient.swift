@@ -73,7 +73,7 @@ private extension StandardURLClient {
 		delegate.sending
 	}
 
-	func controllerError (_ error: ControllerError, _ requestId: UUID, _ request: some Request) -> ControllerError {
+	func controllerError (_ error: URLClientError, _ requestId: UUID, _ request: some Request) -> URLClientError {
 		logger.log(message: .error(error), requestId: requestId, request: request)
 		return error
 	}
@@ -287,7 +287,7 @@ private extension StandardURLClient {
 			)
 		} catch {
 			throw controllerError(
-				.init(requestId: requestId, request: request, category: .general(error)),
+				.init(requestId: requestId, request: request, category: .unexpected(error)),
 				requestId,
 				request
 			)

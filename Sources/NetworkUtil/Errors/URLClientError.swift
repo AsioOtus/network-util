@@ -1,35 +1,33 @@
 import Foundation
 
-public struct ControllerError: NetworkUtilError {
+public struct URLClientError: NetworkUtilError {
 	public let requestId: UUID
 	public let request: any Request
 	public let category: Category
 }
 
-extension ControllerError {
+extension URLClientError {
 	public enum Category {
 		case request(Error)
 		case network(NetworkError)
 		case response(Error)
 
-		case general(Error)
+		case unexpected(Error)
+
+		var networkError: NetworkError? {
+			if case .network(let error) = self { error }
+			else { nil }
+		}
 	}
 }
 
-public extension ControllerError {
+public extension URLClientError {
 	var innerError: Error {
 		switch category {
 		case .request(let error): fallthrough
 		case .network(let error as Error): fallthrough
 		case .response(let error): fallthrough
-		case .general(let error): return error
-		}
-	}
-
-	var networkError: NetworkError? {
-		switch category {
-		case .network(let error): return error
-		default: return nil
+		case .unexpected(let error): return error
 		}
 	}
 
@@ -38,7 +36,7 @@ public extension ControllerError {
 		case .request: return "request"
 		case .network: return "network"
 		case .response: return "response"
-		case .general: return "general"
+		case .unexpected: return "unexpected"
 		}
 	}
 }
