@@ -142,7 +142,7 @@ private extension StandardURLClient {
 		_ urlRequestsInterceptions: [URLRequestInterception]
 	) async throws -> (URLSession, URLRequest) {
 		do {
-			let urlSession = try createUrlSession(request)
+			let urlSession = try createUrlSession(configuration)
 
 			let urlRequest = try await createUrlRequest(
 				request,
@@ -163,10 +163,10 @@ private extension StandardURLClient {
 		}
 	}
 
-	func createUrlSession <RQ: Request> (
-		_ request: RQ
+	func createUrlSession (
+		_ configuration: RequestConfiguration
 	) throws -> URLSession {
-		try urlSessionBuilder.build(request)
+		try urlSessionBuilder.build(configuration: configuration)
 	}
 
 	func createUrlRequest <RQ: Request> (
@@ -177,7 +177,11 @@ private extension StandardURLClient {
 	) async throws -> URLRequest {
 		let body = try encodeRequestBody(request, encoding)
 
-		let urlRequest = try urlRequestBuilder.build(request.address, configuration, body)
+		let urlRequest = try urlRequestBuilder.build(
+			address: request.address,
+			configuration: configuration,
+			body: body
+		)
 		let interceptedUrlRequest = try await interceptUrlRequest(
 			urlRequest,
 			request.delegate.urlRequestInterception,
@@ -356,7 +360,7 @@ private extension StandardURLClient {
 }
 
 public extension StandardURLClient {
-	func configuration (_ update: RequestConfiguration.Update) -> URLClient {
+	func configuration (update: RequestConfiguration.Update) -> URLClient {
 		Self(
 			configuration: update(configuration),
 			delegate: delegate,
@@ -364,7 +368,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func replace (configuration: RequestConfiguration) -> URLClient {
+	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -372,7 +376,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func delegate (_ delegate: URLClientDelegate) -> URLClient {
+	func setDelegate (_ delegate: URLClientDelegate) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,

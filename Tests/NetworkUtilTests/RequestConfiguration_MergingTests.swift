@@ -12,7 +12,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardURLClient(
+		let client = StandardURLClient(
 			configuration: .empty
 				.setQueryItems([
 					.init(name: "client.key1", value: "client.value1"),
@@ -32,7 +32,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		}
 
 		// MARK: Act
-		_ = try await nc.send(
+		_ = try await client.send(
 			request,
 			delegate: .standard(sending: sending)
 		)
@@ -48,7 +48,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardURLClient(
+		let client = StandardURLClient(
 			configuration: .empty
 				.setQueryItems([
 					.init(name: "key1", value: "value1"),
@@ -68,7 +68,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		}
 
 		// MARK: Act
-		_ = try await nc.send(
+		_ = try await client.send(
 			request,
 			delegate: .standard(sending: sending)
 		)
@@ -84,7 +84,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let nc = StandardURLClient(
+		let client = StandardURLClient(
 			configuration: .empty
 				.setQueryItems([
 					.init(name: "key1", value: "value1"),
@@ -104,7 +104,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		}
 
 		// MARK: Act
-		_ = try await nc.send(
+		_ = try await client.send(
 			request,
 			delegate: .standard(sending: sending),
 			configurationUpdate: {

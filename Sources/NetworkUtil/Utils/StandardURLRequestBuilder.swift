@@ -5,7 +5,7 @@ public struct StandardURLRequestBuilder {
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build (_ address: String?, _ configuration: RequestConfiguration, _ body: Data?) throws -> URLRequest {
+	public func build (address: String?, configuration: RequestConfiguration, body: Data?) throws -> URLRequest {
 		let url = try buildUrl(address, configuration)
 
 		var urlRequest = URLRequest(url: url)

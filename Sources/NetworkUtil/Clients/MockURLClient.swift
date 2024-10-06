@@ -73,9 +73,9 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 		}
 	}
 
-	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
-	public func replace (configuration: RequestConfiguration) -> URLClient { self }
-	public func delegate (_ delegate: URLClientDelegate) -> URLClient { self }
+	public func configuration (update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
+	public func setConfiguration (_ configuration: RequestConfiguration) -> URLClient { self }
+	public func setDelegate (_ delegate: URLClientDelegate) -> URLClient { self }
 }
 
 extension MockURLClient {

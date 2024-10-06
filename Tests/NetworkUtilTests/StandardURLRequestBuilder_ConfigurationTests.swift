@@ -15,7 +15,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 		let configuration = baseConfiguration
 
 		// MARK: Act
-		let resultUrlRequest = try sut.build(nil, configuration, nil)
+		let resultUrlRequest = try sut.build(
+			address: nil,
+			configuration: configuration,
+			body: nil
+		)
 
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(url: .init(string: "//site.com")!)
@@ -30,7 +34,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 			.setPath("/base-subpath")
 
 		// MARK: Act
-		let resultUrlRequest = try sut.build(nil, configuration, nil)
+		let resultUrlRequest = try sut.build(
+			address: nil,
+			configuration: configuration,
+			body: nil
+		)
 
 		// MARK: Assert
 		var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath")!)
@@ -46,7 +54,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 			.setPort(1111)
 
 		// MARK: Act
-		let resultUrlRequest = try sut.build(nil, configuration, nil)
+		let resultUrlRequest = try sut.build(
+			address: nil,
+			configuration: configuration,
+			body: nil
+		)
 
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(url: .init(string: "//site.com:1111")!)
@@ -62,7 +74,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 			.setScheme("http")
 
 		// MARK: Act
-		let resultUrlRequest = try sut.build(nil, configuration, nil)
+		let resultUrlRequest = try sut.build(
+			address: nil,
+			configuration: configuration,
+			body: nil
+		)
 
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(url: .init(string: "http://site.com")!)
@@ -78,7 +94,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 			.setTimeout(10)
 
 		// MARK: Act
-		let resultUrlRequest = try sut.build(nil, configuration, nil)
+		let resultUrlRequest = try sut.build(
+			address: nil,
+			configuration: configuration,
+			body: nil
+		)
 
 		// MARK: Assert
 		var expectedUrlRequest = URLRequest(url: .init(string: "//site.com")!)

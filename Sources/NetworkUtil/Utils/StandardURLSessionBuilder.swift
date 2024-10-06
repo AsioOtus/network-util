@@ -9,7 +9,7 @@ public struct StandardURLSessionBuilder {
 }
 
 extension StandardURLSessionBuilder: URLSessionBuilder {
-	public func build (_ request: some Request) throws -> URLSession {
+	public func build (configuration: RequestConfiguration) throws -> URLSession {
 		urlSession
 	}
 }

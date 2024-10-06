@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol URLRequestBuilder {
-	func build (_: String?, _: RequestConfiguration, _: Data?) throws -> URLRequest
+	func build (address: String?, configuration: RequestConfiguration, body: Data?) throws -> URLRequest
 }
