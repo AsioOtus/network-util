@@ -129,9 +129,8 @@ private extension StandardURLClient {
 		_ request: RQ,
 		_ configurationUpdate: RequestConfiguration.Update?
 	) -> RequestConfiguration {
-		request
-			.merge(with: configuration)
-			.update(configurationUpdate ?? { $0 })
+		let configuration = request.mergeConfiguration(with: configuration)
+        return configurationUpdate?(configuration) ?? configuration
 	}
 
 	func createUrlEntities <RQ: Request> (

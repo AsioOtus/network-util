@@ -8,7 +8,7 @@ public protocol Request <Body> {
 	var configuration: RequestConfiguration { get }
 	var delegate: any RequestDelegate<Body> { get }
 
-	func merge (with: RequestConfiguration) -> RequestConfiguration
+	func mergeConfiguration (with: RequestConfiguration) -> RequestConfiguration
 }
 
 public extension Request {
@@ -20,7 +20,7 @@ public extension Request {
 
 	var delegate: any RequestDelegate<Body> { StandardRequestDelegate() }
 
-	func merge (with configuration: RequestConfiguration) -> RequestConfiguration {
+	func mergeConfiguration (with configuration: RequestConfiguration) -> RequestConfiguration {
 		self.configuration.merge(with: configuration)
 	}
 }

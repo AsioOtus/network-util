@@ -28,7 +28,7 @@ final class StandardURLClient_Tests: XCTestCase {
 		)
 
 		let request = baseRequest
-			.configuration { $0.setPath("subpath") }
+			.updateConfiguration { $0.setPath("subpath") }
 
 		// MARK: Act
 		_ = try await sut.send(request, delegate: .standard(decoding: { _, _, _ in Data() }))

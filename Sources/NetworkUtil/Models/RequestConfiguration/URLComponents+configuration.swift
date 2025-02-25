@@ -15,18 +15,16 @@ public extension URLComponents {
 		queryItems: [URLQueryItem]? = nil,
 		fragment: String? = nil
 	) {
-		var uc = Self()
+        self = .init()
 
-		uc.scheme = scheme
-		uc.user = user
-		uc.password = password
-		uc.host = host
-		uc.port = port
-		uc.path = path
-		uc.queryItems = queryItems
-		uc.fragment = fragment
-
-		self = uc
+		self.scheme = scheme
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+        self.path = path
+        self.queryItems = queryItems
+        self.fragment = fragment
 	}
 }
 
@@ -163,12 +161,6 @@ public extension URLComponents {
 		var copy = self
 		copy.fragment = fragment
 		return copy
-	}
-}
-
-public extension URLComponents {
-	func update (_ update: (Self) -> Self) -> Self {
-		update(self)
 	}
 }
 
