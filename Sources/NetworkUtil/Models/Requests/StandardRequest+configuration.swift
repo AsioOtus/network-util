@@ -1,7 +1,7 @@
 import Foundation
 
 public extension StandardRequest {
-    func setAddress (_ address: String?) -> Self {
+    func address (_ address: String?) -> Self {
         .init(
             address: address,
             body: body,
@@ -11,7 +11,7 @@ public extension StandardRequest {
         )
     }
 
-    func setBody (_ body: Body?) -> Self {
+    func body (_ body: Body?) -> Self {
         .init(
             address: address,
             body: body,
@@ -21,7 +21,7 @@ public extension StandardRequest {
         )
     }
 
-    func setConfiguration (_ configuration: RequestConfiguration) -> Self {
+    func configuration (_ configuration: RequestConfiguration) -> Self {
         .init(
             address: address,
             body: body,
@@ -31,7 +31,7 @@ public extension StandardRequest {
         )
     }
 
-    func setDelegate (_ delegate: any RequestDelegate<Body>) -> Self {
+    func delegate (_ delegate: any RequestDelegate<Body>) -> Self {
         .init(
             address: address,
             body: body,
@@ -41,7 +41,7 @@ public extension StandardRequest {
         )
     }
 
-    func setConfigurationsMerging (_ configurationsMerging: @escaping RequestConfiguration.Merging) -> Self {
+    func configurationsMerging (_ configurationsMerging: @escaping RequestConfiguration.Merging) -> Self {
         .init(
             address: address,
             body: body,
@@ -53,41 +53,41 @@ public extension StandardRequest {
 }
 
 public extension StandardRequest {
-    func setMethod (_ method: RequestConfiguration.Method) -> Self {
+    func method (_ method: RequestConfiguration.Method) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setMethod(method),
+            configuration: configuration.method(method),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setUrlComponents (_ urlComponents: URLComponents) -> Self {
+    func urlComponents (_ urlComponents: URLComponents) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setUrlComponents(urlComponents),
+            configuration: configuration.urlComponents(urlComponents),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setHeaders (_ headers: RequestConfiguration.Headers) -> Self {
+    func headers (_ headers: RequestConfiguration.Headers) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setHeaders(headers),
+            configuration: configuration.headers(headers),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setHeader (key: String, value: String) -> Self {
+    func header (key: String, value: String) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setHeader(key: key, value: value),
+            configuration: configuration.header(key: key, value: value),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -113,21 +113,21 @@ public extension StandardRequest {
         )
     }
 
-    func setInfo (_ info: RequestConfiguration.Info) -> Self {
+    func info (_ info: RequestConfiguration.Info) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setInfo(info),
+            configuration: configuration.info(info),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setInfo (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
+    func info (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setInfo(key: key, value: value),
+            configuration: configuration.info(key: key, value: value),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -143,7 +143,7 @@ public extension StandardRequest {
         )
     }
 
-    func updateInfo (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
+    func addInfo (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
         .init(
             address: address,
             body: body,
@@ -153,11 +153,11 @@ public extension StandardRequest {
         )
     }
 
-    func setTimeout (_ timeout: Double) -> Self {
+    func timeout (_ timeout: Double) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setTimeout(timeout),
+            configuration: configuration.timeout(timeout),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -165,61 +165,61 @@ public extension StandardRequest {
 }
 
 public extension StandardRequest {
-    func setScheme (_ scheme: String?) -> Self {
+    func scheme (_ scheme: String?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setScheme(scheme),
+            configuration: configuration.scheme(scheme),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setUser (_ user: String?) -> Self {
+    func user (_ user: String?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setUser(user),
+            configuration: configuration.user(user),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setPassword (_ password: String?) -> Self {
+    func password (_ password: String?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setPassword(password),
+            configuration: configuration.password(password),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setHost (_ host: String?) -> Self {
+    func host (_ host: String?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setHost(host),
+            configuration: configuration.host(host),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setPort (_ port: Int?) -> Self {
+    func port (_ port: Int?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setPort(port),
+            configuration: configuration.port(port),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setPath (_ path: String) -> Self {
+    func path (_ path: String) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setPath(path),
+            configuration: configuration.path(path),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -235,21 +235,21 @@ public extension StandardRequest {
         )
     }
 
-    func setQueryItems (_ queryItems: [URLQueryItem]) -> Self {
+    func queryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setQueryItems(queryItems),
+            configuration: configuration.queryItems(queryItems),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func setQueryItem (_ queryItem: URLQueryItem) -> Self {
+    func queryItem (_ queryItem: URLQueryItem) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setQueryItem(queryItem),
+            configuration: configuration.queryItem(queryItem),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -275,11 +275,11 @@ public extension StandardRequest {
         )
     }
 
-    func setFragment (_ fragment: String?) -> Self {
+    func fragment (_ fragment: String?) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setFragment(fragment),
+            configuration: configuration.fragment(fragment),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -288,6 +288,6 @@ public extension StandardRequest {
 
 public extension StandardRequest {
     func updateConfiguration (_ update: @escaping RequestConfiguration.Update) -> Self {
-        setConfiguration(update(configuration))
+        configuration(update(configuration))
     }
 }

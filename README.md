@@ -28,7 +28,7 @@ let client = StandardURLClient(
 // Create request
 let request = StandardRequest()
 	.configuration {
-		$0.setPath("user")
+		$0.path("user")
 	}
 
 // Send request
@@ -53,7 +53,7 @@ let client = StandardURLClient(
 struct UserRequest: Request {
 	var configuration: RequestConfiguration {
 		.init()
-		.setPath("user")
+		.path("user")
 	}
 }
 
@@ -102,7 +102,7 @@ let authorizedClient = AuthenticatedURLClientDecorator(
 struct UserRequest: Request {
 	var configuration: RequestConfiguration {
 		.init()
-		.setPath("user")
+		.path("user")
 	}
 }
 

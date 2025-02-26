@@ -31,7 +31,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_subpath () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.setPath("/base-subpath")
+			.path("/base-subpath")
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
@@ -51,7 +51,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_port () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.setPort(1111)
+			.port(1111)
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
@@ -71,7 +71,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_scheme () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.setScheme("http")
+			.scheme("http")
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
@@ -91,7 +91,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_timeout () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.setTimeout(10)
+			.timeout(10)
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(

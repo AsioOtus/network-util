@@ -6,7 +6,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
-				.setQueryItems([
+				.queryItems([
 					.init(name: "request.key1", value: "request.value1"),
 					.init(name: "request.key2", value: "request.value2"),
 				])
@@ -14,7 +14,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 
 		let client = StandardURLClient(
 			configuration: .empty
-				.setQueryItems([
+				.queryItems([
 					.init(name: "client.key1", value: "client.value1"),
 					.init(name: "client.key2", value: "client.value2"),
 				])
@@ -42,7 +42,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
-				.setQueryItems([
+				.queryItems([
 					.init(name: "key1", value: "value1"),
 					.init(name: "key2", value: "value2"),
 				])
@@ -50,7 +50,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 
 		let client = StandardURLClient(
 			configuration: .empty
-				.setQueryItems([
+				.queryItems([
 					.init(name: "key1", value: "value1"),
 					.init(name: "key2", value: "value2"),
 				])
@@ -78,7 +78,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
-				.setQueryItems([
+				.queryItems([
 					.init(name: "key1", value: "value1"),
 					.init(name: "key2", value: "value2"),
 				])
@@ -86,7 +86,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 
 		let client = StandardURLClient(
 			configuration: .empty
-				.setQueryItems([
+				.queryItems([
 					.init(name: "key1", value: "value1"),
 					.init(name: "key2", value: "value2"),
 				])

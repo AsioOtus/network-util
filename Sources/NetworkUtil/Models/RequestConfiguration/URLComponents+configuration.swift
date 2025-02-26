@@ -91,37 +91,37 @@ public extension URLComponents {
 }
 
 public extension URLComponents {
-	func setScheme (_ scheme: String?) -> Self {
+	func scheme (_ scheme: String?) -> Self {
 		var copy = self
 		copy.scheme = scheme
 		return copy
 	}
 
-	func setUser (_ user: String?) -> Self {
+	func user (_ user: String?) -> Self {
 		var copy = self
 		copy.user = user
 		return copy
 	}
 
-	func setPassword (_ password: String?) -> Self {
+	func password (_ password: String?) -> Self {
 		var copy = self
 		copy.password = password
 		return copy
 	}
 
-	func setHost (_ host: String?) -> Self {
+	func host (_ host: String?) -> Self {
 		var copy = self
 		copy.host = host
 		return copy
 	}
 
-	func setPort (_ port: Int?) -> Self {
+	func port (_ port: Int?) -> Self {
 		var copy = self
 		copy.port = port
 		return copy
 	}
 
-	func setPath (_ path: String) -> Self {
+	func path (_ path: String) -> Self {
 		var copy = self
 		copy.path = path
 		return copy
@@ -133,13 +133,13 @@ public extension URLComponents {
 		return copy
 	}
 
-	func setQueryItems (_ queryItems: [URLQueryItem]?) -> Self {
+	func queryItems (_ queryItems: [URLQueryItem]?) -> Self {
 		var copy = self
 		copy.queryItems = queryItems
 		return copy
 	}
 
-	func setQueryItem (_ queryItem: URLQueryItem) -> Self {
+	func queryItem (_ queryItem: URLQueryItem) -> Self {
 		var copy = self
 		copy.queryItems = [queryItem]
 		return copy
@@ -157,7 +157,7 @@ public extension URLComponents {
 		return copy
 	}
 
-	func setFragment (_ fragment: String?) -> Self {
+	func fragment (_ fragment: String?) -> Self {
 		var copy = self
 		copy.fragment = fragment
 		return copy

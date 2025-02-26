@@ -1,16 +1,16 @@
 import NetworkUtil
 import Foundation
 
-StandardURLClient()
-	.repeatable(maxAttempts: 10)
-//	.configuration {
-//        $0.addin
+//StandardURLClient()
+//	.repeatable(maxAttempts: 10)
+//	.updateConfiguration {
+//
 //	}
-	.setDelegate(.standard())
+//	.delegate(.standard())
 
 let r = StandardRequest()
-    .setScheme("https")
-    .setHost("google.com")
+    .scheme("https")
+    .host("google.com")
     .addPath("test")
     .addQueryItem(.init(name: "qwe", value: "qwe"))
     .addHeader(key: "qwe", value: "qwe")

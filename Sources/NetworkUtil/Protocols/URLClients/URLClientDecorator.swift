@@ -30,15 +30,15 @@ public extension URLClientDecorator {
 		)
 	}
 
-	func configuration (update: (RequestConfiguration) -> RequestConfiguration) -> URLClient {
-		urlClient.configuration(update: update)
+	func updateConfiguration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient {
+		urlClient.updateConfiguration(update)
 	}
 
-	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient {
-		urlClient.setConfiguration(configuration)
+	func configuration (_ configuration: RequestConfiguration) -> URLClient {
+		urlClient.configuration(configuration)
 	}
 
-	func setDelegate (_ delegate: URLClientDelegate) -> URLClient {
-		urlClient.setDelegate(delegate)
+	func delegate (_ delegate: URLClientDelegate) -> URLClient {
+		urlClient.delegate(delegate)
 	}
 }

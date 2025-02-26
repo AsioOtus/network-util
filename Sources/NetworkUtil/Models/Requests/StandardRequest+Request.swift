@@ -53,7 +53,7 @@ public extension Request {
             configuration: configuration.merge(
                 with: .init(method: .get)
                     .updateUrlComponents {
-                        $0.setPath(path)
+                        $0.path(path)
                     }
             ),
             delegate: delegate,
@@ -95,7 +95,7 @@ public extension Request {
             configuration: configuration.merge(
                 with: .init(method: .post)
                     .updateUrlComponents {
-                        $0.setPath(path)
+                        $0.path(path)
                     }
             ),
             delegate: delegate,

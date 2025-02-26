@@ -359,7 +359,7 @@ private extension StandardURLClient {
 }
 
 public extension StandardURLClient {
-	func configuration (update: RequestConfiguration.Update) -> URLClient {
+	func updateConfiguration (_ update: RequestConfiguration.Update) -> URLClient {
 		Self(
 			configuration: update(configuration),
 			delegate: delegate,
@@ -367,7 +367,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient {
+	func configuration (_ configuration: RequestConfiguration) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -375,7 +375,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func setDelegate (_ delegate: URLClientDelegate) -> URLClient {
+	func delegate (_ delegate: URLClientDelegate) -> URLClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,

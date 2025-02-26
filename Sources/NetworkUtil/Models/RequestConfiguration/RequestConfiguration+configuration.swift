@@ -1,7 +1,7 @@
 import Foundation
 
 public extension RequestConfiguration {
-    func setMethod (_ method: Method) -> Self {
+    func method (_ method: Method) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -11,7 +11,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setUrlComponents (_ urlComponents: URLComponents) -> Self {
+    func urlComponents (_ urlComponents: URLComponents) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -21,7 +21,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setHeaders (_ headers: Headers) -> Self {
+    func headers (_ headers: Headers) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -31,7 +31,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setHeader (key: String, value: String) -> Self {
+    func header (key: String, value: String) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -61,7 +61,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setInfo (_ info: Info) -> Self {
+    func info (_ info: Info) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -71,7 +71,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setInfo (key: InfoKey, value: AnyHashable) -> Self {
+    func info (key: InfoKey, value: AnyHashable) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -101,7 +101,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func setTimeout (_ timeout: Double) -> Self {
+    func timeout (_ timeout: Double) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -113,60 +113,60 @@ public extension RequestConfiguration {
 }
 
 public extension RequestConfiguration {
-    func setScheme (_ scheme: String?) -> Self {
+    func scheme (_ scheme: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setScheme(scheme),
+            urlComponents: urlComponents.scheme(scheme),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setUser (_ user: String?) -> Self {
+    func user (_ user: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setUser(user),
+            urlComponents: urlComponents.user(user),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setPassword (_ password: String?) -> Self {
+    func password (_ password: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setPassword(password),
+            urlComponents: urlComponents.password(password),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setHost (_ host: String?) -> Self {
+    func host (_ host: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setHost(host),
+            urlComponents: urlComponents.host(host),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setPort (_ port: Int?) -> Self {
+    func port (_ port: Int?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setPort(port),
+            urlComponents: urlComponents.port(port),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setPath (_ path: String) -> Self {
+    func path (_ path: String) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setPath(path),
+            urlComponents: urlComponents.path(path),
             headers: headers,
             timeout: timeout,
             info: info
@@ -183,20 +183,20 @@ public extension RequestConfiguration {
         )
     }
 
-    func setQueryItems (_ queryItems: [URLQueryItem]) -> Self {
+    func queryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setQueryItems(queryItems),
+            urlComponents: urlComponents.queryItems(queryItems),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func setQueryItem (_ queryItem: URLQueryItem) -> Self {
+    func queryItem (_ queryItem: URLQueryItem) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setQueryItem(queryItem),
+            urlComponents: urlComponents.queryItem(queryItem),
             headers: headers,
             timeout: timeout,
             info: info
@@ -223,10 +223,10 @@ public extension RequestConfiguration {
         )
     }
 
-    func setFragment (_ fragment: String?) -> Self {
+    func fragment (_ fragment: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setFragment(fragment),
+            urlComponents: urlComponents.fragment(fragment),
             headers: headers,
             timeout: timeout,
             info: info
@@ -236,6 +236,6 @@ public extension RequestConfiguration {
 
 public extension RequestConfiguration {
     func updateUrlComponents (_ update: (URLComponents) -> URLComponents) -> Self {
-        setUrlComponents(update(urlComponents))
+        urlComponents(update(urlComponents))
     }
 }
