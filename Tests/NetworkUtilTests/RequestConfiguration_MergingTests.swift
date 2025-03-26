@@ -108,7 +108,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 			request,
 			delegate: .standard(sending: sending),
 			configurationUpdate: {
-				$0.addQueryItem(.init(name: "key3", value: "value3"))
+				$0.queryItem(.init(name: "key3", value: "value3"))
 			}
 		)
 	}

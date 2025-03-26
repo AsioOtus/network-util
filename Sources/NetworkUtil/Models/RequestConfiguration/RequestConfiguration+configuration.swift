@@ -21,7 +21,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func headers (_ headers: Headers) -> Self {
+    func setHeaders (_ headers: Headers) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -31,7 +31,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func header (key: String, value: String) -> Self {
+    func setHeader (key: String, value: String) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -41,7 +41,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func addHeaders (_ headers: Headers) -> Self {
+    func headers (_ headers: Headers) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -51,7 +51,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func addHeader (key: String, value: String) -> Self {
+    func header (key: String, value: String) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -61,7 +61,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func info (_ info: Info) -> Self {
+    func setInfo (_ info: Info) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -71,7 +71,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func info (key: InfoKey, value: AnyHashable) -> Self {
+    func setInfo (key: InfoKey, value: AnyHashable) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -81,7 +81,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func addInfo (_ info: Info) -> Self {
+    func info (_ info: Info) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -91,7 +91,7 @@ public extension RequestConfiguration {
         )
     }
 
-    func addInfo (key: InfoKey, value: AnyHashable) -> Self {
+    func info (key: InfoKey, value: AnyHashable) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
@@ -163,6 +163,16 @@ public extension RequestConfiguration {
         )
     }
 
+    func setPath (_ path: String) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents.setPath(path),
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
     func path (_ path: String) -> Self {
         .init(
             method: method,
@@ -173,10 +183,10 @@ public extension RequestConfiguration {
         )
     }
 
-    func addPath (_ path: String) -> Self {
+    func setPurePath (_ path: String) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.addPath(path),
+            urlComponents: urlComponents.setPurePath(path),
             headers: headers,
             timeout: timeout,
             info: info
@@ -193,10 +203,20 @@ public extension RequestConfiguration {
         )
     }
 
-    func addPurePath (_ path: String) -> Self {
+    func setQueryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.addPurePath(path),
+            urlComponents: urlComponents.setQueryItems(queryItems),
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
+    func setQueryItem (_ queryItem: URLQueryItem) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents.setQueryItem(queryItem),
             headers: headers,
             timeout: timeout,
             info: info
@@ -217,26 +237,6 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.queryItem(queryItem),
-            headers: headers,
-            timeout: timeout,
-            info: info
-        )
-    }
-
-    func addQueryItems (_ queryItems: [URLQueryItem]) -> Self {
-        .init(
-            method: method,
-            urlComponents: urlComponents.addQueryItems(queryItems),
-            headers: headers,
-            timeout: timeout,
-            info: info
-        )
-    }
-
-    func addQueryItem (_ queryItem: URLQueryItem) -> Self {
-        .init(
-            method: method,
-            urlComponents: urlComponents.addQueryItem(queryItem),
             headers: headers,
             timeout: timeout,
             info: info

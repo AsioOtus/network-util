@@ -113,49 +113,49 @@ public extension URLComponents {
 		return copy
 	}
 
-	func path (_ path: String) -> Self {
+	func setPath (_ path: String) -> Self {
 		var copy = self
         copy.path = path.prefixedWithSlash
 		return copy
 	}
 
-	func addPath (_ path: String) -> Self {
+	func path (_ path: String) -> Self {
 		var copy = self
         copy.path = join(copy.path, path)
 		return copy
 	}
 
-    func purePath (_ path: String) -> Self {
+    func setPurePath (_ path: String) -> Self {
         var copy = self
         copy.path = path
         return copy
     }
 
-    func addPurePath (_ path: String) -> Self {
+    func purePath (_ path: String) -> Self {
         var copy = self
         copy.path += path
         return copy
     }
 
-	func queryItems (_ queryItems: [URLQueryItem]?) -> Self {
+	func setQueryItems (_ queryItems: [URLQueryItem]?) -> Self {
 		var copy = self
 		copy.queryItems = queryItems
 		return copy
 	}
 
-	func queryItem (_ queryItem: URLQueryItem) -> Self {
+	func setQueryItem (_ queryItem: URLQueryItem) -> Self {
 		var copy = self
 		copy.queryItems = [queryItem]
 		return copy
 	}
 
-	func addQueryItems (_ queryItems: [URLQueryItem]) -> Self {
+	func queryItems (_ queryItems: [URLQueryItem]) -> Self {
 		var copy = self
 		copy.queryItems = copy.queryItemsOrEmpty + queryItems
 		return copy
 	}
 
-	func addQueryItem (_ queryItem: URLQueryItem) -> Self {
+	func queryItem (_ queryItem: URLQueryItem) -> Self {
 		var copy = self
 		copy.queryItems = copy.queryItemsOrEmpty + [queryItem]
 		return copy

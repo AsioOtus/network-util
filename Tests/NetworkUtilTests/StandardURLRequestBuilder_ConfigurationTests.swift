@@ -32,6 +32,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 		// MARK: Arrange
 		let configuration = baseConfiguration
 			.path("base-subpath")
+            .path("/added-subpath")
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
@@ -41,7 +42,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 		)
 
 		// MARK: Assert
-		var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath")!)
+		var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath/added-subpath")!)
 		expectedUrlRequest.timeoutInterval = 10
 
 		XCTAssertEqual(resultUrlRequest.url, expectedUrlRequest.url)
@@ -72,7 +73,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
         // MARK: Arrange
         let configuration = baseConfiguration
             .path("base-subpath")
-            .addPath("added-subpath")
+            .path("added-subpath")
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
@@ -93,7 +94,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
         // MARK: Arrange
         let configuration = baseConfiguration
             .purePath("/base-subpath")
-            .addPurePath("/added-subpath")
+            .purePath("/added-subpath")
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
