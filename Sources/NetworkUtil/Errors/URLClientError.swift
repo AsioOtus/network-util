@@ -6,21 +6,6 @@ public struct URLClientError: NetworkUtilError {
 	public let category: Category
 }
 
-extension URLClientError {
-	public enum Category {
-		case request(Error)
-		case network(NetworkError)
-		case response(Error)
-
-		case unexpected(Error)
-
-		var networkError: NetworkError? {
-			if case .network(let error) = self { error }
-			else { nil }
-		}
-	}
-}
-
 public extension URLClientError {
 	var innerError: Error {
 		switch category {
@@ -31,12 +16,12 @@ public extension URLClientError {
 		}
 	}
 
-	var name: String {
+	var debugName: String {
 		switch category {
-		case .request: return "request"
-		case .network: return "network"
-		case .response: return "response"
-		case .unexpected: return "unexpected"
+		case .request: "request"
+		case .network: "network"
+		case .response: "response"
+		case .unexpected: "unexpected"
 		}
 	}
 }

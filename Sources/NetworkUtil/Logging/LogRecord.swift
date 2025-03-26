@@ -8,10 +8,7 @@ public struct LogRecord {
 
 extension LogRecord: CustomStringConvertible {
   public var info: String {
-    [
-      message.debugName.capitalized,
-      requestId.description
-    ].joined(separator: " | ")
+    "\(message.debugName.capitalized) | \(requestId.description)"
   }
 
 	public var description: String {

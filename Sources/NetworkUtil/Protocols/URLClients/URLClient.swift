@@ -1,8 +1,8 @@
+import Combine
 import Foundation
 
 public protocol URLClient {
-	var logPublisher: LogPublisher { get }
-	var logs: AsyncStream<LogRecord> { get }
+	var logPublisher: AnyPublisher<LogRecord, Never> { get }
 
 	var configuration: RequestConfiguration { get }
 	var delegate: URLClientDelegate { get }

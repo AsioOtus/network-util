@@ -1,12 +1,9 @@
+import Combine
 import Foundation
 
 public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
-	public var logPublisher: LogPublisher {
+	public var logPublisher: AnyPublisher<LogRecord, Never> {
 		urlClient.logPublisher
-	}
-
-	public var logs: AsyncStream<LogRecord> {
-		urlClient.logs
 	}
 
 	public let configuration: RequestConfiguration = .empty

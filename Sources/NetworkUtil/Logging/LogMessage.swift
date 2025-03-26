@@ -14,12 +14,29 @@ public enum LogMessage {
 	}
 }
 
+public extension LogMessage {
+    var request: (URLSession,  URLRequest)? {
+        if case .request(let urlSession, let urlRequest) = self { (urlSession, urlRequest) }
+        else { nil }
+    }
+
+    var response: (Data,  URLResponse)? {
+        if case .response(let data, let urlResponse) = self { (data, urlResponse) }
+        else { nil }
+    }
+
+    var error: URLClientError? {
+        if case .error(let urlClientError) = self { urlClientError }
+        else { nil }
+    }
+}
+
 extension LogMessage: CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .request(_, let urlRequest): urlRequest.description
 		case .response(_, let urlResponse): urlResponse.description
-		case .error(let error): "\(error.name): \(error.innerError.localizedDescription)"
+        case .error(let error): "\(error.debugName): \(error.innerError.localizedDescription)"
 		}
 	}
 }

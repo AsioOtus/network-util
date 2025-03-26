@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 public protocol URLClientDecorator: URLClient {
@@ -5,12 +6,8 @@ public protocol URLClientDecorator: URLClient {
 }
 
 public extension URLClientDecorator {
-	var logPublisher: LogPublisher {
+	var logPublisher: AnyPublisher<LogRecord, Never> {
 		urlClient.logPublisher
-	}
-
-	var logs: AsyncStream<LogRecord> {
-		urlClient.logs
 	}
 
 	var configuration: RequestConfiguration { urlClient.configuration }

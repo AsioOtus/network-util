@@ -7,12 +7,8 @@ public struct StandardURLClient: URLClient {
 	public let configuration: RequestConfiguration
 	public let delegate: URLClientDelegate
 
-	public var logPublisher: LogPublisher {
+	public var logPublisher: AnyPublisher<LogRecord, Never> {
 		logger.eraseToAnyPublisher()
-	}
-
-	public var logs: AsyncStream<LogRecord> {
-		logger.logs
 	}
 
 	public init (
