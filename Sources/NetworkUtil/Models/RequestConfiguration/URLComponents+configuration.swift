@@ -74,15 +74,7 @@ public extension URLComponents {
 
 public extension URLComponents {
 	var prefixedPath: String {
-		!path.isEmpty && !path.hasPrefix("/")
-			? "/" + path
-			: path
-	}
-
-	var nonPostfixedPath: String {
-		!path.isEmpty && path.hasSuffix("/")
-			? String(path.dropLast(1))
-			: path
+        path.prefixedWithSlash
 	}
 
 	var queryItemsOrEmpty: [URLQueryItem] {
@@ -123,15 +115,27 @@ public extension URLComponents {
 
 	func path (_ path: String) -> Self {
 		var copy = self
-		copy.path = path
+        copy.path = path.prefixedWithSlash
 		return copy
 	}
 
 	func addPath (_ path: String) -> Self {
 		var copy = self
-		copy.path += path
+        copy.path = join(copy.path, path)
 		return copy
 	}
+
+    func purePath (_ path: String) -> Self {
+        var copy = self
+        copy.path = path
+        return copy
+    }
+
+    func addPurePath (_ path: String) -> Self {
+        var copy = self
+        copy.path += path
+        return copy
+    }
 
 	func queryItems (_ queryItems: [URLQueryItem]?) -> Self {
 		var copy = self
@@ -172,7 +176,7 @@ public extension URLComponents {
 			password: self.password ?? another.password,
 			host: self.host ?? another.host,
 			port: self.port ?? another.port,
-			path: another.nonPostfixedPath + self.prefixedPath,
+            path: join(another.path, self.path),
 			queryItems: join(another.queryItems, self.queryItems),
 			fragment: self.fragment ?? another.fragment
 		)
@@ -186,4 +190,34 @@ fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
 	case (_, .none): lhs
 	case (.some(let lhs), .some(let rhs)): lhs + rhs
 	}
+}
+
+fileprivate func join (_ lhs: String, _ rhs: String) -> String {
+    lhs.withoutSlashPostfix + rhs.prefixedWithSlash
+}
+
+fileprivate extension String {
+    var prefixedWithSlash: Self {
+        !isEmpty && !hasPrefix("/")
+            ? "/" + self
+            : self
+    }
+
+    var postfixedWithSlash: Self {
+        !isEmpty && !hasSuffix("/")
+            ? self + "/"
+            : self
+    }
+
+    var withoutSlashPrefix: Self {
+        !isEmpty && hasPrefix("/")
+            ? .init(dropFirst(1))
+            : self
+    }
+
+    var withoutSlashPostfix: Self {
+        !isEmpty && hasSuffix("/")
+            ? .init(dropLast(1))
+            : self
+    }
 }

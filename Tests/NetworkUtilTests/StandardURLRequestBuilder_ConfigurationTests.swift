@@ -31,7 +31,7 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 	func test_host_subpath () throws {
 		// MARK: Arrange
 		let configuration = baseConfiguration
-			.path("/base-subpath")
+			.path("base-subpath")
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
@@ -47,6 +47,68 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 		XCTAssertEqual(resultUrlRequest.url, expectedUrlRequest.url)
 		XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
 	}
+
+    func test_host_pureSubpath () throws {
+        // MARK: Arrange
+        let configuration = baseConfiguration
+            .purePath("/base-subpath")
+
+        // MARK: Act
+        let resultUrlRequest = try sut.build(
+            address: nil,
+            configuration: configuration,
+            body: nil
+        )
+
+        // MARK: Assert
+        var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath")!)
+        expectedUrlRequest.timeoutInterval = 10
+
+        XCTAssertEqual(resultUrlRequest.url, expectedUrlRequest.url)
+        XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
+    }
+
+    func test_host_subpathAdding () throws {
+        // MARK: Arrange
+        let configuration = baseConfiguration
+            .path("base-subpath")
+            .addPath("added-subpath")
+
+        // MARK: Act
+        let resultUrlRequest = try sut.build(
+            address: nil,
+            configuration: configuration,
+            body: nil
+        )
+
+        // MARK: Assert
+        var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath/added-subpath")!)
+        expectedUrlRequest.timeoutInterval = 10
+
+        XCTAssertEqual(resultUrlRequest.url, expectedUrlRequest.url)
+        XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
+    }
+
+    func test_host_pureSubpathAdding () throws {
+        // MARK: Arrange
+        let configuration = baseConfiguration
+            .purePath("/base-subpath")
+            .addPurePath("/added-subpath")
+
+        // MARK: Act
+        let resultUrlRequest = try sut.build(
+            address: nil,
+            configuration: configuration,
+            body: nil
+        )
+
+        // MARK: Assert
+        var expectedUrlRequest = URLRequest(url: .init(string: "//site.com/base-subpath/added-subpath")!)
+        expectedUrlRequest.timeoutInterval = 10
+
+        XCTAssertEqual(resultUrlRequest.url, expectedUrlRequest.url)
+        XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
+    }
 
 	func test_host_port () throws {
 		// MARK: Arrange

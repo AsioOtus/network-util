@@ -183,6 +183,26 @@ public extension RequestConfiguration {
         )
     }
 
+    func purePath (_ path: String) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents.purePath(path),
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
+    func addPurePath (_ path: String) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents.addPurePath(path),
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
     func queryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
             method: method,

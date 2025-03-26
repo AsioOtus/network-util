@@ -235,6 +235,26 @@ public extension StandardRequest {
         )
     }
 
+    func purePath (_ path: String) -> Self {
+        .init(
+            address: address,
+            body: body,
+            configuration: configuration.purePath(path),
+            delegate: delegate,
+            configurationsMerging: configurationsMerging
+        )
+    }
+
+    func addPurePath (_ path: String) -> Self {
+        .init(
+            address: address,
+            body: body,
+            configuration: configuration.addPurePath(path),
+            delegate: delegate,
+            configurationsMerging: configurationsMerging
+        )
+    }
+
     func queryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
             address: address,
