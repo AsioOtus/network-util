@@ -7,8 +7,8 @@ public protocol URLClient {
 	var configuration: RequestConfiguration { get }
 	var delegate: URLClientDelegate { get }
 
-	func updateConfiguration (_ update: RequestConfiguration.Update) -> URLClient
-	func configuration (_ configuration: RequestConfiguration) -> URLClient
+	func configuration (_ update: RequestConfiguration.Update) -> URLClient
+	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient
 	func delegate (_ delegate: URLClientDelegate) -> URLClient
 
 	func send <RQ: Request, RS: Response> (

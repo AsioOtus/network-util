@@ -235,21 +235,21 @@ public extension StandardRequest {
         )
     }
 
-    func setPurePath (_ path: String) -> Self {
+    func setRawPath (_ path: String) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.setPurePath(path),
+            configuration: configuration.setRawPath(path),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func purePath (_ path: String) -> Self {
+    func rawPath (_ path: String) -> Self {
         .init(
             address: address,
             body: body,
-            configuration: configuration.purePath(path),
+            configuration: configuration.rawPath(path),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )

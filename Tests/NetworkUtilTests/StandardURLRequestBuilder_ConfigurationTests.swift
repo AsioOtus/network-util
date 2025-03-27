@@ -49,10 +49,10 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
 		XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
 	}
 
-    func test_host_pureSubpath () throws {
+    func test_host_rawSubpath () throws {
         // MARK: Arrange
         let configuration = baseConfiguration
-            .purePath("/base-subpath")
+            .rawPath("/base-subpath")
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
@@ -90,11 +90,11 @@ final class StandardURLRequestBuilder_ConfigurationTests: XCTestCase {
         XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
     }
 
-    func test_host_pureSubpathAdding () throws {
+    func test_host_rawSubpathAdding () throws {
         // MARK: Arrange
         let configuration = baseConfiguration
-            .purePath("/base-subpath")
-            .purePath("/added-subpath")
+            .rawPath("/base-subpath")
+            .rawPath("/added-subpath")
 
         // MARK: Act
         let resultUrlRequest = try sut.build(

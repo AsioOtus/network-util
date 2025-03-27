@@ -183,20 +183,20 @@ public extension RequestConfiguration {
         )
     }
 
-    func setPurePath (_ path: String) -> Self {
+    func setRawPath (_ path: String) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setPurePath(path),
+            urlComponents: urlComponents.setRawPath(path),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func purePath (_ path: String) -> Self {
+    func rawPath (_ path: String) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.purePath(path),
+            urlComponents: urlComponents.rawPath(path),
             headers: headers,
             timeout: timeout,
             info: info

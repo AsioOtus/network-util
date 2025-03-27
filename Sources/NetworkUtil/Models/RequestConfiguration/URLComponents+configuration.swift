@@ -125,13 +125,13 @@ public extension URLComponents {
 		return copy
 	}
 
-    func setPurePath (_ path: String) -> Self {
+    func setRawPath (_ path: String) -> Self {
         var copy = self
         copy.path = path
         return copy
     }
 
-    func purePath (_ path: String) -> Self {
+    func rawPath (_ path: String) -> Self {
         var copy = self
         copy.path += path
         return copy
