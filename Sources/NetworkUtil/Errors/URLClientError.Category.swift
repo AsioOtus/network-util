@@ -1,10 +1,10 @@
 extension URLClientError {
-    public enum Category {
+    public enum Category: Error {
         case request(Error)
         case network(NetworkError)
         case response(Error)
         
-        case unexpected(Error)
+        case general(Error)
     }
 }
 
@@ -24,8 +24,8 @@ extension URLClientError.Category {
         else { nil }
     }
     
-    public var unexpectedError: Error? {
-        if case .unexpected(let error) = self { error }
+    public var generalError: Error? {
+        if case .general(let error) = self { error }
         else { nil }
     }
 }

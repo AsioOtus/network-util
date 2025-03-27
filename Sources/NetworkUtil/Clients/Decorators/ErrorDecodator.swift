@@ -15,13 +15,13 @@ public struct ErrorDecorator: URLClientDecorator {
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
-		response: RS,
+        response: RS.Type,
 		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
 		if let error { throw error }
 
-		return try await send(
+        return try await urlClient.send(
 			request,
 			response: response,
 			delegate: delegate,

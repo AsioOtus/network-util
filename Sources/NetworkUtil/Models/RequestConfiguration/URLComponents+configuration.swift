@@ -1,10 +1,6 @@
 import Foundation
 
 public extension URLComponents {
-	init? (address: String) {
-		self.init(string: address)
-	}
-
 	init (
 		scheme: String? = nil,
 		user: String? = nil,

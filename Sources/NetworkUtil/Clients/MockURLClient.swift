@@ -70,6 +70,20 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 		}
 	}
 
+    public func requestEntities <RQ: Request, RS: Response> (
+        _ request: RQ,
+        response: RS.Type,
+        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update?
+    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+        try await urlClient.requestEntities(
+            request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate
+        )
+    }
+
 	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
 	public func setConfiguration (_ configuration: RequestConfiguration) -> URLClient { self }
 	public func delegate (_ delegate: URLClientDelegate) -> URLClient { self }

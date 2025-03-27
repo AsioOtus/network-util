@@ -1,7 +1,7 @@
 import Foundation
 
 public struct URLClientError: NetworkUtilError {
-	public let requestId: UUID
+	public let requestId: UUID?
 	public let request: any Request
 	public let category: Category
 }
@@ -12,7 +12,7 @@ public extension URLClientError {
 		case .request(let error): fallthrough
 		case .network(let error as Error): fallthrough
 		case .response(let error): fallthrough
-		case .unexpected(let error): return error
+		case .general(let error): return error
 		}
 	}
 
@@ -21,7 +21,7 @@ public extension URLClientError {
 		case .request: "request"
 		case .network: "network"
 		case .response: "response"
-		case .unexpected: "unexpected"
+		case .general: "general"
 		}
 	}
 }

@@ -6,7 +6,7 @@ public extension Request {
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body>,
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<B>
     where Self == StandardRequest<B>
@@ -24,7 +24,7 @@ public extension Request {
         address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<B>
     where Self == StandardRequest<B>
@@ -42,7 +42,7 @@ public extension Request {
         path: String,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<Data>
     where Self == StandardRequest<Data>
@@ -65,7 +65,7 @@ public extension Request {
         _ address: String? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<Data>
     where Self == StandardRequest<Data>
@@ -84,7 +84,7 @@ public extension Request {
         path: String,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body> = StandardRequestDelegate.empty(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<Data>
     where Self == StandardRequest<Data>
@@ -108,7 +108,7 @@ public extension Request {
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body>,
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<B>
     where Self == StandardRequest<B>
@@ -126,7 +126,7 @@ public extension Request {
         _ address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
     -> StandardRequest<B>
     where Self == StandardRequest<B>

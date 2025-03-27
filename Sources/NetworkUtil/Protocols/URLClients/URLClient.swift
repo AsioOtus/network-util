@@ -30,6 +30,13 @@ public protocol URLClient {
 		delegate: some URLClientSendingDelegate<RQ, RSM>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> StandardResponse<RSM>
+
+    func requestEntities <RQ: Request, RS: Response> (
+        _ request: RQ,
+        response: RS.Type,
+        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update?
+    ) async throws -> (URLSession, URLRequest, RequestConfiguration)
 }
 
 public extension URLClient {

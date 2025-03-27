@@ -27,6 +27,20 @@ public extension URLClientDecorator {
 		)
 	}
 
+    func requestEntities <RQ: Request, RS: Response> (
+        _ request: RQ,
+        response: RS.Type,
+        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update?
+    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+        try await urlClient.requestEntities(
+            request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate
+        )
+    }
+
 	func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient {
 		urlClient.configuration(update)
 	}

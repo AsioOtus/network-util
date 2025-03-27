@@ -9,10 +9,10 @@ public struct StandardRequest <Body: Encodable>: Request {
 
 	public init (
 		address: String? = nil,
-		body: Body?,
+		body: Body? = nil,
 		configuration: RequestConfiguration = .init(),
 		delegate: any RequestDelegate<Body> = StandardRequestDelegate.empty(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
 	) {
 		self.address = address
 		self.body = body
@@ -25,7 +25,7 @@ public struct StandardRequest <Body: Encodable>: Request {
 		address: String? = nil,
 		configuration: RequestConfiguration = .init(),
 		delegate: any RequestDelegate<Body> = StandardRequestDelegate.empty(),
-        configurationsMerging: @escaping RequestConfiguration.Merging = Self.defaultConfigurationMerging
+        configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
 	) where Body == Data {
 		self.address = address
 		self.body = nil
@@ -37,8 +37,8 @@ public struct StandardRequest <Body: Encodable>: Request {
 	public func mergeConfiguration (with configuration: RequestConfiguration) -> RequestConfiguration {
         configurationsMerging(self.configuration, configuration)
 	}
+}
 
-    public static func defaultConfigurationMerging (_ lhs: RequestConfiguration, _ rhs: RequestConfiguration) -> RequestConfiguration {
-        lhs.merge(with: rhs)
-    }
+public func defaultConfigurationMerging (_ lhs: RequestConfiguration, _ rhs: RequestConfiguration) -> RequestConfiguration {
+    lhs.merge(with: rhs)
 }

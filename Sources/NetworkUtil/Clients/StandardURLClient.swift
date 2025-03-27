@@ -34,89 +34,53 @@ public struct StandardURLClient: URLClient {
 }
 
 public extension StandardURLClient {
-	static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
-	static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
-	static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
-	static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
-}
-
-private extension StandardURLClient {
-	var urlSessionBuilder: URLSessionBuilder {
-		delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
-	}
-
-	var urlRequestBuilder: URLRequestBuilder {
-		delegate.urlRequestBuilder ?? Self.defaultUrlRequestBuilder
-	}
-
-	var encoder: RequestBodyEncoder {
-		delegate.encoder ?? Self.defaultEncoder
-	}
-
-	var decoder: ResponseModelDecoder {
-		delegate.decoder ?? Self.defaultDecoder
-	}
-
-	var urlRequestsInterceptions: [URLRequestInterception] {
-		delegate.urlRequestsInterceptions
-	}
-
-	var urlResponsesInterceptions: [URLResponseInterception] {
-		delegate.urlResponsesInterceptions
-	}
-
-	var sending: AnySending? {
-		delegate.sending
-	}
-
-	func controllerError (_ error: URLClientError, _ requestId: UUID, _ request: some Request) -> URLClientError {
-		logger.log(message: .error(error), requestId: requestId, request: request)
-		return error
-	}
-}
-
-extension StandardURLClient {
-	public func send <RQ: Request, RS: Response> (
+	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
 		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
-		let requestId = delegate.id?() ?? .init()
+        let requestId = delegate.id?() ?? .init()
 
-		let configuration = createConfiguration(
-			request,
-			configurationUpdate
-		)
+        do {
+            let (urlSession, urlRequest, configuration) = try await requestEntities(
+                request,
+                response: response,
+                delegate: delegate,
+                configurationUpdate: configurationUpdate
+            )
 
-		let (urlSession, urlRequest) = try await createUrlEntities(
-			requestId,
-			request,
-			delegate.encoding,
-			configuration,
-			delegate.urlRequestInterceptions
-		)
+            logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
 
-		let (data, urlResponse) = try await sendAction(
-			urlSession,
-			urlRequest,
-			requestId,
-			request,
-			configuration,
-			delegate.urlSessionTaskDelegate,
-			delegate.sending
-		)
+            let (data, urlResponse) = try await sendAction(
+                urlSession,
+                urlRequest,
+                requestId,
+                request,
+                configuration,
+                delegate.urlSessionTaskDelegate,
+                delegate.sending
+            )
 
-		let response: RS = try createResponse(
-			data,
-			urlResponse,
-			requestId,
-			request,
-			delegate.decoding,
-			delegate.urlResponseInterceptions
-		)
+            logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
 
-		return response
+            let response: RS = try createResponse(
+                data,
+                urlResponse,
+                delegate.decoding,
+                delegate.urlResponseInterceptions
+            )
+
+            return response
+        } catch let errorCategory as URLClientError.Category {
+            let error = URLClientError(requestId: requestId, request: request, category: errorCategory)
+            logger.log(message: .error(error), requestId: requestId, request: request)
+            throw error
+        } catch let error {
+            let error = URLClientError(requestId: requestId, request: request, category: .general(error) )
+            logger.log(message: .error(error), requestId: requestId, request: request)
+            throw error
+        }
 	}
 }
 
@@ -130,7 +94,6 @@ private extension StandardURLClient {
 	}
 
 	func createUrlEntities <RQ: Request> (
-		_ requestId: UUID,
 		_ request: RQ,
 		_ encoding: ((RQ.Body) throws -> Data)?,
 		_ configuration: RequestConfiguration,
@@ -146,15 +109,9 @@ private extension StandardURLClient {
 				urlRequestsInterceptions
 			)
 
-			logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
-
 			return (urlSession, urlRequest)
 		} catch {
-			throw controllerError(
-				.init(requestId: requestId, request: request, category: .request(error)),
-				requestId,
-				request
-			)
+            throw URLClientError.Category.request(error)
 		}
 	}
 
@@ -254,19 +211,15 @@ private extension StandardURLClient {
 				try await self.send(
 					urlSession,
 					urlRequest,
-					requestId,
-					request,
 					urlSessionTaskDelegate
 				)
 			}
 		}
 	}
 
-	func send <RQ: Request> (
+	func send (
 		_ urlSession: URLSession,
 		_ urlRequest: URLRequest,
-		_ requestId: UUID,
-		_ request: RQ,
 		_ urlSessionTaskDelegate: URLSessionTaskDelegate?
 	) async throws -> (Data, URLResponse) {
 		do {
@@ -275,29 +228,16 @@ private extension StandardURLClient {
 			} else {
 				try await urlSession.data(for: urlRequest)
 			}
-			logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
 
 			return (data, urlResponse)
 		} catch let urlError as URLError {
-			throw controllerError(
-				.init(requestId: requestId, request: request, category: .network(.init(urlSession, urlRequest, urlError))),
-				requestId,
-				request
-			)
-		} catch {
-			throw controllerError(
-				.init(requestId: requestId, request: request, category: .unexpected(error)),
-				requestId,
-				request
-			)
+            throw URLClientError.Category.network(.init(urlSession, urlRequest, urlError))
 		}
 	}
 
-	func createResponse <RQ: Request, RS: Response> (
+	func createResponse <RS: Response> (
 		_ data: Data,
 		_ urlResponse: URLResponse,
-		_ requestId: UUID,
-		_ request: RQ,
 		_ decoding: Decoding<RS.Model>?,
 		_ urlResponseInterceptions: [URLResponseInterception]
 	) throws -> RS {
@@ -307,11 +247,7 @@ private extension StandardURLClient {
 			let response = try RS(interceptedData, interceptedUrlResponse, model)
 			return response
 		} catch {
-			throw controllerError(
-				.init(requestId: requestId, request: request, category: .response(error)),
-				requestId,
-				request
-			)
+            throw URLClientError.Category.response(error)
 		}
 	}
 
@@ -380,9 +316,67 @@ public extension StandardURLClient {
 	}
 }
 
+public extension StandardURLClient {
+    static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
+    static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
+    static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
+    static let defaultDecoder: ResponseModelDecoder = JSONDecoder()
+
+    func requestEntities <RQ: Request, RS: Response> (
+        _ request: RQ,
+        response: RS.Type,
+        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update?
+    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+        let configuration = createConfiguration(
+            request,
+            configurationUpdate
+        )
+
+        let (urlSession, urlRequest) = try await createUrlEntities(
+            request,
+            delegate.encoding,
+            configuration,
+            delegate.urlRequestInterceptions
+        )
+
+        return (urlSession, urlRequest, configuration)
+    }
+}
+
+private extension StandardURLClient {
+    var urlSessionBuilder: URLSessionBuilder {
+        delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
+    }
+
+    var urlRequestBuilder: URLRequestBuilder {
+        delegate.urlRequestBuilder ?? Self.defaultUrlRequestBuilder
+    }
+
+    var encoder: RequestBodyEncoder {
+        delegate.encoder ?? Self.defaultEncoder
+    }
+
+    var decoder: ResponseModelDecoder {
+        delegate.decoder ?? Self.defaultDecoder
+    }
+
+    var urlRequestsInterceptions: [URLRequestInterception] {
+        delegate.urlRequestsInterceptions
+    }
+
+    var urlResponsesInterceptions: [URLResponseInterception] {
+        delegate.urlResponsesInterceptions
+    }
+
+    var sending: AnySending? {
+        delegate.sending
+    }
+}
+
 public extension URLClient where Self == StandardURLClient {
 	static func standard (
-		configuration: RequestConfiguration,
+        configuration: RequestConfiguration = .empty,
 		delegate: URLClientDelegate = .standard()
 	) -> Self {
 		.init(
