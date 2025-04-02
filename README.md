@@ -65,18 +65,12 @@ let response = try await client.send(request)
 ```swift
 // Declare custom URLClient decorator
 struct AuthenticatedURLClientDecorator: URLClientDecorator {
-    let urlClient: URLClient
-
-    func send <RQ, RS> (
-        _ request: RQ,
-        response: RS.Type,
-        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
-        configurationUpdate: RequestConfiguration.Update?
-    ) async throws -> RS where RS : Response {
-        try await urlClient.send(request, response: response, delegate: delegate) {
-            let updatedConfiguration = $0.header(key: "Authrorization", value: "token")
-            return configurationUpdate?(updatedConfiguration) ?? updatedConfiguration
-        }
+    var _urlClient: URLClient
+    var urlClient: URLClient {
+        _urlClient
+            .configuration {
+                $0.header(key: "Authrorization", value: "token")
+            }
     }
 }
 
@@ -103,4 +97,5 @@ let request = UserRequest()
 
 
 // Send request
-let response = try await authorizedClient.send(request)```
+let response = try await authorizedClient.send(request)
+```

@@ -32,7 +32,7 @@ public extension URLClientDecorator {
         response: RS.Type,
         delegate: some URLClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
-    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+    ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
         try await urlClient.requestEntities(
             request,
             response: response,

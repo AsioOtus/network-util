@@ -15,8 +15,9 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 	public let stubData: Data
 	public let stubUrlResponse: URLResponse
 
+    public var resultUrlSession: URLSession?
 	public var resultUrlRequest: URLRequest?
-	public var resultRequest: SRQ?
+    public var resultRequestConfiguration: RequestConfiguration?
 
 	public init (
 		stubResponseModel: SRSM,
@@ -50,24 +51,14 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
-		do {
-			let delegate = StandardURLClientSendingDelegate<RQ, RS.Model>(
-				decoding: { _, _, _ in self.stubResponseModel as! RS.Model },
-				sending: mockSending(delegate.sending)
-			)
-			.merge(with: delegate)
+        (resultUrlSession, resultUrlRequest, resultRequestConfiguration) = try await requestEntities(
+            request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate
+        )
 
-			let response = try await urlClient.send(
-				request,
-				response: response,
-				delegate: delegate,
-				configurationUpdate: configurationUpdate
-			)
-
-			return response
-		} catch {
-			throw error
-		}
+        return try RS(stubData, stubUrlResponse, stubResponseModel as! RS.Model)
 	}
 
     public func requestEntities <RQ: Request, RS: Response> (
@@ -75,7 +66,7 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
         response: RS.Type,
         delegate: some URLClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
-    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+    ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
         try await urlClient.requestEntities(
             request,
             response: response,
@@ -87,21 +78,4 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
 	public func setConfiguration (_ configuration: RequestConfiguration) -> URLClient { self }
 	public func delegate (_ delegate: URLClientDelegate) -> URLClient { self }
-}
-
-extension MockURLClient {
-	func mockSending <RQ: Request> (_ sending: Sending<RQ>?) -> Sending<RQ> {
-		{ sendingModel, _ in
-			let sending = sending ?? emptySending()
-
-			let (data, urlResponse) = try await sending(sendingModel) { _, urlRequest in
-				self.resultUrlRequest = urlRequest
-				self.resultRequest = (sendingModel.request as! SRQ)
-
-				return (self.stubData, self.stubUrlResponse)
-			}
-
-			return (data, urlResponse)
-		}
-	}
 }

@@ -327,7 +327,7 @@ public extension StandardURLClient {
         response: RS.Type,
         delegate: some URLClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
-    ) async throws -> (URLSession, URLRequest, RequestConfiguration) {
+    ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
         let configuration = createConfiguration(
             request,
             configurationUpdate
