@@ -1,42 +1,46 @@
 import Foundation
 
 public struct StandardURLRequestBuilder {
-	public init () { }
+    public init () { }
 }
 
 extension StandardURLRequestBuilder: URLRequestBuilder {
-	public func build (address: String?, configuration: RequestConfiguration, body: Data?) throws -> URLRequest {
-		let url = try buildUrl(address, configuration)
+    public func build (address: String?, configuration: RequestConfiguration, body: Data?) throws -> URLRequest {
+        let url = try buildUrl(address, configuration)
 
-		var urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: url)
 
-		urlRequest.httpMethod = configuration.method?.value
-		urlRequest.httpBody = body
+        urlRequest.httpMethod = configuration.method?.value
 
-		let headers = configuration.headers
-		headers.forEach { key, value in urlRequest.setValue(value, forHTTPHeaderField: key) }
+        urlRequest.httpBody = body
 
-		if let builderTimeout = configuration.timeout {
-      urlRequest.timeoutInterval = builderTimeout
+        configuration.headers.forEach { key, value in urlRequest.setValue(value, forHTTPHeaderField: key) }
+
+        if let builderTimeout = configuration.timeout {
+            urlRequest.timeoutInterval = builderTimeout
+        }
+
+        if let cachePolicy = configuration.cachePolicy {
+            urlRequest.cachePolicy = cachePolicy
+        }
+
+        return urlRequest
     }
 
-		return urlRequest
-	}
-
-	func buildUrl (_ address: String?, _ configuration: RequestConfiguration) throws -> URL {
-		if let address {
-			guard let url = URL(string: address) else { throw URLCreationError.addressFailure(address) }
-			return url
-		} else {
-			let urlComponents = configuration.urlComponents
-			guard let url = urlComponents.url else { throw URLCreationError.urlComponentsFailure(urlComponents) }
-			return url
-		}
-	}
+    func buildUrl (_ address: String?, _ configuration: RequestConfiguration) throws -> URL {
+        if let address {
+            guard let url = URL(string: address) else { throw URLCreationError.addressFailure(address) }
+            return url
+        } else {
+            let urlComponents = configuration.urlComponents
+            guard let url = urlComponents.url else { throw URLCreationError.urlComponentsFailure(urlComponents) }
+            return url
+        }
+    }
 }
 
 public extension URLRequestBuilder where Self == StandardURLRequestBuilder {
-	static func standard () -> Self {
-		.init()
-	}
+    static func standard () -> Self {
+        .init()
+    }
 }

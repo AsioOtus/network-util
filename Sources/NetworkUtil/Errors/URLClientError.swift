@@ -7,21 +7,20 @@ public struct URLClientError: NetworkUtilError {
 }
 
 public extension URLClientError {
-	var innerError: Error {
-		switch category {
-		case .request(let error): fallthrough
-		case .network(let error as Error): fallthrough
-		case .response(let error): fallthrough
-		case .general(let error): return error
-		}
-	}
+	var innerError: Error { category.innerError }
 
-	var debugName: String {
-		switch category {
-		case .request: "request"
-		case .network: "network"
-		case .response: "response"
-		case .general: "general"
-		}
-	}
+	var debugName: String { category.debugName }
+}
+
+extension URLClientError: LocalizedError {
+    public var errorDescription: String {
+        [
+            debugName,
+            request.name,
+            requestId?.uuidString ?? nil,
+            category.localizedDescription
+        ]
+        .compactMap { $0 }
+        .joined(separator: " | ")
+    }
 }

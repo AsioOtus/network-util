@@ -1,15 +1,15 @@
 import Foundation
 
 public extension Request {
-    static func request <B> (
+    static func request <Body> (
         address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body>,
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
-    -> StandardRequest<B>
-    where Self == StandardRequest<B>
+    -> StandardRequest<Body>
+    where Self == StandardRequest<Body>
     {
         .init(
             address: address,
@@ -20,14 +20,14 @@ public extension Request {
         )
     }
 
-    static func request <B> (
+    static func request <Body> (
         address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
-    -> StandardRequest<B>
-    where Self == StandardRequest<B>
+    -> StandardRequest<Body>
+    where Self == StandardRequest<Body>
     {
         .init(
             address: address,

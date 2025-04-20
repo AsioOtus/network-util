@@ -42,6 +42,10 @@ public extension StandardURLClient {
 	) async throws -> RS {
         let requestId = delegate.id?() ?? .init()
 
+        var urlRequestBuffer: URLRequest?
+        var dataBuffer: Data?
+        var urlResponseBuffer: URLResponse?
+
         do {
             let (urlSession, urlRequest, configuration) = try await requestEntities(
                 request,
@@ -50,7 +54,14 @@ public extension StandardURLClient {
                 configurationUpdate: configurationUpdate
             )
 
-            logger.log(message: .request(urlSession, urlRequest), requestId: requestId, request: request)
+            urlRequestBuffer = urlRequest
+
+            logger.log(
+                message: .request(urlSession, urlRequest),
+                requestId: requestId,
+                request: request,
+                completion: nil
+            )
 
             let (data, urlResponse) = try await sendAction(
                 urlSession,
@@ -62,7 +73,20 @@ public extension StandardURLClient {
                 delegate.sending
             )
 
-            logger.log(message: .response(data, urlResponse), requestId: requestId, request: request)
+            dataBuffer = data
+            urlResponseBuffer = urlResponse
+
+            logger.log(
+                message: .response(data, urlResponse),
+                requestId: requestId,
+                request: request,
+                completion: .init(
+                    urlRequest: urlRequest,
+                    data: data,
+                    urlResponse: urlResponse,
+                    error: nil
+                )
+            )
 
             let response: RS = try createResponse(
                 data,
@@ -74,11 +98,31 @@ public extension StandardURLClient {
             return response
         } catch let errorCategory as URLClientError.Category {
             let error = URLClientError(requestId: requestId, request: request, category: errorCategory)
-            logger.log(message: .error(error), requestId: requestId, request: request)
+            logger.log(
+                message: .error(error),
+                requestId: requestId,
+                request: request,
+                completion: .init(
+                    urlRequest: urlRequestBuffer,
+                    data: dataBuffer,
+                    urlResponse: urlResponseBuffer,
+                    error: error
+                )
+            )
             throw error
         } catch let error {
             let error = URLClientError(requestId: requestId, request: request, category: .general(error) )
-            logger.log(message: .error(error), requestId: requestId, request: request)
+            logger.log(
+                message: .error(error),
+                requestId: requestId,
+                request: request,
+                completion: .init(
+                    urlRequest: urlRequestBuffer,
+                    data: dataBuffer,
+                    urlResponse: urlResponseBuffer,
+                    error: error
+                )
+            )
             throw error
         }
 	}
