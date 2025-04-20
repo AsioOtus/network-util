@@ -177,6 +177,10 @@ public extension URLComponents {
 			fragment: self.fragment ?? another.fragment
 		)
 	}
+
+    func merge (into another: Self) -> Self {
+        another.merge(with: self)
+    }
 }
 
 fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {

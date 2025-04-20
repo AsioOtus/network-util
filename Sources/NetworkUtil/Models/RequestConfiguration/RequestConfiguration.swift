@@ -40,4 +40,8 @@ public extension RequestConfiguration {
 			info: another.info.merging(self.info) { $1 }
 		)
 	}
+
+    func merge (into another: Self) -> Self {
+        another.merge(with: self)
+    }
 }
