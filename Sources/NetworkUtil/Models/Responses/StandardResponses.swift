@@ -9,7 +9,7 @@ public struct StandardResponse <Model: Decodable>: Response {
 		urlResponse as? HTTPURLResponse
 	}
 
-	public init (_ data: Data, _ urlResponse: URLResponse, _ model: Model) throws {
+	public init (data: Data = .init(), urlResponse: URLResponse, model: Model) {
 		self.data = data
 		self.urlResponse = urlResponse
 		self.model = model

@@ -58,7 +58,7 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
             configurationUpdate: configurationUpdate
         )
 
-        return try RS(stubData, stubUrlResponse, stubResponseModel as! RS.Model)
+        return RS(data: stubData, urlResponse: stubUrlResponse, model: stubResponseModel as! RS.Model)
 	}
 
     public func requestEntities <RQ: Request, RS: Response> (

@@ -1,8 +1,20 @@
 import Foundation
 
 public extension StandardRequest {
+    func name (_ name: String) -> Self {
+        .init(
+            name: name,
+            address: address,
+            body: body,
+            configuration: configuration,
+            delegate: delegate,
+            configurationsMerging: configurationsMerging
+        )
+    }
+
     func address (_ address: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration,
@@ -13,6 +25,7 @@ public extension StandardRequest {
 
     func body (_ body: Body?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration,
@@ -23,6 +36,7 @@ public extension StandardRequest {
 
     func configuration (_ configuration: RequestConfiguration) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration,
@@ -33,6 +47,7 @@ public extension StandardRequest {
 
     func delegate (_ delegate: any RequestDelegate<Body>) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration,
@@ -43,6 +58,7 @@ public extension StandardRequest {
 
     func configurationsMerging (_ configurationsMerging: @escaping RequestConfiguration.Merging) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration,
@@ -55,6 +71,7 @@ public extension StandardRequest {
 public extension StandardRequest {
     func method (_ method: RequestConfiguration.Method) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.method(method),
@@ -65,6 +82,7 @@ public extension StandardRequest {
 
     func urlComponents (_ urlComponents: URLComponents) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.urlComponents(urlComponents),
@@ -75,6 +93,7 @@ public extension StandardRequest {
 
     func setHeaders (_ headers: RequestConfiguration.Headers) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setHeaders(headers),
@@ -85,6 +104,7 @@ public extension StandardRequest {
 
     func setHeader (key: String, value: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setHeader(key: key, value: value),
@@ -95,6 +115,7 @@ public extension StandardRequest {
 
     func headers (_ headers: RequestConfiguration.Headers) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.headers(headers),
@@ -105,6 +126,7 @@ public extension StandardRequest {
 
     func header (key: String, value: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.header(key: key, value: value),
@@ -115,6 +137,7 @@ public extension StandardRequest {
 
     func setInfo (_ info: RequestConfiguration.Info) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setInfo(info),
@@ -125,6 +148,7 @@ public extension StandardRequest {
 
     func setInfo (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setInfo(key: key, value: value),
@@ -135,6 +159,7 @@ public extension StandardRequest {
 
     func info (_ info: RequestConfiguration.Info) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.info(info),
@@ -145,6 +170,7 @@ public extension StandardRequest {
 
     func info (key: RequestConfiguration.InfoKey, value: AnyHashable) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.info(key: key, value: value),
@@ -155,6 +181,7 @@ public extension StandardRequest {
 
     func timeout (_ timeout: Double) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.timeout(timeout),
@@ -167,6 +194,7 @@ public extension StandardRequest {
 public extension StandardRequest {
     func scheme (_ scheme: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.scheme(scheme),
@@ -177,6 +205,7 @@ public extension StandardRequest {
 
     func user (_ user: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.user(user),
@@ -187,6 +216,7 @@ public extension StandardRequest {
 
     func password (_ password: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.password(password),
@@ -197,6 +227,7 @@ public extension StandardRequest {
 
     func host (_ host: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.host(host),
@@ -207,6 +238,7 @@ public extension StandardRequest {
 
     func port (_ port: Int?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.port(port),
@@ -217,6 +249,7 @@ public extension StandardRequest {
 
     func setPath (_ path: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setPath(path),
@@ -227,6 +260,7 @@ public extension StandardRequest {
 
     func path (_ path: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.path(path),
@@ -237,6 +271,7 @@ public extension StandardRequest {
 
     func setRawPath (_ path: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setRawPath(path),
@@ -247,6 +282,7 @@ public extension StandardRequest {
 
     func rawPath (_ path: String) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.rawPath(path),
@@ -257,6 +293,7 @@ public extension StandardRequest {
 
     func setQueryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setQueryItems(queryItems),
@@ -267,6 +304,7 @@ public extension StandardRequest {
 
     func setQueryItem (_ queryItem: URLQueryItem) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.setQueryItem(queryItem),
@@ -277,6 +315,7 @@ public extension StandardRequest {
 
     func queryItems (_ queryItems: [URLQueryItem]) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.queryItems(queryItems),
@@ -287,6 +326,7 @@ public extension StandardRequest {
 
     func queryItem (_ queryItem: URLQueryItem) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.queryItem(queryItem),
@@ -297,6 +337,7 @@ public extension StandardRequest {
 
     func fragment (_ fragment: String?) -> Self {
         .init(
+            name: name,
             address: address,
             body: body,
             configuration: configuration.fragment(fragment),

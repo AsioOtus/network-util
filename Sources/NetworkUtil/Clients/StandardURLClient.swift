@@ -288,7 +288,7 @@ private extension StandardURLClient {
 		do {
 			let (interceptedData, interceptedUrlResponse) = try interceptUrlResponse(data, urlResponse, urlResponseInterceptions)
 			let model = try decodeResponseData(interceptedData, decoding, interceptedUrlResponse)
-			let response = try RS(interceptedData, interceptedUrlResponse, model)
+            let response = RS(data: interceptedData, urlResponse: interceptedUrlResponse, model: model)
 			return response
 		} catch {
             throw URLClientError.Category.response(error)
