@@ -12,8 +12,8 @@ public struct StandardURLClientDelegate: URLClientDelegate {
 		urlRequestBuilder: URLRequestBuilder? = nil,
 		encoder: RequestBodyEncoder? = nil,
 		decoder: ResponseModelDecoder? = nil,
-		urlRequestsInterceptions: [URLRequestInterception] = [],
-		urlResponsesInterceptions: [URLResponseInterception] = [],
+		urlRequestsInterceptions: [URLRequestInterception],
+		urlResponsesInterceptions: [URLResponseInterception],
 		sending: AnySending? = nil
 	) {
 		self.urlSessionBuilder = urlSessionBuilder
@@ -24,6 +24,24 @@ public struct StandardURLClientDelegate: URLClientDelegate {
 		self.urlResponsesInterceptions = urlResponsesInterceptions
 		self.sending = sending
 	}
+
+    public init (
+        urlSessionBuilder: URLSessionBuilder? = nil,
+        urlRequestBuilder: URLRequestBuilder? = nil,
+        encoder: RequestBodyEncoder? = nil,
+        decoder: ResponseModelDecoder? = nil,
+        urlRequestsInterception: URLRequestInterception? = nil,
+        urlResponsesInterception: URLResponseInterception? = nil,
+        sending: AnySending? = nil
+    ) {
+        self.urlSessionBuilder = urlSessionBuilder
+        self.urlRequestBuilder = urlRequestBuilder
+        self.encoder = encoder
+        self.decoder = decoder
+        self.urlRequestsInterceptions = urlRequestsInterception.map { [$0] } ?? []
+        self.urlResponsesInterceptions = urlResponsesInterception.map { [$0] } ?? []
+        self.sending = sending
+    }
 
 	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> URLClientDelegate {
 		var copy = self
@@ -58,8 +76,8 @@ public extension URLClientDelegate where Self == StandardURLClientDelegate {
 		urlRequestBuilder: URLRequestBuilder? = nil,
 		encoder: RequestBodyEncoder? = nil,
 		decoder: ResponseModelDecoder? = nil,
-		urlRequestsInterceptions: [URLRequestInterception] = [],
-		urlResponsesInterceptions: [URLResponseInterception] = [],
+		urlRequestsInterceptions: [URLRequestInterception],
+		urlResponsesInterceptions: [URLResponseInterception],
 		sending: AnySending? = nil
 	) -> Self {
 		.init(
@@ -72,6 +90,26 @@ public extension URLClientDelegate where Self == StandardURLClientDelegate {
 			sending: sending
 		)
 	}
+
+    static func standard (
+        urlSessionBuilder: URLSessionBuilder? = nil,
+        urlRequestBuilder: URLRequestBuilder? = nil,
+        encoder: RequestBodyEncoder? = nil,
+        decoder: ResponseModelDecoder? = nil,
+        urlRequestsInterception: URLRequestInterception? = nil,
+        urlResponsesInterception: URLResponseInterception? = nil,
+        sending: AnySending? = nil
+    ) -> Self {
+        .init(
+            urlSessionBuilder: urlSessionBuilder,
+            urlRequestBuilder: urlRequestBuilder,
+            encoder: encoder,
+            decoder: decoder,
+            urlRequestsInterception: urlRequestsInterception,
+            urlResponsesInterception: urlResponsesInterception,
+            sending: sending
+        )
+    }
 
 	static func empty () -> Self {
 		.init()

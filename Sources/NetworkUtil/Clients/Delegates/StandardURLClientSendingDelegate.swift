@@ -13,8 +13,8 @@ public struct StandardURLClientSendingDelegate <RQ: Request, RSM: Decodable>: UR
 		id: UUIDGenerator? = nil,
 		encoding: Encoding<RQ.Body>? = nil,
 		decoding: Decoding<RSM>? = nil,
-		urlRequestInterceptions: [URLRequestInterception] = [],
-		urlResponseInterceptions: [URLResponseInterception] = [],
+		urlRequestInterceptions: [URLRequestInterception],
+		urlResponseInterceptions: [URLResponseInterception],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
 	) {
@@ -26,6 +26,24 @@ public struct StandardURLClientSendingDelegate <RQ: Request, RSM: Decodable>: UR
 		self.urlSessionTaskDelegate = urlSessionTaskDelegate
 		self.sending = sending
 	}
+
+    public init (
+        id: UUIDGenerator? = nil,
+        encoding: Encoding<RQ.Body>? = nil,
+        decoding: Decoding<RSM>? = nil,
+        urlRequestInterception: URLRequestInterception? = nil,
+        urlResponseInterception: URLResponseInterception? = nil,
+        urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
+        sending: Sending<RQ>? = nil
+    ) {
+        self.id = id
+        self.encoding = encoding
+        self.decoding = decoding
+        self.urlRequestInterceptions = urlRequestInterception.map { [$0] } ?? []
+        self.urlResponseInterceptions = urlResponseInterception.map { [$0] } ?? []
+        self.urlSessionTaskDelegate = urlSessionTaskDelegate
+        self.sending = sending
+    }
 }
 
 public extension StandardURLClientSendingDelegate {
@@ -56,26 +74,6 @@ public extension StandardURLClientSendingDelegate {
 }
 
 public extension URLClientSendingDelegate {
-    static func standard <RQ: Request, RSM: Decodable> (
-        id: UUIDGenerator? = nil,
-        encoding: Encoding<RQ.Body>? = nil,
-        decoding: Decoding<RSM>? = nil,
-        urlRequestInterceptions: URLRequestInterception? = nil,
-        urlResponseInterceptions: URLResponseInterception? = nil,
-        urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
-        sending: Sending<RQ>? = nil
-    ) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
-        .init(
-            id: id,
-            encoding: encoding,
-            decoding: decoding,
-            urlRequestInterceptions: urlRequestInterceptions.map { [$0] } ?? [],
-            urlResponseInterceptions: urlResponseInterceptions.map { [$0] } ?? [],
-            urlSessionTaskDelegate: urlSessionTaskDelegate,
-            sending: sending
-        )
-    }
-
 	static func standard <RQ: Request, RSM: Decodable> (
 		id: UUIDGenerator? = nil,
 		encoding: Encoding<RQ.Body>? = nil,
@@ -96,8 +94,27 @@ public extension URLClientSendingDelegate {
 		)
 	}
 
-	static func empty <RQ: Request, RSM: Decodable> (
-	) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
+    static func standard <RQ: Request, RSM: Decodable> (
+        id: UUIDGenerator? = nil,
+        encoding: Encoding<RQ.Body>? = nil,
+        decoding: Decoding<RSM>? = nil,
+        urlRequestInterceptions: URLRequestInterception? = nil,
+        urlResponseInterceptions: URLResponseInterception? = nil,
+        urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
+        sending: Sending<RQ>? = nil
+    ) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
+        .init(
+            id: id,
+            encoding: encoding,
+            decoding: decoding,
+            urlRequestInterceptions: urlRequestInterceptions.map { [$0] } ?? [],
+            urlResponseInterceptions: urlResponseInterceptions.map { [$0] } ?? [],
+            urlSessionTaskDelegate: urlSessionTaskDelegate,
+            sending: sending
+        )
+    }
+
+	static func empty <RQ: Request, RSM: Decodable> () -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
 		.init()
 	}
 }
