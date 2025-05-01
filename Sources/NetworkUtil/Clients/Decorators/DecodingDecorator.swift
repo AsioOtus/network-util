@@ -1,15 +1,15 @@
 import Foundation
 
-struct DecodingDecorator: URLClientDecorator {
-	let urlClient: URLClient
+struct DecodingDecorator: APIClientDecorator {
+	let apiClient: APIClient
 
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM?.Type,
-		delegate: some URLClientSendingDelegate<RQ, RSM>,
+		delegate: some APIClientSendingDelegate<RQ, RSM>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RSM? {
-		let response = try await urlClient.send(
+		let response = try await apiClient.send(
 			request,
 			response: StandardResponse<Data>.self,
 			delegate: .standard(
@@ -25,9 +25,9 @@ struct DecodingDecorator: URLClientDecorator {
 
 		return if response.httpUrlResponse?.statusCode == 200 {
 			if let decoding = delegate.decoding {
-				try decoding(response.data, response.urlResponse, urlClient.delegate.decoder ?? StandardURLClient.defaultDecoder)
+				try decoding(response.data, response.urlResponse, apiClient.delegate.decoder ?? StandardAPIClient.defaultDecoder)
 			} else {
-				try urlClient.delegate.decoder?.decode(
+				try apiClient.delegate.decoder?.decode(
 					RSM.self,
 					from: response.data,
 					urlResponse: response.urlResponse

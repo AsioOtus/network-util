@@ -2,8 +2,8 @@ import Testing
 
 @testable import NetworkUtil
 
-struct URLClient_decoratingTests {
-    let client = StandardURLClient()
+struct APIClient_decoratingTests {
+    let client = StandardAPIClient()
         .configuration {
             $0
                 .scheme("http")
@@ -14,10 +14,10 @@ struct URLClient_decoratingTests {
     @Test
     func clientConfiguration_whenDecorated_thenHasDecoratorConfigurationItems () {
         // MARK: Arrange
-        struct Decorator: URLClientDecorator {
-            var _urlClient: URLClient
-            var urlClient: URLClient {
-                _urlClient
+        struct Decorator: APIClientDecorator {
+            var _apiClient: APIClient
+            var apiClient: APIClient {
+                _apiClient
                     .configuration {
                         $0
                             .scheme("https")
@@ -25,13 +25,13 @@ struct URLClient_decoratingTests {
                     }
             }
 
-            init (urlClient: URLClient) {
-                self._urlClient = urlClient
+            init (apiClient: APIClient) {
+                self._apiClient = apiClient
             }
         }
 
         // MARK: Act
-        let decoratedClient = Decorator(urlClient: client)
+        let decoratedClient = Decorator(apiClient: client)
 
         // MARK: Assert
         let expectedConfiguration = RequestConfiguration()

@@ -1,35 +1,35 @@
 import Combine
 import Foundation
 
-public protocol URLClient {
+public protocol APIClient {
 	var logPublisher: AnyPublisher<LogRecord, Never> { get }
 
 	var configuration: RequestConfiguration { get }
-	var delegate: URLClientDelegate { get }
+	var delegate: APIClientDelegate { get }
 
-	func configuration (_ update: RequestConfiguration.Update) -> URLClient
-	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient
-	func delegate (_ delegate: URLClientDelegate) -> URLClient
+	func configuration (_ update: RequestConfiguration.Update) -> APIClient
+	func setConfiguration (_ configuration: RequestConfiguration) -> APIClient
+	func delegate (_ delegate: APIClientDelegate) -> APIClient
 
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS
 
     func requestEntities <RQ: Request, RS: Response> (
         _ request: RQ,
         response: RS.Type,
-        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
     ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration)
 }
 
-public extension URLClient {
+public extension APIClient {
     func send <RQ: Request> (
         _ request: RQ,
-        delegate: some URLClientSendingDelegate<RQ, StandardResponse<Data>.Model>,
+        delegate: some APIClientSendingDelegate<RQ, StandardResponse<Data>.Model>,
         configurationUpdate: RequestConfiguration.Update? = nil
     ) async throws -> StandardResponse<Data> {
         try await send(
@@ -53,11 +53,11 @@ public extension URLClient {
     }
 }
 
-public extension URLClient {
+public extension APIClient {
 	func send <RQ: Request, RSM: Decodable> (
 		_ request: RQ,
 		responseModel: RSM.Type,
-		delegate: some URLClientSendingDelegate<RQ, RSM>,
+		delegate: some APIClientSendingDelegate<RQ, RSM>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> StandardResponse<RSM> {
 		try await send(
@@ -82,10 +82,10 @@ public extension URLClient {
 	}
 }
 
-public extension URLClient {
+public extension APIClient {
     func send <RQ: RequestWithResponseModel> (
         _ request: RQ,
-        delegate: some URLClientSendingDelegate<RQ, RQ.RSM>,
+        delegate: some APIClientSendingDelegate<RQ, RQ.RSM>,
         configurationUpdate: RequestConfiguration.Update? = nil
     ) async throws -> StandardResponse<RQ.RSM> {
         try await send(
@@ -109,10 +109,10 @@ public extension URLClient {
     }
 }
 
-public extension URLClient {
+public extension APIClient {
     func send <RQ: RequestWithResponse> (
         _ request: RQ,
-        delegate: some URLClientSendingDelegate<RQ, RQ.RS.Model>,
+        delegate: some APIClientSendingDelegate<RQ, RQ.RS.Model>,
         configurationUpdate: RequestConfiguration.Update? = nil
     ) async throws -> RQ.RS {
         try await send(

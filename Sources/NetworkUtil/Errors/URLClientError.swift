@@ -1,18 +1,18 @@
 import Foundation
 
-public struct URLClientError: NetworkUtilError {
+public struct APIClientError: NetworkUtilError {
 	public let requestId: UUID?
 	public let request: any Request
 	public let category: Category
 }
 
-public extension URLClientError {
+public extension APIClientError {
 	var innerError: Error { category.innerError }
 
 	var debugName: String { category.debugName }
 }
 
-extension URLClientError: LocalizedError {
+extension APIClientError: LocalizedError {
     public var errorDescription: String {
         [
             debugName,

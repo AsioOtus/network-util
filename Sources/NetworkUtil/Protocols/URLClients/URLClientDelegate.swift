@@ -1,4 +1,4 @@
-public protocol URLClientDelegate {
+public protocol APIClientDelegate {
 	var urlSessionBuilder: URLSessionBuilder? { get }
 	var urlRequestBuilder: URLRequestBuilder? { get }
 	var encoder: RequestBodyEncoder? { get }

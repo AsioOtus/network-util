@@ -2,7 +2,7 @@ import XCTest
 
 @testable import NetworkUtil
 
-final class StandardURLClient_SendingTests: XCTestCase {
+final class StandardAPIClient_SendingTests: XCTestCase {
 	func test_sendingMerging () async throws {
 		// MARK: Arrange
 		let expectedObject = "test"
@@ -26,7 +26,7 @@ final class StandardURLClient_SendingTests: XCTestCase {
 			return (expectedData, .init())
 		}
 
-		let sut = StandardURLClient(
+		let sut = StandardAPIClient(
 			delegate: .standard(sending: anySending)
 		)
 

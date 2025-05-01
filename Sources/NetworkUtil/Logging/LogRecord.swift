@@ -21,5 +21,5 @@ public struct LogCompletion {
     public let urlRequest: URLRequest?
     public let data: Data?
     public let urlResponse: URLResponse?
-    public let error: URLClientError?
+    public let error: APIClientError?
 }

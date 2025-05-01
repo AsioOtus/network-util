@@ -1,11 +1,11 @@
 import XCTest
 @testable import NetworkUtil
 
-final class StandardURLClient_Tests: XCTestCase {
+final class StandardAPIClient_Tests: XCTestCase {
 	let baseRequest = StandardRequest()
 	let baseConfiguration = RequestConfiguration()
 
-	var sut: StandardURLClient!
+	var sut: StandardAPIClient!
 
 	override func tearDown () {
 		sut = nil

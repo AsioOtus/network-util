@@ -3,7 +3,7 @@ import Foundation
 public enum LogMessage {
 	case request(URLSession, URLRequest)
 	case response(Data, URLResponse)
-	case error(URLClientError)
+	case error(APIClientError)
 
 	public var debugName: String {
 		switch self {
@@ -25,8 +25,8 @@ public extension LogMessage {
         else { nil }
     }
 
-    var error: URLClientError? {
-        if case .error(let urlClientError) = self { urlClientError }
+    var error: APIClientError? {
+        if case .error(let apiClientError) = self { apiClientError }
         else { nil }
     }
 }

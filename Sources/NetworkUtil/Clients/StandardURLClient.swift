@@ -1,11 +1,11 @@
 import Combine
 import Foundation
 
-public struct StandardURLClient: URLClient {
+public struct StandardAPIClient: APIClient {
 	let logger: Logger
 
 	public let configuration: RequestConfiguration
-	public let delegate: URLClientDelegate
+	public let delegate: APIClientDelegate
 
 	public var logPublisher: AnyPublisher<LogRecord, Never> {
 		logger.eraseToAnyPublisher()
@@ -13,7 +13,7 @@ public struct StandardURLClient: URLClient {
 
 	public init (
 		configuration: RequestConfiguration = .empty,
-		delegate: URLClientDelegate = .standard()
+		delegate: APIClientDelegate = .standard()
 	) {
 		self.configuration = configuration
 		self.delegate = delegate
@@ -23,7 +23,7 @@ public struct StandardURLClient: URLClient {
 
 	private init (
 		configuration: RequestConfiguration,
-		delegate: URLClientDelegate,
+		delegate: APIClientDelegate,
 		logger: Logger
 	) {
 		self.configuration = configuration
@@ -33,11 +33,11 @@ public struct StandardURLClient: URLClient {
 	}
 }
 
-public extension StandardURLClient {
+public extension StandardAPIClient {
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
         let requestId = delegate.id?() ?? .init()
@@ -96,8 +96,8 @@ public extension StandardURLClient {
             )
 
             return response
-        } catch let errorCategory as URLClientError.Category {
-            let error = URLClientError(requestId: requestId, request: request, category: errorCategory)
+        } catch let errorCategory as APIClientError.Category {
+            let error = APIClientError(requestId: requestId, request: request, category: errorCategory)
             logger.log(
                 message: .error(error),
                 requestId: requestId,
@@ -111,7 +111,7 @@ public extension StandardURLClient {
             )
             throw error
         } catch let error {
-            let error = URLClientError(requestId: requestId, request: request, category: .general(error) )
+            let error = APIClientError(requestId: requestId, request: request, category: .general(error) )
             logger.log(
                 message: .error(error),
                 requestId: requestId,
@@ -128,7 +128,7 @@ public extension StandardURLClient {
 	}
 }
 
-private extension StandardURLClient {
+private extension StandardAPIClient {
 	func createConfiguration <RQ: Request> (
 		_ request: RQ,
 		_ configurationUpdate: RequestConfiguration.Update?
@@ -155,7 +155,7 @@ private extension StandardURLClient {
 
 			return (urlSession, urlRequest)
 		} catch {
-            throw URLClientError.Category.request(error)
+            throw APIClientError.Category.request(error)
 		}
 	}
 
@@ -275,7 +275,7 @@ private extension StandardURLClient {
 
 			return (data, urlResponse)
 		} catch let urlError as URLError {
-            throw URLClientError.Category.network(.init(urlSession, urlRequest, urlError))
+            throw APIClientError.Category.network(.init(urlSession, urlRequest, urlError))
 		}
 	}
 
@@ -291,7 +291,7 @@ private extension StandardURLClient {
             let response = RS(data: interceptedData, urlResponse: interceptedUrlResponse, model: model)
 			return response
 		} catch {
-            throw URLClientError.Category.response(error)
+            throw APIClientError.Category.response(error)
 		}
 	}
 
@@ -334,8 +334,8 @@ private extension StandardURLClient {
 	}
 }
 
-public extension StandardURLClient {
-	func configuration (_ update: RequestConfiguration.Update) -> URLClient {
+public extension StandardAPIClient {
+	func configuration (_ update: RequestConfiguration.Update) -> APIClient {
 		Self(
 			configuration: update(configuration),
 			delegate: delegate,
@@ -343,7 +343,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient {
+	func setConfiguration (_ configuration: RequestConfiguration) -> APIClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -351,7 +351,7 @@ public extension StandardURLClient {
 		)
 	}
 
-	func delegate (_ delegate: URLClientDelegate) -> URLClient {
+	func delegate (_ delegate: APIClientDelegate) -> APIClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
@@ -360,7 +360,7 @@ public extension StandardURLClient {
 	}
 }
 
-public extension StandardURLClient {
+public extension StandardAPIClient {
     static let defaultUrlSessionBuilder: URLSessionBuilder = .standard()
     static let defaultUrlRequestBuilder: URLRequestBuilder = .standard()
     static let defaultEncoder: RequestBodyEncoder = JSONEncoder()
@@ -369,7 +369,7 @@ public extension StandardURLClient {
     func requestEntities <RQ: Request, RS: Response> (
         _ request: RQ,
         response: RS.Type,
-        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
     ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
         let configuration = createConfiguration(
@@ -388,7 +388,7 @@ public extension StandardURLClient {
     }
 }
 
-private extension StandardURLClient {
+private extension StandardAPIClient {
     var urlSessionBuilder: URLSessionBuilder {
         delegate.urlSessionBuilder ?? Self.defaultUrlSessionBuilder
     }
@@ -418,10 +418,10 @@ private extension StandardURLClient {
     }
 }
 
-public extension URLClient where Self == StandardURLClient {
+public extension APIClient where Self == StandardAPIClient {
 	static func standard (
         configuration: RequestConfiguration = .empty,
-		delegate: URLClientDelegate = .standard()
+		delegate: APIClientDelegate = .standard()
 	) -> Self {
 		.init(
 			configuration: configuration,

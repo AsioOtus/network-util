@@ -12,7 +12,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let client = StandardURLClient(
+		let client = StandardAPIClient(
 			configuration: .empty
 				.queryItems([
 					.init(name: "client.key1", value: "client.value1"),
@@ -48,7 +48,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let client = StandardURLClient(
+		let client = StandardAPIClient(
 			configuration: .empty
 				.queryItems([
 					.init(name: "key1", value: "value1"),
@@ -84,7 +84,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 				])
 		)
 
-		let client = StandardURLClient(
+		let client = StandardAPIClient(
 			configuration: .empty
 				.queryItems([
 					.init(name: "key1", value: "value1"),

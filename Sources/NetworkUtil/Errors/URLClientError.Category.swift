@@ -1,6 +1,6 @@
 import Foundation
 
-extension URLClientError {
+extension APIClientError {
     public enum Category: Error {
         case request(Error)
         case network(NetworkError)
@@ -10,7 +10,7 @@ extension URLClientError {
     }
 }
 
-extension URLClientError.Category {
+extension APIClientError.Category {
     var innerError: Error {
         switch self {
         case .request(let error): fallthrough
@@ -41,7 +41,7 @@ extension URLClientError.Category {
     }
 }
 
-extension URLClientError.Category {
+extension APIClientError.Category {
     var debugName: String {
         switch self {
         case .request: "request"
@@ -52,7 +52,7 @@ extension URLClientError.Category {
     }
 }
 
-extension URLClientError.Category {
+extension APIClientError.Category {
     var localizedDescription: String {
         .init(describing: innerError)
     }

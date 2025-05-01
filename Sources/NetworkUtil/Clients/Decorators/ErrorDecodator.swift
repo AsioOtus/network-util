@@ -1,27 +1,27 @@
 import Foundation
 
-public struct ErrorDecorator: URLClientDecorator {
-	public let urlClient: URLClient
+public struct ErrorDecorator: APIClientDecorator {
+	public let apiClient: APIClient
 
 	public let error: Error?
 
 	public init (
 		error: Error?,
-		urlClient: URLClient
+		apiClient: APIClient
 	) {
 		self.error = error
-		self.urlClient = urlClient
+		self.apiClient = apiClient
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
         response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
 		if let error { throw error }
 
-        return try await urlClient.send(
+        return try await apiClient.send(
 			request,
 			response: response,
 			delegate: delegate,
@@ -30,8 +30,8 @@ public struct ErrorDecorator: URLClientDecorator {
 	}
 }
 
-public extension URLClient {
+public extension APIClient {
 	func error (_ error: Error?) -> ErrorDecorator {
-		.init(error: error, urlClient: self)
+		.init(error: error, apiClient: self)
 	}
 }

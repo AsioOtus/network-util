@@ -1,4 +1,4 @@
-public struct StandardURLClientDelegate: URLClientDelegate {
+public struct StandardAPIClientDelegate: APIClientDelegate {
 	public var urlSessionBuilder: URLSessionBuilder?
 	public var urlRequestBuilder: URLRequestBuilder?
 	public var encoder: RequestBodyEncoder?
@@ -43,22 +43,22 @@ public struct StandardURLClientDelegate: URLClientDelegate {
         self.sending = sending
     }
 
-	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> URLClientDelegate {
+	public func addUrlRequestInterception (_ interception: @escaping URLRequestInterception) -> APIClientDelegate {
 		var copy = self
 		copy.urlRequestsInterceptions = [interception] + copy.urlRequestsInterceptions
 		return copy
 	}
 
-	public func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> URLClientDelegate {
+	public func addUrlResponseInterception (_ interception: @escaping URLResponseInterception) -> APIClientDelegate {
 		var copy = self
 		copy.urlResponsesInterceptions = [interception] + copy.urlResponsesInterceptions
 		return copy
 	}
 }
 
-public extension StandardURLClientDelegate {
-	func merge (with another: URLClientDelegate) -> StandardURLClientDelegate {
-		StandardURLClientDelegate(
+public extension StandardAPIClientDelegate {
+	func merge (with another: APIClientDelegate) -> StandardAPIClientDelegate {
+		StandardAPIClientDelegate(
 			urlSessionBuilder: self.urlSessionBuilder ?? another.urlSessionBuilder,
 			urlRequestBuilder: self.urlRequestBuilder ?? another.urlRequestBuilder,
 			encoder: self.encoder ?? another.encoder,
@@ -70,7 +70,7 @@ public extension StandardURLClientDelegate {
 	}
 }
 
-public extension URLClientDelegate where Self == StandardURLClientDelegate {
+public extension APIClientDelegate where Self == StandardAPIClientDelegate {
 	static func standard (
 		urlSessionBuilder: URLSessionBuilder? = nil,
 		urlRequestBuilder: URLRequestBuilder? = nil,

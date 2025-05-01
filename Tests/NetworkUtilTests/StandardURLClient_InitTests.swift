@@ -1,10 +1,10 @@
 import XCTest
 @testable import NetworkUtil
 
-final class StandardURLClient_InitTests: XCTestCase {
+final class StandardAPIClient_InitTests: XCTestCase {
 	func test_minimalInit () {
 		// MARK: Act
-		_ = StandardURLClient()
+		_ = StandardAPIClient()
 
 		// MARK: Assert
 		XCTAssert(true)
@@ -12,7 +12,7 @@ final class StandardURLClient_InitTests: XCTestCase {
 
 	func test_minimalSend () async throws {
 		// MARK: Arrange
-		let sut = StandardURLClient()
+		let sut = StandardAPIClient()
 
 		// MARK: Act
 		_ = try await sut.send(.get("site.com"), delegate: .standard(sending: mockSending()))

@@ -1,25 +1,25 @@
 import Combine
 import Foundation
 
-public protocol URLClientDecorator: URLClient {
-	var urlClient: URLClient { get }
+public protocol APIClientDecorator: APIClient {
+	var apiClient: APIClient { get }
 }
 
-public extension URLClientDecorator {
+public extension APIClientDecorator {
 	var logPublisher: AnyPublisher<LogRecord, Never> {
-		urlClient.logPublisher
+		apiClient.logPublisher
 	}
 
-	var configuration: RequestConfiguration { urlClient.configuration }
-	var delegate: URLClientDelegate { urlClient.delegate }
+	var configuration: RequestConfiguration { apiClient.configuration }
+	var delegate: APIClientDelegate { apiClient.delegate }
 
 	func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
-		try await urlClient.send(
+		try await apiClient.send(
 			request,
 			response: response,
 			delegate: delegate,
@@ -30,10 +30,10 @@ public extension URLClientDecorator {
     func requestEntities <RQ: Request, RS: Response> (
         _ request: RQ,
         response: RS.Type,
-        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
     ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
-        try await urlClient.requestEntities(
+        try await apiClient.requestEntities(
             request,
             response: response,
             delegate: delegate,
@@ -41,15 +41,15 @@ public extension URLClientDecorator {
         )
     }
 
-	func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient {
-		urlClient.configuration(update)
+	func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> APIClient {
+		apiClient.configuration(update)
 	}
 
-	func setConfiguration (_ configuration: RequestConfiguration) -> URLClient {
-		urlClient.setConfiguration(configuration)
+	func setConfiguration (_ configuration: RequestConfiguration) -> APIClient {
+		apiClient.setConfiguration(configuration)
 	}
 
-	func delegate (_ delegate: URLClientDelegate) -> URLClient {
-		urlClient.delegate(delegate)
+	func delegate (_ delegate: APIClientDelegate) -> APIClient {
+		apiClient.delegate(delegate)
 	}
 }

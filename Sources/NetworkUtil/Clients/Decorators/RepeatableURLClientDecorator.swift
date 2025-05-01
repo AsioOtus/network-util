@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RepeatableURLClientDecorator: URLClientDecorator {
+public struct RepeatableAPIClientDecorator: APIClientDecorator {
 	public typealias DelayStrategy = (Int) -> Int
 	public typealias ErrorHandler = (Error, Int, Int?) throws -> Void
 
@@ -8,16 +8,16 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	public let delayStrategy: DelayStrategy?
 	public let errorHandler: ErrorHandler?
 
-	public let urlClient: URLClient
+	public let apiClient: APIClient
 
 	public init (
 		maxAttempts: Int?,
-		urlClient: URLClient,
+		apiClient: APIClient,
 		delayStrategy: DelayStrategy? = nil,
 		errorHandler: ErrorHandler? = nil
 	) {
 		self.maxAttempts = maxAttempts
-		self.urlClient = urlClient
+		self.apiClient = apiClient
 		self.delayStrategy = delayStrategy
 		self.errorHandler = errorHandler
 	}
@@ -25,10 +25,10 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update?
 	) async throws -> RS {
-		try await urlClient.send(
+		try await apiClient.send(
 			request,
 			response: response,
 			delegate: .standard(sending: self.sending).merge(with: delegate),
@@ -67,19 +67,19 @@ public struct RepeatableURLClientDecorator: URLClientDecorator {
 
 public extension RequestConfiguration.InfoKey {
 	static var maxRepeatAttemptCount: Self {
-		"infoKey.RepeatableURLClientDecorator.maxRepeatAttemptCount"
+		"infoKey.RepeatableAPIClientDecorator.maxRepeatAttemptCount"
 	}
 }
 
-public extension URLClient {
+public extension APIClient {
 	func repeatable (
 		maxAttempts: Int?,
-		delayStrategy: RepeatableURLClientDecorator.DelayStrategy? = nil,
-		errorHandler: RepeatableURLClientDecorator.ErrorHandler? = nil
-	) -> RepeatableURLClientDecorator {
-		RepeatableURLClientDecorator(
+		delayStrategy: RepeatableAPIClientDecorator.DelayStrategy? = nil,
+		errorHandler: RepeatableAPIClientDecorator.ErrorHandler? = nil
+	) -> RepeatableAPIClientDecorator {
+		RepeatableAPIClientDecorator(
 			maxAttempts: maxAttempts,
-			urlClient: self,
+			apiClient: self,
 			delayStrategy: delayStrategy,
 			errorHandler: errorHandler
 		)

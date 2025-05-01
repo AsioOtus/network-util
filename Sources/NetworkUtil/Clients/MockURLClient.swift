@@ -1,15 +1,15 @@
 import Combine
 import Foundation
 
-public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
+public final class MockAPIClient <SRQ: Request, SRSM: Decodable>: APIClient {
 	public var logPublisher: AnyPublisher<LogRecord, Never> {
-		urlClient.logPublisher
+		apiClient.logPublisher
 	}
 
 	public let configuration: RequestConfiguration = .empty
-	public var delegate: URLClientDelegate = .standard()
+	public var delegate: APIClientDelegate = .standard()
 
-	public let urlClient: URLClient
+	public let apiClient: APIClient
 
 	public let stubResponseModel: SRSM
 	public let stubData: Data
@@ -23,32 +23,32 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
 		stubResponseModel: SRSM,
 		stubData: Data = .init(),
 		stubUrlResponse: URLResponse = .init(),
-		urlClient: URLClient = StandardURLClient()
+		apiClient: APIClient = StandardAPIClient()
 	) {
 		self.stubData = stubData
 		self.stubUrlResponse = stubUrlResponse
 		self.stubResponseModel = stubResponseModel
 
-		self.urlClient = urlClient
+		self.apiClient = apiClient
 	}
 
 	public init (
 		stubResponseModel: SRSM,
 		stubData: Data = .init(),
 		stubUrlResponse: URLResponse = .init(),
-		urlClient: URLClient = StandardURLClient()
+		apiClient: APIClient = StandardAPIClient()
 	) where SRQ == StandardRequest<Data> {
 		self.stubData = stubData
 		self.stubUrlResponse = stubUrlResponse
 		self.stubResponseModel = stubResponseModel
 
-		self.urlClient = urlClient
+		self.apiClient = apiClient
 	}
 
 	public func send <RQ: Request, RS: Response> (
 		_ request: RQ,
 		response: RS.Type,
-		delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
 		configurationUpdate: RequestConfiguration.Update? = nil
 	) async throws -> RS {
         (resultUrlSession, resultUrlRequest, resultRequestConfiguration) = try await requestEntities(
@@ -64,10 +64,10 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
     public func requestEntities <RQ: Request, RS: Response> (
         _ request: RQ,
         response: RS.Type,
-        delegate: some URLClientSendingDelegate<RQ, RS.Model>,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
         configurationUpdate: RequestConfiguration.Update?
     ) async throws -> (urlSession: URLSession, urlRequest: URLRequest, configuration: RequestConfiguration) {
-        try await urlClient.requestEntities(
+        try await apiClient.requestEntities(
             request,
             response: response,
             delegate: delegate,
@@ -75,7 +75,7 @@ public final class MockURLClient <SRQ: Request, SRSM: Decodable>: URLClient {
         )
     }
 
-	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> URLClient { self }
-	public func setConfiguration (_ configuration: RequestConfiguration) -> URLClient { self }
-	public func delegate (_ delegate: URLClientDelegate) -> URLClient { self }
+	public func configuration (_ update: (RequestConfiguration) -> RequestConfiguration) -> APIClient { self }
+	public func setConfiguration (_ configuration: RequestConfiguration) -> APIClient { self }
+	public func delegate (_ delegate: APIClientDelegate) -> APIClient { self }
 }

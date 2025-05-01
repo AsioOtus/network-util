@@ -1,6 +1,6 @@
 import Foundation
 
-public struct StandardURLClientSendingDelegate <RQ: Request, RSM: Decodable>: URLClientSendingDelegate {
+public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: APIClientSendingDelegate {
 	public let id: UUIDGenerator?
 	public let encoding: Encoding<RQ.Body>?
 	public let decoding: Decoding<RSM>?
@@ -46,8 +46,8 @@ public struct StandardURLClientSendingDelegate <RQ: Request, RSM: Decodable>: UR
     }
 }
 
-public extension StandardURLClientSendingDelegate {
-	func merge (with another: some URLClientSendingDelegate<RQ, RSM>) -> Self where Self.RQ == RQ, Self.RSM == RSM {
+public extension StandardAPIClientSendingDelegate {
+	func merge (with another: some APIClientSendingDelegate<RQ, RSM>) -> Self where Self.RQ == RQ, Self.RSM == RSM {
 		Self(
 			id: self.id ?? another.id,
 			encoding: self.encoding ?? another.encoding,
@@ -73,7 +73,7 @@ public extension StandardURLClientSendingDelegate {
 	}
 }
 
-public extension URLClientSendingDelegate {
+public extension APIClientSendingDelegate {
 	static func standard <RQ: Request, RSM: Decodable> (
 		id: UUIDGenerator? = nil,
 		encoding: Encoding<RQ.Body>? = nil,
@@ -82,7 +82,7 @@ public extension URLClientSendingDelegate {
 		urlResponseInterceptions: [URLResponseInterception],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
 		sending: Sending<RQ>? = nil
-	) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
+	) -> Self where Self == StandardAPIClientSendingDelegate<RQ, RSM> {
 		.init(
 			id: id,
 			encoding: encoding,
@@ -102,7 +102,7 @@ public extension URLClientSendingDelegate {
         urlResponseInterceptions: URLResponseInterception? = nil,
         urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
         sending: Sending<RQ>? = nil
-    ) -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
+    ) -> Self where Self == StandardAPIClientSendingDelegate<RQ, RSM> {
         .init(
             id: id,
             encoding: encoding,
@@ -114,7 +114,7 @@ public extension URLClientSendingDelegate {
         )
     }
 
-	static func empty <RQ: Request, RSM: Decodable> () -> Self where Self == StandardURLClientSendingDelegate<RQ, RSM> {
+	static func empty <RQ: Request, RSM: Decodable> () -> Self where Self == StandardAPIClientSendingDelegate<RQ, RSM> {
 		.init()
 	}
 }
