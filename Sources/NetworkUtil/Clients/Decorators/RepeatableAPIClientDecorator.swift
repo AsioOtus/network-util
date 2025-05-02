@@ -67,7 +67,7 @@ public struct RepeatableAPIClientDecorator: APIClientDecorator {
 
 public extension RequestConfiguration.InfoKey {
 	static var maxRepeatAttemptCount: Self {
-		"infoKey.RepeatableAPIClientDecorator.maxRepeatAttemptCount"
+		"maxRepetitionAttemptCount"
 	}
 }
 
