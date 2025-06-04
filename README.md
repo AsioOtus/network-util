@@ -7,6 +7,8 @@
 ```swift
 // Create a URLClient
 let client = StandardURLClient()
+// Create a APIClient
+let client = StandardAPIClient()
 
 // Send request
 let response = try await client.send(.get("https://api.github.com/user"))
@@ -15,8 +17,8 @@ let response = try await client.send(.get("https://api.github.com/user"))
 ## Intermediate example:
 
 ```swift
-// Create a URLClient
-let client = StandardURLClient()
+// Create a APIClient
+let client = StandardAPIClient()
     .configuration {
         $0
         .scheme("https")
@@ -36,8 +38,8 @@ let response = try await client.send(request)
 ## Advanced example:
 
 ```swift
-// Create a URLClient
-let client = StandardURLClient()
+// Create a APIClient
+let client = StandardAPIClient()
     .configuration {
         $0
             .scheme("https")
@@ -63,26 +65,26 @@ let response = try await client.send(request)
 ## Expert example:
 
 ```swift
-// Declare custom URLClient decorator
-struct AuthenticatedURLClientDecorator: URLClientDecorator {
-    var _urlClient: URLClient
-    var urlClient: URLClient {
-        _urlClient
+// Declare custom APIClient decorator
+struct AuthenticatedAPIClientDecorator: APIClientDecorator {
+    var _apiClient: APIClient
+    var apiClient: APIClient {
+        _apiClient
             .configuration {
                 $0.header(key: "Authrorization", value: "token")
             }
     }
 }
 
-// Create a URLClient
-let client = StandardURLClient()
+// Create a APIClient
+let client = StandardAPIClient()
     .configuration {
         $0
             .scheme("https")
             .host("api.github.com")
     }
 
-let authorizedClient = AuthenticatedURLClientDecorator(urlClient: client)
+let authorizedClient = AuthenticatedAPIClientDecorator(apiClient: client)
 
 // Declare custom request
 struct UserRequest: Request {

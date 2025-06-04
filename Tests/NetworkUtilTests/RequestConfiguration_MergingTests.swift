@@ -2,7 +2,7 @@ import XCTest
 @testable import NetworkUtil
 
 final class RequestConfiguration_MergingTests: XCTestCase {
-	func test_mergingOfUrlClientAndRequestConfigurations_differentQueryMerging () async throws {
+	func test_mergingOfApiClientAndRequestConfigurations_differentQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
@@ -38,7 +38,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		)
 	}
 
-	func test_mergingOfUrlClientAndRequestConfigurations_equalQueryMerging () async throws {
+	func test_mergingOfApiClientAndRequestConfigurations_equalQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
@@ -74,7 +74,7 @@ final class RequestConfiguration_MergingTests: XCTestCase {
 		)
 	}
 
-	func test_mergingOfUrlClientAndRequestAndSendingConfigurations_equalQueryMerging () async throws {
+	func test_mergingOfApiClientAndRequestAndSendingConfigurations_equalQueryMerging () async throws {
 		// MARK: Arrange
 		let request = StandardRequest(
 			configuration: .init()
