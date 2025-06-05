@@ -97,11 +97,17 @@ public extension URLComponents {
 		return copy
 	}
 
-	func host (_ host: String?) -> Self {
-		var copy = self
-		copy.host = host
-		return copy
-	}
+    func setHost (_ host: String?) -> Self {
+        var copy = self
+        copy.host = host
+        return copy
+    }
+
+    func host (_ host: String, raw: Bool = false) -> Self {
+        var copy = self
+        copy.host = joinHost(copy.host, host, raw: raw)
+        return copy
+    }
 
 	func port (_ port: Int?) -> Self {
 		var copy = self
@@ -109,29 +115,17 @@ public extension URLComponents {
 		return copy
 	}
 
-	func setPath (_ path: String) -> Self {
+	func setPath (_ path: String, raw: Bool = false) -> Self {
 		var copy = self
-        copy.path = path.prefixedWithSlash
+        copy.path = raw ? path : path.prefixedWithSlash
 		return copy
 	}
 
-	func path (_ path: String) -> Self {
+	func path (_ path: String, raw: Bool = false) -> Self {
 		var copy = self
-        copy.path = join(copy.path, path)
+        copy.path = joinPath(copy.path, path, raw: raw)
 		return copy
 	}
-
-    func setRawPath (_ path: String) -> Self {
-        var copy = self
-        copy.path = path
-        return copy
-    }
-
-    func rawPath (_ path: String) -> Self {
-        var copy = self
-        copy.path += path
-        return copy
-    }
 
 	func setQueryItems (_ queryItems: [URLQueryItem]?) -> Self {
 		var copy = self
@@ -170,9 +164,9 @@ public extension URLComponents {
 			scheme: self.scheme ?? another.scheme,
 			user: self.user ?? another.user,
 			password: self.password ?? another.password,
-			host: self.host ?? another.host,
+            host: joinHost(another.host, self.host, raw: false),
 			port: self.port ?? another.port,
-            path: join(another.path, self.path),
+            path: joinPath(another.path, self.path, raw: false),
 			queryItems: join(another.queryItems, self.queryItems),
 			fragment: self.fragment ?? another.fragment
 		)
@@ -192,20 +186,36 @@ fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
 	}
 }
 
-fileprivate func join (_ lhs: String, _ rhs: String) -> String {
-    lhs.withoutSlashPostfix + rhs.prefixedWithSlash
+fileprivate func joinHost (_ lhs: String?, _ rhs: String?, raw: Bool) -> String? {
+    switch (lhs, rhs) {
+    case (.some(let lhs), .some(let rhs)):
+        guard !raw else { return rhs + lhs }
+
+        return [rhs.withoutDotPostfix, lhs.withoutDotPrefix]
+            .filter { !$0.isEmpty }
+            .joined(separator: ".")
+
+    case (.some(let value), _), (_, .some(let value)):
+        return value
+
+    case (.none, .none):
+        return nil
+    }
+}
+
+fileprivate func joinPath (_ lhs: String, _ rhs: String, raw: Bool) -> String {
+    guard !raw else { return lhs + rhs }
+
+    return [lhs.withoutSlashPostfix, rhs.withoutSlashPrefix]
+        .filter { !$0.isEmpty }
+        .joined(separator: "/")
+        .prefixedWithSlash
 }
 
 fileprivate extension String {
     var prefixedWithSlash: Self {
         !isEmpty && !hasPrefix("/")
             ? "/" + self
-            : self
-    }
-
-    var postfixedWithSlash: Self {
-        !isEmpty && !hasSuffix("/")
-            ? self + "/"
             : self
     }
 
@@ -219,5 +229,23 @@ fileprivate extension String {
         !isEmpty && hasSuffix("/")
             ? .init(dropLast(1))
             : self
+    }
+
+    var postfixedWithDot: Self {
+        !isEmpty && !hasSuffix(".")
+            ? self + "."
+            : self
+    }
+
+    var withoutDotPrefix: Self {
+        !isEmpty && hasPrefix(".")
+            ? .init(dropFirst(1))
+            : self
+    }
+
+    var withoutDotPostfix: Self {
+        !isEmpty && hasSuffix(".")
+        ? .init(dropLast(1))
+        : self
     }
 }

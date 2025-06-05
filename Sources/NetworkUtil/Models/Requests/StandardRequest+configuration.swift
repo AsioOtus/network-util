@@ -225,12 +225,23 @@ public extension StandardRequest {
         )
     }
 
-    func host (_ host: String?) -> Self {
+    func setHost (_ host: String?) -> Self {
         .init(
             name: name,
             address: address,
             body: body,
-            configuration: configuration.host(host),
+            configuration: configuration.setHost(host),
+            delegate: delegate,
+            configurationsMerging: configurationsMerging
+        )
+    }
+
+    func host (_ host: String, raw: Bool = false) -> Self {
+        .init(
+            name: name,
+            address: address,
+            body: body,
+            configuration: configuration.host(host, raw: raw),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -247,45 +258,23 @@ public extension StandardRequest {
         )
     }
 
-    func setPath (_ path: String) -> Self {
+    func setPath (_ path: String, raw: Bool = false) -> Self {
         .init(
             name: name,
             address: address,
             body: body,
-            configuration: configuration.setPath(path),
+            configuration: configuration.setPath(path, raw: raw),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
     }
 
-    func path (_ path: String) -> Self {
+    func path (_ path: String, raw: Bool = false) -> Self {
         .init(
             name: name,
             address: address,
             body: body,
-            configuration: configuration.path(path),
-            delegate: delegate,
-            configurationsMerging: configurationsMerging
-        )
-    }
-
-    func setRawPath (_ path: String) -> Self {
-        .init(
-            name: name,
-            address: address,
-            body: body,
-            configuration: configuration.setRawPath(path),
-            delegate: delegate,
-            configurationsMerging: configurationsMerging
-        )
-    }
-
-    func rawPath (_ path: String) -> Self {
-        .init(
-            name: name,
-            address: address,
-            body: body,
-            configuration: configuration.rawPath(path),
+            configuration: configuration.path(path, raw: raw),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )

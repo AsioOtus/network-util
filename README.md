@@ -5,8 +5,6 @@
 ## Basic example:
 
 ```swift
-// Create a URLClient
-let client = StandardURLClient()
 // Create a APIClient
 let client = StandardAPIClient()
 

@@ -1,59 +1,53 @@
-import XCTest
+import Foundation
+import Testing
+
 @testable import NetworkUtil
 
-final class StandardAPIClient_Tests: XCTestCase {
-	let baseRequest = StandardRequest()
-	let baseConfiguration = RequestConfiguration()
-
-	var sut: StandardAPIClient!
-
-	override func tearDown () {
-		sut = nil
-	}
-
-	func test_urlRequestCreation () async throws {
+struct StandardAPIClient_Tests {
+    @Test
+	func urlRequestCreation () async throws {
 		// MARK: Assert
 		let expectedUrlRequest = URLRequest(url: .init(string: "/subpath")!)
 
 		let sending: AnySending = { sendingModel, _ in
-			self.assert(resultUrlRequest: sendingModel.urlRequest, expectedUrlRequest: expectedUrlRequest)
+            #expect(sendingModel.urlRequest == expectedUrlRequest)
 
 			return (.init(), .init())
 		}
 
 		// MARK: Arrange
-		sut = .init(
-			configuration: baseConfiguration,
+        let sut = StandardAPIClient(
+			configuration: RequestConfiguration(),
 			delegate: .standard(sending: sending)
 		)
 
-		let request = baseRequest
-			.updateConfiguration { $0.path("subpath") }
+		let request = StandardRequest().updateConfiguration { $0.path("subpath") }
 
 		// MARK: Act
 		_ = try await sut.send(request, delegate: .standard(decoding: { _, _, _ in Data() }))
 	}
 
-	func test_urlSessionCreation () async throws {
+    @Test
+	func urlSessionCreation () async throws {
 		// MARK: Assert
 		let expectedUrlSession = URLSession(configuration: .default)
 
 		let sending: AnySending = { sendingModel, _ in
-			XCTAssertEqual(sendingModel.urlSession, expectedUrlSession)
-			
+            #expect(sendingModel.urlSession == expectedUrlSession)
+
 			return (.init(), .init())
 		}
 
 		// MARK: Arrange
-		sut = .init(
-			configuration: baseConfiguration,
+		let sut = StandardAPIClient(
+			configuration: RequestConfiguration(),
 			delegate: .standard(
 				urlSessionBuilder: expectedUrlSession,
 				sending: sending
 			)
 		)
 
-		let request = baseRequest
+		let request = StandardRequest()
 
 		// MARK: Act
 		_ = try await sut.send(request, delegate: .standard(decoding: { _, _, _ in Data() }))

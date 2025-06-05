@@ -21,7 +21,6 @@ struct APIClient_decoratingTests {
                     .configuration {
                         $0
                             .scheme("https")
-                            .host("github.com")
                     }
             }
 
@@ -36,7 +35,7 @@ struct APIClient_decoratingTests {
         // MARK: Assert
         let expectedConfiguration = RequestConfiguration()
             .scheme("https")
-            .host("github.com")
+            .host("google.com")
             .path("api")
 
         #expect(decoratedClient.configuration == expectedConfiguration)

@@ -143,10 +143,20 @@ public extension RequestConfiguration {
         )
     }
 
-    func host (_ host: String?) -> Self {
+    func setHost (_ host: String?) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.host(host),
+            urlComponents: urlComponents.setHost(host),
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
+    func host (_ host: String, raw: Bool = false) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents.host(host, raw: raw),
             headers: headers,
             timeout: timeout,
             info: info
@@ -163,40 +173,20 @@ public extension RequestConfiguration {
         )
     }
 
-    func setPath (_ path: String) -> Self {
+    func setPath (_ path: String, raw: Bool = false) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.setPath(path),
+            urlComponents: urlComponents.setPath(path, raw: raw),
             headers: headers,
             timeout: timeout,
             info: info
         )
     }
 
-    func path (_ path: String) -> Self {
+    func path (_ path: String, raw: Bool = false) -> Self {
         .init(
             method: method,
-            urlComponents: urlComponents.path(path),
-            headers: headers,
-            timeout: timeout,
-            info: info
-        )
-    }
-
-    func setRawPath (_ path: String) -> Self {
-        .init(
-            method: method,
-            urlComponents: urlComponents.setRawPath(path),
-            headers: headers,
-            timeout: timeout,
-            info: info
-        )
-    }
-
-    func rawPath (_ path: String) -> Self {
-        .init(
-            method: method,
-            urlComponents: urlComponents.rawPath(path),
+            urlComponents: urlComponents.path(path, raw: raw),
             headers: headers,
             timeout: timeout,
             info: info
