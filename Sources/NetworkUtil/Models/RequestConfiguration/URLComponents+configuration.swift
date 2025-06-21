@@ -105,7 +105,7 @@ public extension URLComponents {
 
     func host (_ host: String, raw: Bool = false) -> Self {
         var copy = self
-        copy.host = joinHost(copy.host, host, raw: raw)
+        copy.host = joinHost(host, copy.host, raw: raw)
         return copy
     }
 
@@ -164,10 +164,10 @@ public extension URLComponents {
 			scheme: self.scheme ?? another.scheme,
 			user: self.user ?? another.user,
 			password: self.password ?? another.password,
-            host: joinHost(another.host, self.host, raw: false),
+            host: joinHost(self.host, another.host, raw: false),
 			port: self.port ?? another.port,
             path: joinPath(another.path, self.path, raw: false),
-			queryItems: join(another.queryItems, self.queryItems),
+			queryItems: joinQuery(another.queryItems, self.queryItems),
 			fragment: self.fragment ?? another.fragment
 		)
 	}
@@ -177,7 +177,7 @@ public extension URLComponents {
     }
 }
 
-fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
+fileprivate func joinQuery <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
 	switch (lhs, rhs) {
 	case (.none, .none): nil
 	case (.none, _): rhs
@@ -189,9 +189,9 @@ fileprivate func join <T> (_ lhs: Array<T>?, _ rhs: Array<T>?) -> Array<T>? {
 fileprivate func joinHost (_ lhs: String?, _ rhs: String?, raw: Bool) -> String? {
     switch (lhs, rhs) {
     case (.some(let lhs), .some(let rhs)):
-        guard !raw else { return rhs + lhs }
+        guard !raw else { return lhs + rhs }
 
-        return [rhs.withoutDotPostfix, lhs.withoutDotPrefix]
+        return [lhs.withoutDotPostfix, rhs.withoutDotPrefix]
             .filter { !$0.isEmpty }
             .joined(separator: ".")
 
@@ -228,12 +228,6 @@ fileprivate extension String {
     var withoutSlashPostfix: Self {
         !isEmpty && hasSuffix("/")
             ? .init(dropLast(1))
-            : self
-    }
-
-    var postfixedWithDot: Self {
-        !isEmpty && !hasSuffix(".")
-            ? self + "."
             : self
     }
 

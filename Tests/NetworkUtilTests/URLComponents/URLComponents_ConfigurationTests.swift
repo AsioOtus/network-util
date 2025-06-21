@@ -305,4 +305,172 @@ struct URLComponents_ConfigurationTests {
         sut = sut.path("/details", raw: true)
         #expect(sut.path == "api/user/info//details")
     }
+
+    @Test
+    func setQueryItems () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.setQueryItems([
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+
+        sut = sut.setQueryItems([
+            .init(name: "key3", value: "value3"),
+            .init(name: "key4", value: "value4"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key3", value: "value3"),
+            .init(name: "key4", value: "value4"),
+        ])
+
+        sut = sut.setQueryItems(nil)
+        #expect(sut.queryItems == nil)
+
+        sut = sut.setQueryItems([
+            .init(name: "key5", value: "value5"),
+            .init(name: "key6", value: "value6"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key5", value: "value5"),
+            .init(name: "key6", value: "value6"),
+        ])
+    }
+
+    @Test
+    func setQueryItems_emptyAndNil () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.setQueryItems([])
+        #expect(sut.queryItems == [])
+
+        sut = sut.setQueryItems(nil)
+        #expect(sut.queryItems == nil)
+    }
+
+    @Test
+    func setQueryItem () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.setQueryItem(.init(name: "key1", value: "value1"))
+        #expect(sut.queryItems == [.init(name: "key1", value: "value1")])
+
+        sut = sut.setQueryItem(.init(name: "key2", value: "value2"))
+        #expect(sut.queryItems == [.init(name: "key2", value: "value2")])
+    }
+
+    @Test
+    func queryItems () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.queryItems([
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+
+        sut = sut.queryItems([
+            .init(name: "key3", value: "value3"),
+            .init(name: "key4", value: "value4"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+            .init(name: "key3", value: "value3"),
+            .init(name: "key4", value: "value4"),
+        ])
+    }
+
+    @Test
+    func queryItems_duplicatedKeys () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.queryItems([
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+
+        sut = sut.queryItems([
+            .init(name: "key1", value: "value1"),
+            .init(name: "key3", value: "value3"),
+        ])
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+            .init(name: "key1", value: "value1"),
+            .init(name: "key3", value: "value3"),
+        ])
+    }
+
+    @Test
+    func queryItem () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.queryItem(.init(name: "key1", value: "value1"))
+        #expect(sut.queryItems == [.init(name: "key1", value: "value1"),])
+
+        sut = sut.queryItem(.init(name: "key2", value: "value2"))
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key2", value: "value2"),
+        ])
+    }
+
+    @Test
+    func queryItem_duplicatedKeys () {
+        var sut = URLComponents()
+
+        #expect(sut.queryItems == nil)
+
+        sut = sut.queryItem(.init(name: "key1", value: "value1"))
+        #expect(sut.queryItems == [.init(name: "key1", value: "value1")])
+
+        sut = sut.queryItem(.init(name: "key1", value: "value1"))
+        #expect(sut.queryItems == [
+            .init(name: "key1", value: "value1"),
+            .init(name: "key1", value: "value1"),
+        ])
+    }
+
+    @Test
+    func fragment () {
+        var sut = URLComponents()
+
+        #expect(sut.fragment == nil)
+
+        sut = sut.fragment("fragment1")
+        #expect(sut.fragment == "fragment1")
+
+        sut = sut.fragment("fragment2")
+        #expect(sut.fragment == "fragment2")
+
+        sut = sut.fragment(nil)
+        #expect(sut.fragment == nil)
+
+        sut = sut.fragment("fragment3")
+        #expect(sut.fragment == "fragment3")
+    }
 }
