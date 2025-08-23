@@ -6,6 +6,7 @@
 
 ```swift
 // Create a APIClient
+// Create an APIClient
 let client = StandardAPIClient()
 
 // Send request
@@ -16,11 +17,14 @@ let response = try await client.send(.get("https://api.github.com/user"))
 
 ```swift
 // Create a APIClient
+// Create an APIClient
 let client = StandardAPIClient()
     .configuration {
         $0
         .scheme("https")
         .host("api.github.com")
+            .scheme("https")
+            .host("api.github.com")
     }
 
 // Create request
@@ -37,6 +41,7 @@ let response = try await client.send(request)
 
 ```swift
 // Create a APIClient
+// Create an APIClient
 let client = StandardAPIClient()
     .configuration {
         $0
@@ -48,6 +53,7 @@ let client = StandardAPIClient()
 struct UserRequest: Request {
     var configuration: RequestConfiguration {
         .init()
+        .empty
         .path("user")
     }
 }
@@ -75,6 +81,7 @@ struct AuthenticatedAPIClientDecorator: APIClientDecorator {
 }
 
 // Create a APIClient
+// Create an APIClient
 let client = StandardAPIClient()
     .configuration {
         $0
@@ -88,6 +95,7 @@ let authorizedClient = AuthenticatedAPIClientDecorator(apiClient: client)
 struct UserRequest: Request {
     var configuration: RequestConfiguration {
         .init()
+        .empty
         .path("user")
     }
 }
