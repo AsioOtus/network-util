@@ -82,7 +82,7 @@ public extension StandardAPIClient {
                 request: request,
                 completion: .init(
                     urlRequest: urlRequest,
-                    data: data,
+                    responseData: data,
                     urlResponse: urlResponse,
                     error: nil
                 )
@@ -104,7 +104,7 @@ public extension StandardAPIClient {
                 request: request,
                 completion: .init(
                     urlRequest: urlRequestBuffer,
-                    data: dataBuffer,
+                    responseData: dataBuffer,
                     urlResponse: urlResponseBuffer,
                     error: error
                 )
@@ -118,7 +118,7 @@ public extension StandardAPIClient {
                 request: request,
                 completion: .init(
                     urlRequest: urlRequestBuffer,
-                    data: dataBuffer,
+                    responseData: dataBuffer,
                     urlResponse: urlResponseBuffer,
                     error: error
                 )

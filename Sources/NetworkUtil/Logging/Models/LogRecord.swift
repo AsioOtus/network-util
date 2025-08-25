@@ -16,10 +16,3 @@ extension LogRecord: CustomStringConvertible {
         "\(requestId) | \(message.debugName.capitalized) – \(message)"
     }
 }
-
-public struct LogCompletion {
-    public let urlRequest: URLRequest?
-    public let data: Data?
-    public let urlResponse: URLResponse?
-    public let error: APIClientError?
-}
