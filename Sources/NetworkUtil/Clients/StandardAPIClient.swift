@@ -2,7 +2,8 @@ import Combine
 import Foundation
 
 public struct StandardAPIClient: APIClient {
-	let logger: Logger
+    let logger: Logger
+    let completionLogger: CompletionLogger
 
 	public let configuration: RequestConfiguration
 	public let delegate: APIClientDelegate
@@ -10,6 +11,10 @@ public struct StandardAPIClient: APIClient {
 	public var logPublisher: AnyPublisher<LogRecord, Never> {
 		logger.eraseToAnyPublisher()
 	}
+
+    public var completionLogPublisher: AnyPublisher<CompletionLogRecord, Never> {
+        completionLogger.eraseToAnyPublisher()
+    }
 
 	public init (
 		configuration: RequestConfiguration = .empty,
@@ -19,17 +24,20 @@ public struct StandardAPIClient: APIClient {
 		self.delegate = delegate
 
 		self.logger = .init()
+        self.completionLogger = .init()
 	}
 
 	private init (
 		configuration: RequestConfiguration,
 		delegate: APIClientDelegate,
-		logger: Logger
+		logger: Logger,
+        completionLogger: CompletionLogger
 	) {
 		self.configuration = configuration
 		self.delegate = delegate
 
 		self.logger = logger
+        self.completionLogger = completionLogger
 	}
 }
 
@@ -42,9 +50,22 @@ public extension StandardAPIClient {
 	) async throws -> RS {
         let requestId = delegate.id?() ?? .init()
 
+        var urlSessionBuffer: URLSession?
         var urlRequestBuffer: URLRequest?
-        var dataBuffer: Data?
-        var urlResponseBuffer: URLResponse?
+        var responseBuffer: (data: Data, urlResponse: URLResponse)?
+        var errorBuffer: APIClientError?
+
+        defer {
+            completionLogger
+                .log(
+                    requestId: requestId,
+                    request: request,
+                    urlSession: urlSessionBuffer,
+                    urlRequest: urlRequestBuffer,
+                    response: responseBuffer,
+                    error: errorBuffer
+                )
+        }
 
         do {
             let (urlSession, urlRequest, configuration) = try await requestEntities(
@@ -54,14 +75,15 @@ public extension StandardAPIClient {
                 configurationUpdate: configurationUpdate
             )
 
+            urlSessionBuffer = urlSession
             urlRequestBuffer = urlRequest
 
-            logger.log(
-                message: .request(urlSession, urlRequest),
-                requestId: requestId,
-                request: request,
-                completion: nil
-            )
+            logger
+                .log(
+                    message: .request(urlSession, urlRequest),
+                    requestId: requestId,
+                    request: request
+                )
 
             let (data, urlResponse) = try await sendAction(
                 urlSession,
@@ -73,20 +95,14 @@ public extension StandardAPIClient {
                 delegate.sending
             )
 
-            dataBuffer = data
-            urlResponseBuffer = urlResponse
+            responseBuffer = (data, urlResponse)
 
-            logger.log(
-                message: .response(data, urlResponse),
-                requestId: requestId,
-                request: request,
-                completion: .init(
-                    urlRequest: urlRequest,
-                    responseData: data,
-                    urlResponse: urlResponse,
-                    error: nil
+            logger
+                .log(
+                    message: .response(data, urlResponse),
+                    requestId: requestId,
+                    request: request
                 )
-            )
 
             let response: RS = try createResponse(
                 data,
@@ -98,31 +114,27 @@ public extension StandardAPIClient {
             return response
         } catch let errorCategory as APIClientError.Category {
             let error = APIClientError(requestId: requestId, request: request, category: errorCategory)
-            logger.log(
-                message: .error(error),
-                requestId: requestId,
-                request: request,
-                completion: .init(
-                    urlRequest: urlRequestBuffer,
-                    responseData: dataBuffer,
-                    urlResponse: urlResponseBuffer,
-                    error: error
+            errorBuffer = error
+            
+            logger
+                .log(
+                    message: .error(error),
+                    requestId: requestId,
+                    request: request
                 )
-            )
+
             throw error
         } catch let error {
             let error = APIClientError(requestId: requestId, request: request, category: .general(error) )
-            logger.log(
-                message: .error(error),
-                requestId: requestId,
-                request: request,
-                completion: .init(
-                    urlRequest: urlRequestBuffer,
-                    responseData: dataBuffer,
-                    urlResponse: urlResponseBuffer,
-                    error: error
+            errorBuffer = error
+
+            logger
+                .log(
+                    message: .error(error),
+                    requestId: requestId,
+                    request: request
                 )
-            )
+
             throw error
         }
 	}
@@ -339,7 +351,8 @@ public extension StandardAPIClient {
 		Self(
 			configuration: update(configuration),
 			delegate: delegate,
-			logger: logger
+			logger: logger,
+            completionLogger: completionLogger
 		)
 	}
 
@@ -347,7 +360,8 @@ public extension StandardAPIClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
-			logger: logger
+            logger: logger,
+            completionLogger: completionLogger
 		)
 	}
 
@@ -355,7 +369,8 @@ public extension StandardAPIClient {
 		Self(
 			configuration: configuration,
 			delegate: delegate,
-			logger: logger
+            logger: logger,
+            completionLogger: completionLogger
 		)
 	}
 }

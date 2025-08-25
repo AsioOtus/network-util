@@ -7,15 +7,13 @@ extension Logger {
     func log (
         message: LogMessage,
         requestId: UUID,
-        request: any Request,
-        completion: LogCompletion?
+        request: any Request
     ) {
         send(
             .init(
                 requestId: requestId,
                 request: request,
-                message: message,
-                completion: completion
+                message: message
             )
         )
     }

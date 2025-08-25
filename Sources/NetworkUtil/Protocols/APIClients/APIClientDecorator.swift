@@ -10,6 +10,10 @@ public extension APIClientDecorator {
 		apiClient.logPublisher
 	}
 
+    var completionLogPublisher: AnyPublisher<CompletionLogRecord, Never> {
+        apiClient.completionLogPublisher
+    }
+
 	var configuration: RequestConfiguration { apiClient.configuration }
 	var delegate: APIClientDelegate { apiClient.delegate }
 

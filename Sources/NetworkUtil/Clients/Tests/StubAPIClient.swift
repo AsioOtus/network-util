@@ -11,6 +11,7 @@ public final class StubAPIClient: APIClient {
     public var delegate: any APIClientDelegate
 
     public var logPublisher: AnyPublisher<LogRecord, Never> { Empty().eraseToAnyPublisher() }
+    public var completionLogPublisher: AnyPublisher<CompletionLogRecord, Never> { Empty().eraseToAnyPublisher() }
 
     public var responses: [String: any Response] = [:]
 

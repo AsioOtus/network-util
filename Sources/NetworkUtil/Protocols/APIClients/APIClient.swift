@@ -3,6 +3,7 @@ import Foundation
 
 public protocol APIClient {
 	var logPublisher: AnyPublisher<LogRecord, Never> { get }
+    var completionLogPublisher: AnyPublisher<CompletionLogRecord, Never> { get }
 
 	var configuration: RequestConfiguration { get }
 	var delegate: APIClientDelegate { get }
