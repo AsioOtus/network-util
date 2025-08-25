@@ -13,15 +13,15 @@ public protocol Response <Model>: CustomStringConvertible {
 public extension Response {
 	var description: String { urlResponse.description }
 
-    public init (data: Data = .init(), urlResponse: HTTPURLResponse, model: Model) {
+    init (data: Data = .init(), urlResponse: HTTPURLResponse, model: Model) {
         self.init(data: data, urlResponse: urlResponse, model: model)
     }
 
-    public init (data: Data = .init(), urlResponse: URLResponse) where Model == Data {
+    init (data: Data = .init(), urlResponse: URLResponse) where Model == Data {
         self.init(data: data, urlResponse: urlResponse, model: data)
     }
 
-    public init (data: Data = .init(), urlResponse: HTTPURLResponse) where Model == Data {
+    init (data: Data = .init(), urlResponse: HTTPURLResponse) where Model == Data {
         self.init(data: data, urlResponse: urlResponse, model: data)
     }
 }

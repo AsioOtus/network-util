@@ -13,7 +13,7 @@ public extension APIClientError {
 }
 
 extension APIClientError: LocalizedError {
-    public var errorDescription: String {
+    public var errorDescription: String? {
         [
             debugName,
             request.name,
