@@ -10,5 +10,6 @@ public protocol APIClientSendingDelegate <RQ, RSM> {
 	var urlRequestInterceptions: [URLRequestInterception] { get }
 	var urlResponseInterceptions: [URLResponseInterception] { get }
 	var urlSessionTaskDelegate: URLSessionTaskDelegate? { get }
-	var sending: Sending<RQ>? { get }
+    var sending: Sending<RQ>? { get }
+    var responseModelPreparation: Preparation<RSM>? { get }
 }

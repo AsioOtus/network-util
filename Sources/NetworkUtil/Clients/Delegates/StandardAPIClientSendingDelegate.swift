@@ -8,6 +8,7 @@ public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: AP
 	public let urlResponseInterceptions: [URLResponseInterception]
 	public let urlSessionTaskDelegate: URLSessionTaskDelegate?
 	public let sending: Sending<RQ>?
+    public let responseModelPreparation: Preparation<RSM>?
 
 	public init (
 		id: UUIDGenerator? = nil,
@@ -16,7 +17,8 @@ public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: AP
 		urlRequestInterceptions: [URLRequestInterception],
 		urlResponseInterceptions: [URLResponseInterception],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
-		sending: Sending<RQ>? = nil
+		sending: Sending<RQ>? = nil,
+        responseModelPreparation: Preparation<RSM>? = nil
 	) {
 		self.id = id
 		self.encoding = encoding
@@ -25,6 +27,7 @@ public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: AP
 		self.urlResponseInterceptions = urlResponseInterceptions
 		self.urlSessionTaskDelegate = urlSessionTaskDelegate
 		self.sending = sending
+        self.responseModelPreparation = responseModelPreparation
 	}
 
     public init (
@@ -34,7 +37,8 @@ public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: AP
         urlRequestInterception: URLRequestInterception? = nil,
         urlResponseInterception: URLResponseInterception? = nil,
         urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
-        sending: Sending<RQ>? = nil
+        sending: Sending<RQ>? = nil,
+        responseModelPreparation: Preparation<RSM>? = nil
     ) {
         self.id = id
         self.encoding = encoding
@@ -43,6 +47,7 @@ public struct StandardAPIClientSendingDelegate <RQ: Request, RSM: Decodable>: AP
         self.urlResponseInterceptions = urlResponseInterception.map { [$0] } ?? []
         self.urlSessionTaskDelegate = urlSessionTaskDelegate
         self.sending = sending
+        self.responseModelPreparation = responseModelPreparation
     }
 }
 
@@ -68,7 +73,12 @@ public extension StandardAPIClientSendingDelegate {
 						sendingAction
 					)
 				}
-			}
+			},
+            responseModelPreparation: {
+                let anotherPreparedModel = try another.responseModelPreparation?($0) ?? $0
+                let selfPreparedModel = try self.responseModelPreparation?(anotherPreparedModel) ?? anotherPreparedModel
+                return selfPreparedModel
+            }
 		)
 	}
 }
@@ -81,7 +91,8 @@ public extension APIClientSendingDelegate {
 		urlRequestInterceptions: [URLRequestInterception],
 		urlResponseInterceptions: [URLResponseInterception],
 		urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
-		sending: Sending<RQ>? = nil
+		sending: Sending<RQ>? = nil,
+        responseModelPreparation: Preparation<RSM>? = nil
 	) -> Self where Self == StandardAPIClientSendingDelegate<RQ, RSM> {
 		.init(
 			id: id,
@@ -90,7 +101,8 @@ public extension APIClientSendingDelegate {
 			urlRequestInterceptions: urlRequestInterceptions,
 			urlResponseInterceptions: urlResponseInterceptions,
 			urlSessionTaskDelegate: urlSessionTaskDelegate,
-			sending: sending
+			sending: sending,
+            responseModelPreparation: responseModelPreparation
 		)
 	}
 
@@ -101,7 +113,8 @@ public extension APIClientSendingDelegate {
         urlRequestInterceptions: URLRequestInterception? = nil,
         urlResponseInterceptions: URLResponseInterception? = nil,
         urlSessionTaskDelegate: URLSessionTaskDelegate? = nil,
-        sending: Sending<RQ>? = nil
+        sending: Sending<RQ>? = nil,
+        responseModelPreparation: Preparation<RSM>? = nil
     ) -> Self where Self == StandardAPIClientSendingDelegate<RQ, RSM> {
         .init(
             id: id,
@@ -110,7 +123,8 @@ public extension APIClientSendingDelegate {
             urlRequestInterceptions: urlRequestInterceptions.map { [$0] } ?? [],
             urlResponseInterceptions: urlResponseInterceptions.map { [$0] } ?? [],
             urlSessionTaskDelegate: urlSessionTaskDelegate,
-            sending: sending
+            sending: sending,
+            responseModelPreparation: responseModelPreparation
         )
     }
 

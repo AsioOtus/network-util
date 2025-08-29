@@ -108,7 +108,8 @@ public extension StandardAPIClient {
                 data,
                 urlResponse,
                 delegate.decoding,
-                delegate.urlResponseInterceptions
+                delegate.urlResponseInterceptions,
+                delegate.responseModelPreparation
             )
 
             return response
@@ -295,12 +296,14 @@ private extension StandardAPIClient {
 		_ data: Data,
 		_ urlResponse: URLResponse,
 		_ decoding: Decoding<RS.Model>?,
-		_ urlResponseInterceptions: [URLResponseInterception]
+		_ urlResponseInterceptions: [URLResponseInterception],
+        _ responseModelPreparation: Preparation<RS.Model>?
 	) throws -> RS {
 		do {
 			let (interceptedData, interceptedUrlResponse) = try interceptUrlResponse(data, urlResponse, urlResponseInterceptions)
 			let model = try decodeResponseData(interceptedData, decoding, interceptedUrlResponse)
-            let response = RS(data: interceptedData, urlResponse: interceptedUrlResponse, model: model)
+            let preparedModel = try responseModelPreparation?(model) ?? model
+            let response = RS(data: interceptedData, urlResponse: interceptedUrlResponse, model: preparedModel)
 			return response
 		} catch {
             throw APIClientError.Category.response(error)
