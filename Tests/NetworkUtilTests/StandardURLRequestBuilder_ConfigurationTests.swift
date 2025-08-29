@@ -11,7 +11,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
-			address: nil,
             configuration: .empty.host("site.com"),
 			body: nil
 		)
@@ -30,7 +29,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
-			address: nil,
             configuration: .empty
                 .path("base-subpath")
                 .path("/added-subpath"),
@@ -49,7 +47,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
-            address: nil,
             configuration: .empty.path("/base-subpath", raw: true),
             body: nil
         )
@@ -66,7 +63,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
-            address: nil,
             configuration: .empty
                 .path("base-subpath")
                 .path("added-subpath"),
@@ -85,7 +81,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
         // MARK: Act
         let resultUrlRequest = try sut.build(
-            address: nil,
             configuration: .empty
                 .path("/base-subpath", raw: true)
                 .path("/added-subpath", raw: true),
@@ -104,7 +99,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
-			address: nil,
 			configuration: .empty.port(1111),
 			body: nil
 		)
@@ -121,7 +115,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
-			address: nil,
 			configuration: .empty.scheme("http"),
 			body: nil
 		)
@@ -138,7 +131,6 @@ struct StandardURLRequestBuilder_ConfigurationTests {
 
 		// MARK: Act
 		let resultUrlRequest = try sut.build(
-			address: nil,
 			configuration: .empty.host("site.com").timeout(10),
 			body: nil
 		)

@@ -187,7 +187,6 @@ private extension StandardAPIClient {
 		let body = try encodeRequestBody(request, encoding)
 
 		let urlRequest = try urlRequestBuilder.build(
-			address: request.address,
 			configuration: configuration,
 			body: body
 		)

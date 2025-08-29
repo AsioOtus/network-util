@@ -10,13 +10,7 @@ extension XCTestCase {
 		XCTAssertEqual(resultUrlRequest, expectedUrlRequest)
 	}
 
-	func assert (resultRequest: any Request, expectedRequest: any Request) {
-		XCTAssertEqual(resultRequest.address, expectedRequest.address)
-		XCTAssertEqual(resultRequest.configuration, expectedRequest.configuration)
-	}
-
 	func assert <Body: Encodable> (resultRequest: any Request<Body>, expectedRequest: any Request<Body>) where Body: Equatable {
-		XCTAssertEqual(resultRequest.address, expectedRequest.address)
 		XCTAssertEqual(resultRequest.body, expectedRequest.body)
 		XCTAssertEqual(resultRequest.configuration, expectedRequest.configuration)
 	}

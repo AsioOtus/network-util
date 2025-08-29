@@ -3,7 +3,6 @@ import Foundation
 public extension Request {
     static func standard <Body> (
         name: String = .init(describing: Self.self),
-        _ address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Body>,
@@ -14,7 +13,6 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             body: body,
             configuration: configuration,
             delegate: delegate,
@@ -24,7 +22,6 @@ public extension Request {
 
     static func standard <Body> (
         name: String = .init(describing: Self.self),
-        _ address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
@@ -34,7 +31,6 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             body: body,
             configuration: configuration,
             delegate: StandardRequestDelegate.empty(),
@@ -44,7 +40,6 @@ public extension Request {
 
     static func standard (
         name: String = .init(describing: Self.self),
-        _ address: String? = nil,
         configuration: RequestConfiguration = .init(),
         delegate: some RequestDelegate<Data>,
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
@@ -54,7 +49,6 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             configuration: configuration,
             delegate: delegate,
             configurationsMerging: configurationsMerging
@@ -63,7 +57,6 @@ public extension Request {
 
     static func standard (
         name: String = .init(describing: Self.self),
-        _ address: String? = nil,
         configuration: RequestConfiguration = .init(),
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
     )
@@ -72,13 +65,14 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             configuration: configuration,
             delegate: StandardRequestDelegate.empty(),
             configurationsMerging: configurationsMerging
         )
     }
+}
 
+public extension Request {
     static func get (
         name: String = .init(describing: Self.self),
         path: String,
@@ -91,14 +85,8 @@ public extension Request {
     {
         .init(
             name: name,
-            address: nil,
             body: nil,
-            configuration: configuration.merge(
-                with: .init(method: .get)
-                    .updateUrlComponents {
-                        $0.path(path)
-                    }
-            ),
+            configuration: .init().method(.get).path(path).merge(into: configuration),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -116,9 +104,8 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             body: nil,
-            configuration: configuration.merge(with: .init(method: .get)),
+            configuration: .init().method(.get).address(address).merge(into: configuration),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -137,14 +124,8 @@ public extension Request {
     {
         .init(
             name: name,
-            address: nil,
             body: body,
-            configuration: configuration.merge(
-                with: .init(method: .post)
-                    .updateUrlComponents {
-                        $0.path(path)
-                    }
-            ),
+            configuration: .init().method(.post).path(path).merge(into: configuration),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -163,9 +144,8 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             body: body,
-            configuration: .init(method: .post).merge(with: configuration),
+            configuration: .init().method(.post).address(address).merge(into: configuration),
             delegate: delegate,
             configurationsMerging: configurationsMerging
         )
@@ -173,7 +153,6 @@ public extension Request {
 
     static func post <B> (
         name: String = .init(describing: Self.self),
-        _ address: String? = nil,
         body: Body? = nil,
         configuration: RequestConfiguration = .init(),
         configurationsMerging: @escaping RequestConfiguration.Merging = defaultConfigurationMerging
@@ -183,9 +162,8 @@ public extension Request {
     {
         .init(
             name: name,
-            address: address,
             body: body,
-            configuration: .init(method: .post).merge(with: configuration),
+            configuration: .init().method(.post).merge(into: configuration),
             delegate: StandardRequestDelegate.empty(),
             configurationsMerging: configurationsMerging
         )

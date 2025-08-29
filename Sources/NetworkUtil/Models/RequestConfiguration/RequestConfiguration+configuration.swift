@@ -11,10 +11,25 @@ public extension RequestConfiguration {
         )
     }
 
-    func urlComponents (_ urlComponents: URLComponents) -> Self {
+    func setUrlComponents (_ urlComponents: URLComponents) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
+            headers: headers,
+            timeout: timeout,
+            info: info
+        )
+    }
+
+    func urlComponents (_ update: (URLComponents) -> URLComponents) -> Self {
+        setUrlComponents(update(urlComponents))
+    }
+
+    func address (_ address: String?) -> Self {
+        .init(
+            method: method,
+            urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -241,11 +256,5 @@ public extension RequestConfiguration {
             timeout: timeout,
             info: info
         )
-    }
-}
-
-public extension RequestConfiguration {
-    func updateUrlComponents (_ update: (URLComponents) -> URLComponents) -> Self {
-        urlComponents(update(urlComponents))
     }
 }

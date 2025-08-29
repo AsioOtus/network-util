@@ -4,7 +4,6 @@ public protocol Request <Body> {
 	associatedtype Body: Encodable = Data
 
     var name: String { get }
-	var address: String? { get }
 	var body: Body? { get }
 	var configuration: RequestConfiguration { get }
 	var delegate: any RequestDelegate<Body> { get }
@@ -14,8 +13,6 @@ public protocol Request <Body> {
 
 public extension Request {
     var name: String { .init(describing: Self.self) }
-
-	var address: String? { nil }
 
 	var body: Body? { nil }
 
