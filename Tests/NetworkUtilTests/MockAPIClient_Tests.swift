@@ -1,9 +1,12 @@
-import XCTest
+import Foundation
+import Testing
 
 @testable import NetworkUtil
 
-final class MockAPIClient_Tests: XCTestCase {
-	func test_sendGetRequest_shouldReturnExpectedStubResponse () async throws {
+@Suite("MockAPIClient")
+struct MockAPIClientTests {
+    @Test("send method should return stub response")
+	func sendMethodShouldReturnStubResponse () async throws {
 		// MARK: Arrange
 		let expectedResponseModel = "test"
 		let expectedUrlRequest = URLRequest(url: URLComponents().url!)
@@ -14,8 +17,7 @@ final class MockAPIClient_Tests: XCTestCase {
 		let response = try await sut.send(.get(), responseModel: String.self)
 
 		// MARK: Assert
-		XCTAssertEqual(response.model, expectedResponseModel)
-
-		assert(resultUrlRequest: sut.resultUrlRequest!, expectedUrlRequest: expectedUrlRequest)
+        #expect(response.model == expectedResponseModel)
+        #expect(sut.resultUrlRequest == expectedUrlRequest)
 	}
 }

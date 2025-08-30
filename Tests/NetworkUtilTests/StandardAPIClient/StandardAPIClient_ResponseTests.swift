@@ -1,16 +1,8 @@
 import XCTest
+
 @testable import NetworkUtil
 
 final class StandardAPIClient_ResponseTests: XCTestCase {
-	let baseRequest = StandardRequest()
-	let baseConfiguration = RequestConfiguration()
-
-	var sut: StandardAPIClient!
-
-	override func tearDown () {
-		sut = nil
-	}
-
 	func test_expectedResponseData () async throws {
 		// MARK: Arrange
 		let expectedObject = "test"
@@ -18,13 +10,13 @@ final class StandardAPIClient_ResponseTests: XCTestCase {
 
 		let sending: AnySending = { _, _ in (expectedData, .init()) }
 
-		sut = .init(
-			configuration: baseConfiguration,
+		let sut = StandardAPIClient(
+            configuration: .init(),
 			delegate: .standard(sending: sending)
 		)
 
 		// MARK: Act
-		let standardResponse = try await sut.send(baseRequest)
+        let standardResponse = try await sut.send(.get())
 
 		// MARK: Assert
 		XCTAssertEqual(standardResponse.data, expectedData)
@@ -39,13 +31,13 @@ final class StandardAPIClient_ResponseTests: XCTestCase {
 			(expectedData, .init())
 		}
 
-		sut = .init(
-			configuration: baseConfiguration,
+        let sut = StandardAPIClient(
+			configuration: .init(),
 			delegate: .standard(sending: sending)
 		)
 
 		// MARK: Act
-		let standardResponse = try await sut.send(baseRequest, responseModel: String.self)
+		let standardResponse = try await sut.send(.get(), responseModel: String.self)
 
 		// MARK: Assert
 		XCTAssertEqual(standardResponse.model, expectedObject)
@@ -59,13 +51,13 @@ final class StandardAPIClient_ResponseTests: XCTestCase {
 			(expectedData, .init())
 		}
 
-		sut = .init(
-			configuration: baseConfiguration,
+        let sut = StandardAPIClient(
+			configuration: .init(),
 			delegate: .standard(sending: sending)
 		)
 
 		// MARK: Act
-		let standardResponse = try await sut.send(baseRequest)
+		let standardResponse = try await sut.send(.get())
 
 		// MARK: Assert
 		XCTAssertEqual(standardResponse.model, expectedData)

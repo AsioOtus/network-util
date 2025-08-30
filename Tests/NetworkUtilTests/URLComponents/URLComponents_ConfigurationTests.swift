@@ -472,5 +472,8 @@ struct URLComponents_ConfigurationTests {
 
         sut = sut.fragment("fragment3")
         #expect(sut.fragment == "fragment3")
+
+        sut = sut.fragment("")
+        #expect(sut.fragment == "")
     }
 }

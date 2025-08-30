@@ -1,15 +1,16 @@
-import XCTest
+import Foundation
+import Testing
 
 @testable import NetworkUtil
 
-final class StandardAPIClient_SendingTests: XCTestCase {
-	func test_sendingMerging () async throws {
+@Suite("StandardAPIClient – sending")
+struct StandardAPIClient_SendingTests {
+    @Test
+	func sendingMerging () async throws {
 		// MARK: Arrange
 		let expectedObject = "test"
 		let expectedData = try JSONEncoder().encode(expectedObject)
 
-		var expectedUrlRequest = URLRequest(url: URLComponents().url!)
-		expectedUrlRequest.httpBody = expectedData
 		let overridingExpectedUrlRequest = URLRequest(url: .init(string: "expected.com")!)
 		var resultUrlRequests = [URLRequest]()
 		var sendingCalls = [String]()
@@ -37,8 +38,11 @@ final class StandardAPIClient_SendingTests: XCTestCase {
 		)
 
 		// MARK: Assert
-		XCTAssertEqual(standardResponse.data, expectedData)
-		XCTAssertEqual(resultUrlRequests, [expectedUrlRequest, overridingExpectedUrlRequest])
-		XCTAssertEqual(sendingCalls, ["AnySending", "Sending"])
+        var expectedUrlRequest = URLRequest(url: URLComponents().url!)
+        expectedUrlRequest.httpBody = expectedData
+
+        #expect(standardResponse.data == expectedData)
+        #expect(resultUrlRequests == [expectedUrlRequest, overridingExpectedUrlRequest])
+        #expect(sendingCalls == ["AnySending", "Sending"])
 	}
 }

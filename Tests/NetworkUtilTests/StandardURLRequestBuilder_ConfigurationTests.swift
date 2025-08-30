@@ -3,8 +3,58 @@ import Testing
 
 @testable import NetworkUtil
 
+@Suite("StandardURLRequestBuilder")
 struct StandardURLRequestBuilder_ConfigurationTests {
-    @Test 
+    @Test
+    func address () throws {
+        // MARK: Arrange
+        let sut = StandardURLRequestBuilder()
+
+        // MARK: Act
+        let resultUrlRequest = try sut.build(
+            configuration: .empty.address("site.com"),
+            body: nil
+        )
+
+        // MARK: Assert
+        let expectedUrlRequest = URLRequest(url: .init(string: "site.com")!)
+
+        #expect(resultUrlRequest == expectedUrlRequest)
+    }
+
+    @Test
+    func addressAndUrlComponents () throws {
+        // MARK: Arrange
+        let sut = StandardURLRequestBuilder()
+
+        do {
+            // MARK: Act
+            let resultUrlRequest = try sut.build(
+                configuration: .empty.address("site.com").host("another.net"),
+                body: nil
+            )
+
+            // MARK: Assert
+            let expectedUrlRequest = URLRequest(url: .init(string: "site.com")!)
+
+            #expect(resultUrlRequest == expectedUrlRequest)
+        }
+
+        do {
+            // MARK: Act
+            let resultUrlRequest = try sut.build(
+                configuration: .empty.host("another.net").address("site.com"),
+                body: nil
+            )
+
+            // MARK: Assert
+            let expectedUrlRequest = URLRequest(url: .init(string: "site.com")!)
+
+            #expect(resultUrlRequest == expectedUrlRequest)
+        }
+    }
+
+    @Test
 	func host () throws {
 		// MARK: Arrange
         let sut = StandardURLRequestBuilder()
