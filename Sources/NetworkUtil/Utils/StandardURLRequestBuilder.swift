@@ -27,7 +27,7 @@ extension StandardURLRequestBuilder: URLRequestBuilder {
         return urlRequest
     }
 
-    func buildUrl (_ configuration: RequestConfiguration) throws -> URL {
+    private func buildUrl (_ configuration: RequestConfiguration) throws -> URL {
         if let address = configuration.address {
             guard let url = URL(string: address) else { throw URLCreationError.addressFailure(address) }
             return url

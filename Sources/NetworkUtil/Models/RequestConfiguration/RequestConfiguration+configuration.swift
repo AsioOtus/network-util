@@ -1,10 +1,11 @@
 import Foundation
 
 public extension RequestConfiguration {
-    func method (_ method: Method) -> Self {
+    func method (_ method: Method?) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -15,6 +16,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -40,6 +42,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -50,6 +53,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: [key: value],
             timeout: timeout,
             info: info
@@ -60,6 +64,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: self.headers.merging(headers) { $1 },
             timeout: timeout,
             info: info
@@ -70,6 +75,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: self.headers.merging([key: value]) { $1 },
             timeout: timeout,
             info: info
@@ -80,6 +86,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -90,6 +97,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: [key: value]
@@ -100,6 +108,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: self.info.merging(info) { $1 }
@@ -110,16 +119,18 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: self.info.merging([key: value]) { $1 }
         )
     }
 
-    func timeout (_ timeout: Double) -> Self {
+    func timeout (_ timeout: Double?) -> Self {
         .init(
             method: method,
             urlComponents: urlComponents,
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -132,6 +143,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.scheme(scheme),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -142,6 +154,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.user(user),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -152,6 +165,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.password(password),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -162,6 +176,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.setHost(host),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -172,6 +187,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.host(host, raw: raw),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -182,6 +198,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.port(port),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -192,6 +209,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.setPath(path, raw: raw),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -202,6 +220,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.path(path, raw: raw),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -212,6 +231,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.setQueryItems(queryItems),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -222,6 +242,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.setQueryItem(queryItem),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -232,6 +253,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.queryItems(queryItems),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -242,6 +264,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.queryItem(queryItem),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info
@@ -252,6 +275,7 @@ public extension RequestConfiguration {
         .init(
             method: method,
             urlComponents: urlComponents.fragment(fragment),
+            address: address,
             headers: headers,
             timeout: timeout,
             info: info

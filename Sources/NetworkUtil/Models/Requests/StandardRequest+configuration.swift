@@ -53,7 +53,7 @@ public extension StandardRequest {
 }
 
 public extension StandardRequest {
-    func method (_ method: RequestConfiguration.Method) -> Self {
+    func method (_ method: RequestConfiguration.Method?) -> Self {
         .init(
             name: name,
             body: body,
@@ -159,7 +159,7 @@ public extension StandardRequest {
         )
     }
 
-    func timeout (_ timeout: Double) -> Self {
+    func timeout (_ timeout: Double?) -> Self {
         .init(
             name: name,
             body: body,
