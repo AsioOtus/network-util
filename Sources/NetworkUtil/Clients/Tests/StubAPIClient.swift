@@ -16,7 +16,7 @@ public final class StubAPIClient: APIClient {
     public var responses: [String: any Response] = [:]
 
     public init (
-        configuration: RequestConfiguration = .empty,
+        configuration: RequestConfiguration = .init(),
         delegate: APIClientDelegate = .standard()
     ) {
         self.configuration = configuration

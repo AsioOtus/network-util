@@ -17,7 +17,7 @@ public struct StandardAPIClient: APIClient {
     }
 
 	public init (
-		configuration: RequestConfiguration = .empty,
+		configuration: RequestConfiguration = .init(),
 		delegate: APIClientDelegate = .standard()
 	) {
 		self.configuration = configuration
@@ -437,7 +437,7 @@ private extension StandardAPIClient {
 
 public extension APIClient where Self == StandardAPIClient {
 	static func standard (
-        configuration: RequestConfiguration = .empty,
+        configuration: RequestConfiguration = .init(),
 		delegate: APIClientDelegate = .standard()
 	) -> Self {
 		.init(

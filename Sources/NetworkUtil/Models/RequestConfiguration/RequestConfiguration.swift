@@ -29,10 +29,6 @@ public struct RequestConfiguration: Hashable {
 }
 
 public extension RequestConfiguration {
-	static let empty = Self()
-}
-
-public extension RequestConfiguration {
 	func merge (with another: Self) -> Self {
 		.init(
 			method: self.method ?? another.method,

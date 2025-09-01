@@ -53,7 +53,6 @@ let client = StandardAPIClient()
 struct UserRequest: Request {
     var configuration: RequestConfiguration {
         .init()
-        .empty
         .path("user")
     }
 }
@@ -95,7 +94,6 @@ let authorizedClient = AuthenticatedAPIClientDecorator(apiClient: client)
 struct UserRequest: Request {
     var configuration: RequestConfiguration {
         .init()
-        .empty
         .path("user")
     }
 }

@@ -10,7 +10,7 @@ public final class MockAPIClient <SRQ: Request, SRSM: Decodable>: APIClient {
         apiClient.completionLogPublisher
     }
 
-	public let configuration: RequestConfiguration = .empty
+	public let configuration: RequestConfiguration = .init()
 	public var delegate: APIClientDelegate = .standard()
 
 	public let apiClient: APIClient
