@@ -2,6 +2,7 @@ import Testing
 
 @testable import NetworkUtil
 
+@Suite("StandardAPIClient – initialization")
 struct StandardAPIClient_InitTests {
     @Test
 	func minimalInit () {

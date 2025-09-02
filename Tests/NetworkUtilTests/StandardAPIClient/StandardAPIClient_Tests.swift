@@ -3,6 +3,7 @@ import Testing
 
 @testable import NetworkUtil
 
+@Suite("StandardAPIClient")
 struct StandardAPIClient_Tests {
     @Test
 	func urlRequestCreation () async throws {

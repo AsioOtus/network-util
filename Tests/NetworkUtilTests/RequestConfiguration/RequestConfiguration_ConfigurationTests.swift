@@ -122,6 +122,9 @@ struct RequestConfiguration_ConfigurationTests {
         sut = sut.headers(["key1": "value1"])
         #expect(sut == .init(headers: ["key1": "value1"]))
 
+        sut = sut.headers(["key1": "value1"])
+        #expect(sut == .init(headers: ["key1": "value1"]))
+
         sut = sut.headers([
             "key2": "value2",
             "key3": "value3",
@@ -164,6 +167,9 @@ struct RequestConfiguration_ConfigurationTests {
         sut = sut.header(key: "key1", value: "value1")
         #expect(sut == .init(headers: ["key1": "value1"]))
 
+        sut = sut.header(key: "key1", value: "value1")
+        #expect(sut == .init(headers: ["key1": "value1"]))
+
         sut = sut.header(key: "key2", value: "value2")
         #expect(
             sut == .init(headers: [
@@ -187,6 +193,9 @@ struct RequestConfiguration_ConfigurationTests {
         var sut = RequestConfiguration()
 
         #expect(sut.info == [:])
+
+        sut = sut.setInfo(["key1": "value1"])
+        #expect(sut == .init(info: ["key1": "value1"]))
 
         sut = sut.setInfo(["key1": "value1"])
         #expect(sut == .init(info: ["key1": "value1"]))
@@ -218,6 +227,9 @@ struct RequestConfiguration_ConfigurationTests {
         sut = sut.setInfo(key: "key1", value: "value1")
         #expect(sut == .init(info: ["key1": "value1"]))
 
+        sut = sut.setInfo(key: "key1", value: "value1")
+        #expect(sut == .init(info: ["key1": "value1"]))
+
         sut = sut.setInfo(key: "key2", value: "value2")
         #expect(sut == .init(info: ["key2": "value2"]))
 
@@ -230,6 +242,9 @@ struct RequestConfiguration_ConfigurationTests {
         var sut = RequestConfiguration()
 
         #expect(sut.info == [:])
+
+        sut = sut.info(["key1": "value1"])
+        #expect(sut == .init(info: ["key1": "value1"]))
 
         sut = sut.info(["key1": "value1"])
         #expect(sut == .init(info: ["key1": "value1"]))
@@ -272,6 +287,9 @@ struct RequestConfiguration_ConfigurationTests {
         var sut = RequestConfiguration()
 
         #expect(sut.info == [:])
+
+        sut = sut.info(key: "key1", value: "value1")
+        #expect(sut == .init(info: ["key1": "value1"]))
 
         sut = sut.info(key: "key1", value: "value1")
         #expect(sut == .init(info: ["key1": "value1"]))
