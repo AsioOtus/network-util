@@ -1,4 +1,5 @@
 import Foundation
+import NetworkUtilTestSupport
 import Testing
 
 @testable import NetworkUtil

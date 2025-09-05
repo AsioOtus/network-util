@@ -13,18 +13,29 @@ let package = Package(
 			name: "NetworkUtil",
 			targets: ["NetworkUtil"]
 		),
+        .library(
+            name: "NetworkUtilTestSupport",
+            targets: ["NetworkUtilTestSupport"]
+        ),
 	],
 	targets: [
 		.target(
 			name: "NetworkUtil"
 		),
+        .target(
+            name: "NetworkUtilTestSupport",
+            dependencies: ["NetworkUtil"]
+        ),
 		.executableTarget(
 			name: "Testground",
 			dependencies: ["NetworkUtil"]
 		),
 		.testTarget(
 			name: "NetworkUtilTests",
-			dependencies: ["NetworkUtil"]
+			dependencies: [
+                "NetworkUtil",
+                "NetworkUtilTestSupport"
+            ]
 		),
 	]
 )

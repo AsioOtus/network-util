@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import NetworkUtil
 
 public final class MockAPIClient <SRQ: Request, SRSM: Decodable>: APIClient {
 	public var logPublisher: AnyPublisher<LogRecord, Never> {

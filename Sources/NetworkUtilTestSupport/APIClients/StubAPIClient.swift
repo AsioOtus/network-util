@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import NetworkUtil
 
 public enum StubAPIClientError: Error {
     case stubNotFound
