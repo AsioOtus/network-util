@@ -42,11 +42,61 @@ public struct StandardAPIClient: APIClient {
 }
 
 public extension StandardAPIClient {
+    func send <RQ: Request, RS: Response> (
+        _ request: RQ,
+        response: RS.Type,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update? = nil
+    ) async throws -> RS {
+        try await send(
+            request: request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate,
+            communicationMethod: .data
+        )
+    }
+
+    func upload <RQ: Request, RS: Response> (
+        _ request: RQ,
+        data: Data,
+        response: RS.Type,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update? = nil
+    ) async throws -> RS {
+        try await send(
+            request: request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate,
+            communicationMethod: .uploadData(data)
+        )
+    }
+
+    func upload <RQ: Request, RS: Response> (
+        _ request: RQ,
+        file: URL,
+        response: RS.Type,
+        delegate: some APIClientSendingDelegate<RQ, RS.Model>,
+        configurationUpdate: RequestConfiguration.Update? = nil
+    ) async throws -> RS {
+        try await send(
+            request: request,
+            response: response,
+            delegate: delegate,
+            configurationUpdate: configurationUpdate,
+            communicationMethod: .uploadFromFile(file)
+        )
+    }
+}
+
+private extension StandardAPIClient {
 	func send <RQ: Request, RS: Response> (
-		_ request: RQ,
+		request: RQ,
 		response: RS.Type,
 		delegate: some APIClientSendingDelegate<RQ, RS.Model>,
-		configurationUpdate: RequestConfiguration.Update? = nil
+		configurationUpdate: RequestConfiguration.Update? = nil,
+        communicationMethod: CommunicationMethod
 	) async throws -> RS {
         let requestId = delegate.id?() ?? .init()
 
@@ -92,7 +142,8 @@ public extension StandardAPIClient {
                 request,
                 configuration,
                 delegate.urlSessionTaskDelegate,
-                delegate.sending
+                delegate.sending,
+                communicationMethod
             )
 
             responseBuffer = (data, urlResponse)
@@ -238,7 +289,8 @@ private extension StandardAPIClient {
 		_ request: RQ,
 		_ configuration: RequestConfiguration,
 		_ urlSessionTaskDelegate: URLSessionTaskDelegate?,
-		_ sending: Sending<RQ>?
+		_ sending: Sending<RQ>?,
+        _ communicationMethod: CommunicationMethod
 	) async throws -> (Data, URLResponse) {
 		let urlSessionTaskDelegate = urlSessionTaskDelegate ?? request.delegate.urlSessionTaskDelegate
 
@@ -267,29 +319,86 @@ private extension StandardAPIClient {
 				try await self.send(
 					urlSession,
 					urlRequest,
-					urlSessionTaskDelegate
+					urlSessionTaskDelegate,
+                    communicationMethod
 				)
 			}
 		}
 	}
 
-	func send (
+    func send (
+        _ urlSession: URLSession,
+        _ urlRequest: URLRequest,
+        _ urlSessionTaskDelegate: URLSessionTaskDelegate?,
+        _ communicationMethod: CommunicationMethod
+    ) async throws -> (Data, URLResponse) {
+        do {
+            return switch communicationMethod {
+            case .data:
+                try await self.data(
+                    urlSession,
+                    urlRequest,
+                    urlSessionTaskDelegate
+                )
+
+            case .uploadData(let data):
+                try await self.upload(
+                    urlSession,
+                    urlRequest,
+                    data,
+                    urlSessionTaskDelegate
+                )
+
+            case .uploadFromFile(let url):
+                try await self.upload(
+                    urlSession,
+                    urlRequest,
+                    url,
+                    urlSessionTaskDelegate
+                )
+            }
+        } catch let urlError as URLError {
+            throw APIClientError.Category.network(.init(urlSession, urlRequest, urlError))
+        }
+    }
+
+	func data (
 		_ urlSession: URLSession,
 		_ urlRequest: URLRequest,
 		_ urlSessionTaskDelegate: URLSessionTaskDelegate?
 	) async throws -> (Data, URLResponse) {
-		do {
-			let (data, urlResponse) = if #available(iOS 15.0, *) {
-				try await urlSession.data(for: urlRequest, delegate: urlSessionTaskDelegate)
-			} else {
-				try await urlSession.data(for: urlRequest)
-			}
-
-			return (data, urlResponse)
-		} catch let urlError as URLError {
-            throw APIClientError.Category.network(.init(urlSession, urlRequest, urlError))
-		}
+        if #available(iOS 15.0, *) {
+            try await urlSession.data(for: urlRequest, delegate: urlSessionTaskDelegate)
+        } else {
+            try await urlSession.data(for: urlRequest)
+        }
 	}
+
+    func upload (
+        _ urlSession: URLSession,
+        _ urlRequest: URLRequest,
+        _ data: Data,
+        _ urlSessionTaskDelegate: URLSessionTaskDelegate?
+    ) async throws -> (Data, URLResponse) {
+        if #available(iOS 15.0, *) {
+            try await urlSession.upload(for: urlRequest, from: data, delegate: urlSessionTaskDelegate)
+        } else {
+            try await urlSession.upload(for: urlRequest, from: data)
+        }
+    }
+
+    func upload (
+        _ urlSession: URLSession,
+        _ urlRequest: URLRequest,
+        _ fileUrl: URL,
+        _ urlSessionTaskDelegate: URLSessionTaskDelegate?
+    ) async throws -> (Data, URLResponse) {
+        if #available(iOS 15.0, *) {
+            try await urlSession.upload(for: urlRequest, fromFile: fileUrl, delegate: urlSessionTaskDelegate)
+        } else {
+            try await urlSession.upload(for: urlRequest, fromFile: fileUrl)
+        }
+    }
 
 	func createResponse <RS: Response> (
 		_ data: Data,
